@@ -119,6 +119,11 @@ tr.has{background:#fff}
 .wcqty{display:flex;gap:8px;margin-top:8px}
 .wcqty .qty{flex:1;min-width:0;font-size:16px;padding:9px 8px}
 .wcqty .addb{flex:0 0 auto;padding:9px 16px;font-size:13px;font-weight:700;border:0;border-radius:8px;background:var(--ink);color:#fff;cursor:pointer}
+.wcvars{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.wcvars select.pk{max-width:none;border-radius:8px;padding:6px 9px;font-size:11.5px;font-weight:600}
+.vbadge{border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:11px;color:var(--ink2);background:#faf9f5}
+.wcgrouphdr{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink2);font-weight:700;margin:16px 0 2px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.wcards>.wcgrouphdr:first-child{margin-top:0}
 /* basket rows — stack into cards on phones so qty/discount are never off-screen */
 @media(max-width:640px){
  #bkbody table.bt thead{display:none}
@@ -946,27 +951,23 @@ function fanSel(r,ri){
 function renderFan(){
  const rs=fanRows();
  document.getElementById('pairInfo').innerHTML=`<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span>`;
- const anySweep=rs.some(r=>r.sweeps.length>1);
- const anyFin=rs.some(r=>new Set(r.o.map(o=>o.f).filter(Boolean)).size>1);
- let h='<table><thead><tr><th style="width:30%">Item</th>'+
-   (anySweep?'<th>Sweep</th>':'')+(anyFin?'<th>Finish</th>':'')+
-   '<th class="r">Rate</th><th class="r">Qty</th><th></th></tr></thead><tbody>';
- h+=rs.map((r,ri)=>{
+ let h='<div class="wcards">'+rs.map((r,ri)=>{
   const sel=fanSel(r,ri),sw=sel.sw,o=sel.o,inSw=sel.inSw,inb=Q[o.c];
-  let swCell='';
-  if(anySweep){ if(r.sweeps.length>1)
-     swCell=`<td><select class="pk" onchange="setFan(${ri},'sw',this.value)">${r.sweeps.map(v=>`<option value="${esc(v)}"${sw===v?' selected':''}>${esc(v)}</option>`).join('')}</select></td>`;
-   else swCell=`<td class="cd">${esc(r.sweeps[0]||'\u2014')}</td>`; }
-  let finCell='';
-  if(anyFin){ const fins=[...new Set(inSw.map(x=>x.f).filter(Boolean))];
-   if(fins.length>1)
-     finCell=`<td><select class="pk" onchange="setFan(${ri},'f',this.value)">${fins.map(v=>`<option value="${esc(v)}"${o.f===v?' selected':''}>${esc(v)}</option>`).join('')}</select></td>`;
-   else finCell=`<td class="cd">${fins[0]?esc(fins[0]):'\u2014'}</td>`; }
-  return `<tr><td class="it">${esc(r.n)}<div class="cd">${esc(o.c)}</div></td>${swCell}${finCell}
-   <td class="r">${inr(o.p)}</td>
-   <td class="r"><input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/></td>
-   <td class="r"><button class="addb" onclick="addFanLine(${ri})">${inb?'Update':'Add'}</button></td></tr>`}).join('');
- h+='</tbody></table>';
+  let swPart='';
+  if(r.sweeps.length>1)swPart=`<select class="pk" onchange="setFan(${ri},'sw',this.value)">${r.sweeps.map(v=>`<option value="${esc(v)}"${sw===v?' selected':''}>${esc(v)}</option>`).join('')}</select>`;
+  else if(r.sweeps[0])swPart=`<span class="vbadge">${esc(r.sweeps[0])}</span>`;
+  const fins=[...new Set(inSw.map(x=>x.f).filter(Boolean))];
+  let finPart='';
+  if(fins.length>1)finPart=`<select class="pk" onchange="setFan(${ri},'f',this.value)">${fins.map(v=>`<option value="${esc(v)}"${o.f===v?' selected':''}>${esc(v)}</option>`).join('')}</select>`;
+  else if(fins[0])finPart=`<span class="vbadge">${esc(fins[0])}</span>`;
+  return `<div class="wcard${inb?' has':''}">
+   <div class="wctop"><div class="wcname">${esc(r.n)}</div><div class="wccode">${esc(o.c)}</div></div>
+   ${(swPart||finPart)?`<div class="wcvars">${swPart}${finPart}</div>`:''}
+   <div class="wcrates"><span>Rate <b>${inr(o.p)}</b></span></div>
+   <div class="wcqty">
+    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <button class="addb" onclick="addFanLine(${ri})">${inb?'Update':'Add'}</button>
+   </div></div>`}).join('')+'</div>';
  document.getElementById('list').innerHTML=h+addAllBar();
  document.getElementById('flag').innerHTML='';}
 function setFan(ri,fld,val){
@@ -1007,20 +1008,20 @@ function renderSG(){
  const rs=sgRows(),defs=sgDefs();
  document.getElementById('pairInfo').innerHTML=`<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span>`;
  const live=defs.filter(([k])=>rs.some(r=>new Set(r.o.map(o=>o[k]).filter(Boolean)).size>1));
- let h='<table><thead><tr><th style="width:26%">Item</th>'+
-   live.map(([k,l])=>`<th>${esc(l)}</th>`).join('')+
-   '<th class="r">Rate</th><th class="r">Qty</th><th></th></tr></thead><tbody>';
- h+=rs.map((r,ri)=>{
+ let h='<div class="wcards">'+rs.map((r,ri)=>{
   const sel=sgSel(r,ri),inb=Q[sgKey(r,sel)];
-  const cells=live.map(([k,l])=>{
+  const vars=live.map(([k,l])=>{
    const vals=[...new Set(r.o.map(o=>o[k]).filter(Boolean))];
-   if(vals.length>1)return `<td><select class="pk" onchange="setSG(${ri},'${k}',this.value)">${vals.map(v=>`<option value="${esc(v)}"${sel[k]===v?' selected':''}>${esc(v)}</option>`).join('')}</select></td>`;
-   return `<td class="cd">${vals[0]?esc(vals[0]):'\u2014'}</td>`;}).join('');
-  return `<tr><td class="it">${esc(r.n)}<div class="cd">${esc(sel.c)}</div></td>${cells}
-   <td class="r">${inr(sel.p)}</td>
-   <td class="r"><input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/></td>
-   <td class="r"><button class="addb" onclick="addSGLine(${ri})">${inb?'Update':'Add'}</button></td></tr>`}).join('');
- h+='</tbody></table>'+addAllBar();
+   if(vals.length>1)return `<select class="pk" onchange="setSG(${ri},'${k}',this.value)">${vals.map(v=>`<option value="${esc(v)}"${sel[k]===v?' selected':''}>${esc(v)}</option>`).join('')}</select>`;
+   return vals[0]?`<span class="vbadge">${esc(vals[0])}</span>`:'';}).join('');
+  return `<div class="wcard${inb?' has':''}">
+   <div class="wctop"><div class="wcname">${esc(r.n)}</div><div class="wccode">${esc(sel.c)}</div></div>
+   ${vars?`<div class="wcvars">${vars}</div>`:''}
+   <div class="wcrates"><span>Rate <b>${inr(sel.p)}</b></span></div>
+   <div class="wcqty">
+    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <button class="addb" onclick="addSGLine(${ri})">${inb?'Update':'Add'}</button>
+   </div></div>`}).join('')+'</div>'+addAllBar();
  document.getElementById('list').innerHTML=h;
  let f='';
  if(A==='MCB')f='6\u201332A share one part number in the price list \u2014 the rating is shown per row for clarity.';
@@ -1047,15 +1048,15 @@ function miRows(){return D.MI[A][B];}
 function renderMI(){
  const rs=miRows();
  document.getElementById('pairInfo').innerHTML=`<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span> <span class="chip" style="background:#8d6e2f">cost + premium</span>`;
- let h='<table><thead><tr><th style="width:44%">Item</th><th>Unit</th><th class="r">Purchase cost</th><th class="r">Qty</th><th></th></tr></thead><tbody>';
- h+=rs.map((r,ri)=>{
+ let h='<div class="wcards">'+rs.map((r,ri)=>{
   const inb=Q[miKey(r)];
-  return `<tr><td class="it">${esc(r.n)}</td>
-   <td class="cd">${esc(r.u||'')}</td>
-   <td class="r">${inr(r.c)}</td>
-   <td class="r"><input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/></td>
-   <td class="r"><button class="addb" onclick="addMILine(${ri})">${inb?'Update':'Add'}</button></td></tr>`}).join('');
- h+='</tbody></table>'+addAllBar();
+  return `<div class="wcard${inb?' has':''}">
+   <div class="wctop"><div class="wcname">${esc(r.n)}</div>${r.u?`<div class="wccode">${esc(r.u)}</div>`:''}</div>
+   <div class="wcrates"><span>Purchase cost <b>${inr(r.c)}</b></span></div>
+   <div class="wcqty">
+    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <button class="addb" onclick="addMILine(${ri})">${inb?'Update':'Add'}</button>
+   </div></div>`}).join('')+'</div>'+addAllBar();
  document.getElementById('list').innerHTML=h;
  document.getElementById('flag').innerHTML='<div class="flag">These items have no Havells list price, so they\u2019re quoted on <b>purchase cost</b>. Set a <b>premium %</b> per group in the Basket to mark them up; GST 18% then applies on top.</div>';}
 function miKey(r){return 'MI::'+r.n;}
@@ -1097,20 +1098,21 @@ function renderPL(){
  const rs=plRows();
  document.getElementById('pairInfo').innerHTML=`<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span>`;
  const allax=PLAX.filter(([k])=>rs.some(r=>new Set(r.o.map(o=>o[k]).filter(x=>x!=null&&x!=='')).size>1));
- let h='<table><thead><tr><th style="width:32%">Item</th>'+
-   allax.map(([k,l])=>`<th>${esc(l)}</th>`).join('')+
-   '<th class="r">List price</th><th class="r">Qty</th><th></th></tr></thead><tbody>';
- h+=rs.map((r,ri)=>{const sel=plCur(r,ri),inb=Q[sel.c];
-  const cells=allax.map(([k,l])=>{
+ let h='<div class="wcards">'+rs.map((r,ri)=>{const sel=plCur(r,ri),inb=Q[sel.c];
+  const vars=allax.map(([k,l])=>{
    const vals=[...new Set(r.o.map(o=>o[k]).filter(x=>x!=null&&x!==''))];
    if(vals.length>1){const sv=vals.slice().sort((a,b)=>(k==='w')?a-b:String(a).localeCompare(b));
-    return `<td><select class="pk" onchange="setPL(${ri},'${k}',this.value)">${sv.map(v=>`<option value="${esc(v)}"${String(sel[k])===String(v)?' selected':''}>${esc(plFmt(k,v))}</option>`).join('')}</select></td>`;}
-   return `<td class="cd">${vals[0]!=null?esc(plFmt(k,vals[0])):'\u2014'}</td>`;}).join('');
-  return `<tr><td class="it">${esc(r.n)}<div class="cd">${esc(sel.c)}</div><div class="plmrp">MRP <b>${inr(sel.mrp)}</b></div></td>${cells}
-   <td class="r">${inr(sel.lp)}</td>
-   <td class="r"><input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/></td>
-   <td class="r"><button class="addb" onclick="addPLLine(${ri})">${inb?'Update':'Add'}</button></td></tr>`}).join('');
- h+='</tbody></table>';
+    return `<select class="pk" onchange="setPL(${ri},'${k}',this.value)">${sv.map(v=>`<option value="${esc(v)}"${String(sel[k])===String(v)?' selected':''}>${esc(plFmt(k,v))}</option>`).join('')}</select>`;}
+   return vals[0]!=null?`<span class="vbadge">${esc(plFmt(k,vals[0]))}</span>`:'';}).join('');
+  return `<div class="wcard${inb?' has':''}">
+   <div class="wctop"><div class="wcname">${esc(r.n)}</div><div class="wccode">${esc(sel.c)}</div></div>
+   <div class="plmrp">MRP <b>${inr(sel.mrp)}</b></div>
+   ${vars?`<div class="wcvars">${vars}</div>`:''}
+   <div class="wcrates"><span>List price <b>${inr(sel.lp)}</b></span></div>
+   <div class="wcqty">
+    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <button class="addb" onclick="addPLLine(${ri})">${inb?'Update':'Add'}</button>
+   </div></div>`}).join('')+'</div>';
  document.getElementById('list').innerHTML=h+addAllBar();
  document.getElementById('flag').innerHTML='';}
 function addPLLine(ri){const r=plRows()[ri],o=plCur(r,ri);
@@ -1273,18 +1275,20 @@ function render(){
    const pair=(canPair&&INNER)?D.SW[A].plates[inner]:null;
    if(canPair)h+='<div class="inn"><button class="ib'+(INNER?' on':'')+'" onclick="setInner(1)">Plate + Inner</button>'+
      '<button class="ib'+(!INNER?' on':'')+'" onclick="setInner(0)">Plate only</button></div>';
-   h+='<table><thead><tr><th>Code</th><th>Item</th><th class="r">'+(pair?'Rate (plate + inner)':'Rate')+'</th>'+(pair?'<th class="r">Inner</th>':'')+'<th class="r">Qty</th><th></th></tr></thead><tbody>'+
-    rows.map(i=>{const e=Q[i.c],q=e?e.q:0;
+   h+='<div class="wcards">'+rows.map(i=>{const e=Q[i.c],q=e?e.q:0;
      const ip=pair?pair.find(y=>y.s===i.s):null;
      const eff=i.p+(ip?ip.p:0);
-     return `<tr class="${q?'has':''}"><td class="cd">${esc(i.c)}</td><td>${esc(i.s)} plate</td>
-     <td class="r">${pair?`<b>${inr(eff)}</b><div class="cd">${inr(i.p)} plate</div>`:inr(i.p)}</td>${pair?`<td class="r cd">${ip?'+ '+inr(ip.p):'\u2014'}</td>`:''}
-     <td class="r"><input class="qty swq" type="number" min="0" value="${q||''}" placeholder="0"
-      data-c="${esc(i.c)}" data-p="${i.p}" data-n="${esc(i.s+' plate \u00b7 '+B)}"
-      ${ip?`data-ic="${esc(ip.c)}" data-ip="${ip.p}" data-in="${esc(i.s+' '+inner)}"`:''}/></td>
-     <td class="r"><button class="addb" onclick="addSW(this)"
-      data-c="${esc(i.c)}" data-p="${i.p}" data-n="${esc(i.s+' plate \u00b7 '+B)}"
-      ${ip?`data-ic="${esc(ip.c)}" data-ip="${ip.p}" data-in="${esc(i.s+' '+inner)}"`:''}>${q?'Update':'Add'}</button></td></tr>`}).join('')+'</tbody></table>'+addAllBar();
+     const nm=esc(i.s+' plate \u00b7 '+B);
+     const dat=`data-c="${esc(i.c)}" data-p="${i.p}" data-n="${nm}"`+(ip?` data-ic="${esc(ip.c)}" data-ip="${ip.p}" data-in="${esc(i.s+' '+inner)}"`:'');
+     return `<div class="wcard${q?' has':''}">
+      <div class="wctop"><div class="wcname">${esc(i.s)} plate</div><div class="wccode">${esc(i.c)}</div></div>
+      <div class="wcrates">${pair?
+        `<span>Rate <b>${inr(eff)}</b> (plate+inner)</span><span>Plate only <b>${inr(i.p)}</b></span><span>Inner <b>${ip?'+'+inr(ip.p):'\u2014'}</b></span>`
+        :`<span>Rate <b>${inr(i.p)}</b></span>`}</div>
+      <div class="wcqty">
+       <input class="qty swq" type="number" min="0" value="${q||''}" placeholder="Qty" ${dat}/>
+       <button class="addb" onclick="addSW(this)" ${dat}>${q?'Update':'Add'}</button>
+      </div></div>`}).join('')+'</div>'+addAllBar();
    if(pair)f='<b>Plate + Inner</b>: the rate shown is outer plus matching '+inner+'; both go to the basket as separate lines. Switch to <b>Plate only</b> to quote outers alone at the plate rate.';
    if(exempt)f=B+' is a single-piece plate \u2014 no inner required.';
   }else{
@@ -1294,17 +1298,22 @@ function render(){
    rows.forEach(it=>{const g=accGroup(it.n);(gmap[g]=gmap[g]||[]).push(it);});
    const gorder=['Regulators','Sockets','Bell Push','DP / Heavy Duty','Two-way Switches','One-way Switches','Other Switches','USB / Charger','Indicators & Lamps','Plates & Covers','Other'];
    const gkeys=gorder.filter(g=>gmap[g]);
-   let body='';
+   let body='<div class="wcards">';
    gkeys.forEach(g=>{
     const items=gmap[g].sort((a,b)=>a.p-b.p);
-    body+=`<tr class="acch"><td colspan="5">${esc(g)}</td></tr>`;
-    body+=items.map(i=>{const e=Q[i.c],q=e?e.q:0;return `<tr class="${q?'has':''}">
-      <td class="cd">${esc(i.c)}</td><td>${esc(i.n)}</td><td class="r">${inr(i.p)}</td>
-      <td class="r"><input class="qty swq" type="number" min="0" value="${q||''}" placeholder="0"
-       data-c="${esc(i.c)}" data-p="${i.p}" data-n="${esc(i.n)}"/></td>
-      <td class="r"><button class="addb" onclick="addSW(this)" data-c="${esc(i.c)}" data-p="${i.p}" data-n="${esc(i.n)}">${q?'Update':'Add'}</button></td></tr>`}).join('');
+    body+=`<div class="wcgrouphdr">${esc(g)}</div>`;
+    body+=items.map(i=>{const e=Q[i.c],q=e?e.q:0;
+     const dat=`data-c="${esc(i.c)}" data-p="${i.p}" data-n="${esc(i.n)}"`;
+     return `<div class="wcard${q?' has':''}">
+      <div class="wctop"><div class="wcname">${esc(i.n)}</div><div class="wccode">${esc(i.c)}</div></div>
+      <div class="wcrates"><span>Rate <b>${inr(i.p)}</b></span></div>
+      <div class="wcqty">
+       <input class="qty swq" type="number" min="0" value="${q||''}" placeholder="Qty" ${dat}/>
+       <button class="addb" onclick="addSW(this)" ${dat}>${q?'Update':'Add'}</button>
+      </div></div>`}).join('');
    });
-   h+='<table><thead><tr><th>Code</th><th>Item</th><th class="r">Rate</th><th class="r">Qty</th><th></th></tr></thead><tbody>'+body+'</tbody></table>'+addAllBar();
+   body+='</div>';
+   h+=body+addAllBar();
   }
  }
  else if(CAT==='LI'){
@@ -1316,19 +1325,23 @@ function render(){
    rows=rows.map(r=>({...r,o:r.o.filter(o=>!o.s||o.s===SHAPE)})).filter(r=>r.o.length);
   }
   document.getElementById('pairInfo').innerHTML=`<span class="chip">${esc(B)}</span> <span class="chip" style="background:${TIER==='Regular'?'#2f5d54':'#8d9195'}">${TIER}</span>`;
-  h+='<table><thead><tr><th style="width:26%">Item</th><th>Watt</th><th>Finish</th><th>Colour temp</th><th class="r">Rate</th><th class="r">Qty</th><th></th></tr></thead><tbody>'+
+  h+='<div class="wcards">'+
    rows.map((r,ri)=>{
     const fs=[...new Set(r.o.map(o=>o.f).filter(Boolean))];
     const ks=[...new Set(r.o.map(o=>o.k).filter(Boolean))];
     const sel=curOpt(r,ri);
-    const fsel=fs.length>1?`<select class="pk" onchange="setVar(${ri},'f',this.value)">${fs.map(x=>`<option${sel.f===x?' selected':''}>${esc(x)}</option>`).join('')}</select>`:(fs[0]?`<span class="cd">${esc(fs[0])}</span>`:'<span class="cd">\u2014</span>');
-    const ksel=ks.length>1?`<select class="pk" onchange="setVar(${ri},'k',this.value)">${ks.map(x=>`<option${sel.k===x?' selected':''}>${esc(x)}</option>`).join('')}</select>`:(ks[0]?`<span class="cd">${esc(ks[0])}</span>`:'<span class="cd">\u2014</span>');
+    const wBadge=r.w?`<span class="vbadge">${r.w}W</span>`:'';
+    const fsel=fs.length>1?`<select class="pk" onchange="setVar(${ri},'f',this.value)">${fs.map(x=>`<option${sel.f===x?' selected':''}>${esc(x)}</option>`).join('')}</select>`:(fs[0]?`<span class="vbadge">${esc(fs[0])}</span>`:'');
+    const ksel=ks.length>1?`<select class="pk" onchange="setVar(${ri},'k',this.value)">${ks.map(x=>`<option${sel.k===x?' selected':''}>${esc(x)}</option>`).join('')}</select>`:(ks[0]?`<span class="vbadge">${esc(ks[0])}</span>`:'');
     const inb=Q[sel.c];
-    return `<tr id="lr_${ri}"><td>${esc(r.n)}<div class="cd ${sel.prov?'pv':''}">${esc(sel.c)}${sel.prov?'<span class="pvb">prov</span>':''}</div></td>
-     <td class="cd">${r.w?r.w+'W':'\u2014'}</td><td>${fsel}</td><td>${ksel}</td>
-     <td class="r">${inr(sel.p)}</td>
-     <td class="r"><input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/></td>
-     <td class="r"><button class="addb" onclick="addLine(${ri})">${inb?'Update':'Add'}</button></td></tr>`}).join('')+'</tbody></table>';
+    return `<div class="wcard${inb?' has':''}" id="lr_${ri}">
+     <div class="wctop"><div class="wcname">${esc(r.n)}</div><div class="wccode${sel.prov?' pv':''}">${esc(sel.c)}${sel.prov?'<span class="pvb">prov</span>':''}</div></div>
+     ${(wBadge||fsel||ksel)?`<div class="wcvars">${wBadge}${fsel}${ksel}</div>`:''}
+     <div class="wcrates"><span>Rate <b>${inr(sel.p)}</b></span></div>
+     <div class="wcqty">
+      <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+      <button class="addb" onclick="addLine(${ri})">${inb?'Update':'Add'}</button>
+     </div></div>`}).join('')+'</div>';
   if(rows.some(r=>r.o.some(o=>o.prov)))f='Lines marked <b>prov</b> are provisional \u2014 the variant was added on your instruction but its code and rate are not in the uploaded price list. Confirm with Havells before ordering.';
  }
  else{
