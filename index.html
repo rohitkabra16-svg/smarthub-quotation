@@ -127,6 +127,24 @@ tr.has{background:#fff}
 .vbadge{border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:11px;color:var(--ink2);background:#faf9f5}
 .wcgrouphdr{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink2);font-weight:700;margin:16px 0 2px;padding-bottom:5px;border-bottom:1px solid var(--line)}
 .wcards>.wcgrouphdr:first-child{margin-top:0}
+/* Paste-list result rows */
+.prm-sec{margin-bottom:12px}
+.prm-shdr{font-size:11px;letter-spacing:.6px;text-transform:uppercase;font-weight:800;color:var(--ink);margin-bottom:6px}
+.prm-row{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;position:relative}
+.prm-row.prm-ask{border-color:#e8dcb5;background:#fdfaf1}
+.prm-row.prm-nomatch{border-color:#f0c9c5;background:#fdf5f4}
+.prm-row.prm-custom{border-color:#e8dcb5;background:#fefaef}
+.prm-line{font-size:12px;color:var(--ink);display:flex;gap:8px;align-items:baseline}
+.prm-qty{background:var(--ink);color:#fff;border-radius:6px;padding:1px 7px;font-weight:700;font-size:11px;flex:0 0 auto}
+.prm-said{font-weight:600}
+.prm-right{margin-top:6px}
+.prm-match{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:#0f766e}
+.prm-match b{font-weight:700}
+.prm-rate{font-weight:800;color:var(--ink)}
+.prm-sel{width:100%;font-size:12.5px}
+.prm-nomatch{color:#8a3d2e;font-size:11.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prm-btn{border:0;background:var(--ink);color:#fff;border-radius:6px;padding:5px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.prm-skip{position:absolute;top:6px;right:8px;border:0;background:#eef1f5;color:var(--ink2);border-radius:6px;padding:2px 8px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
 /* basket rows — stack into cards on phones so qty/discount are never off-screen */
 @media(max-width:640px){
  #bkbody table.bt thead{display:none}
@@ -490,18 +508,91 @@ body.finalMode{background:#e6f4f2}
  thead{display:table-header-group}
  .qtw,.qsign,.qwar,.qtot,.qterms{page-break-inside:avoid}
  #quote .qsheet,#quote table.qi thead th,#quote .grp td,#quote .qtot .grand,#quote .qstrip,#quote .qparty,#quote .qwc{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}</style></head><body>
+}
+/* === SmartHub branded landing (added 2026-09) === */
+header.shHeader{display:flex;align-items:center;gap:14px;padding:14px 0 12px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+header.shHeader h1{font-size:20px;letter-spacing:-.4px;line-height:1.1;margin:0}
+header.shHeader .sub{font-size:10.5px;text-transform:uppercase;letter-spacing:1.8px;color:var(--ink2);margin-top:3px}
+header.shHeader .shBrand{display:flex;align-items:center;gap:11px;min-width:0}
+header.shHeader .shLogo{width:42px;height:42px;flex:0 0 42px;border-radius:10px;background:linear-gradient(135deg,#15161a 0%,#15161a 55%,#b39457 55%,#b39457 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:-1px;font-size:16px;box-shadow:0 2px 6px rgba(15,23,42,.22);position:relative;overflow:hidden}
+header.shHeader .shLogoS{position:absolute;left:9px;top:9px;color:#fff}
+header.shHeader .shLogoH{position:absolute;right:9px;bottom:8px;color:#15161a;text-shadow:0 0 1px rgba(255,255,255,.35)}
+.shHero{background:linear-gradient(160deg,#1b1d21 0%,#26292f 50%,#2d3138 100%);color:#fff;border-radius:14px;padding:18px 16px 14px;margin-top:14px;box-shadow:0 4px 14px rgba(15,23,42,.14);position:relative;overflow:hidden}
+.shHero:before{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(179,148,87,.22) 0%,rgba(179,148,87,0) 70%);pointer-events:none}
+.shHeroTitle{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.shHeroSub{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px;margin-bottom:14px}
+.shTiles{display:flex;flex-direction:column;gap:8px}
+.shTile{display:flex;align-items:center;gap:12px;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:10px;padding:12px 12px;font:inherit;text-align:left;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent}
+.shTile:hover,.shTile:active{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.2)}
+.shTilePrimary{background:linear-gradient(135deg,#b39457 0%,#c9a563 100%);border-color:transparent;color:#1b1d21}
+.shTilePrimary:hover,.shTilePrimary:active{background:linear-gradient(135deg,#c9a563 0%,#d9b46f 100%);border-color:transparent;filter:brightness(1.02)}
+.shTileIcon{flex:0 0 32px;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px}
+.shTilePrimary .shTileIcon{background:rgba(27,29,33,.14)}
+.shTileBody{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.shTileT{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.shTileD{font-size:11.5px;font-weight:400;opacity:.78;line-height:1.35}
+.shTilePrimary .shTileD{opacity:.72}
+.shTileArrow{flex:0 0 auto;font-size:20px;line-height:1;opacity:.55;padding-left:4px}
+@media (min-width:640px){
+ .shTiles{flex-direction:row}
+ .shTile{flex:1}
+ .shTileArrow{display:none}
+ .shTileBody{gap:3px}
+}
+@media print{header.shHeader,.shHero{display:none!important}}
+</style></head><body>
 <div class="wrap">
-<header><div><h1><span class="brand">SMART HUB</span> <span>&mdash; quotation builder</span></h1>
-<div class="sub">Switches &middot; Lighting &middot; Wires &middot; Fans &middot; Switchgear &middot; Misc</div></div>
-<div class="tabsMain">
- <button class="tm on" id="tmB" onclick="view('browse')">Browse</button>
- <button class="tm" id="tmK" onclick="view('basket')">Basket <span class="badge" id="bc">0</span></button>
- <button class="tm" id="tmR" onclick="view('review')">Review</button>
- <button class="tm" id="tmS" onclick="view('saved')">Saved</button>
-</div></header>
+<header class="shHeader">
+ <div class="shBrand">
+  <div class="shLogo" aria-hidden="true">
+   <span class="shLogoS">S</span><span class="shLogoH">H</span>
+  </div>
+  <div>
+   <h1><span class="brand">SMART HUB</span></h1>
+   <div class="sub">Havells Authorised Dealer &middot; Guwahati</div>
+  </div>
+ </div>
+ <div class="tabsMain">
+  <button class="tm on" id="tmB" onclick="view('browse')">Browse</button>
+  <button class="tm" id="tmK" onclick="view('basket')">Basket <span class="badge" id="bc">0</span></button>
+  <button class="tm" id="tmR" onclick="view('review')">Review</button>
+  <button class="tm" id="tmS" onclick="view('saved')">Saved</button>
+ </div>
+</header>
 
 <div id="browse">
+<!-- SmartHub Hero — 3 primary actions, no duplicates -->
+<div class="shHero">
+ <div class="shHeroTitle">Build a quotation</div>
+ <div class="shHeroSub">Start from a customer's list, search by product, or pick a category.</div>
+ <div class="shTiles">
+  <button class="shTile shTilePrimary" onclick="openPasteList()">
+   <span class="shTileIcon">&#128203;</span>
+   <span class="shTileBody">
+    <span class="shTileT">Paste customer list</span>
+    <span class="shTileD">Convert a WhatsApp / text order into basket items in one go &mdash; auto-matches to Havells SKUs.</span>
+   </span>
+   <span class="shTileArrow">&rsaquo;</span>
+  </button>
+  <button class="shTile" onclick="document.getElementById('gq').focus();document.getElementById('gq').scrollIntoView({behavior:'smooth',block:'center'});">
+   <span class="shTileIcon">&#128269;</span>
+   <span class="shTileBody">
+    <span class="shTileT">Search all products</span>
+    <span class="shTileD">Type a name, code, wattage, size, or colour temperature.</span>
+   </span>
+   <span class="shTileArrow">&rsaquo;</span>
+  </button>
+  <button class="shTile" onclick="toggleCatDD(true);document.getElementById('catHead').scrollIntoView({behavior:'smooth',block:'center'});">
+   <span class="shTileIcon">&#128218;</span>
+   <span class="shTileBody">
+    <span class="shTileT">Pick a category</span>
+    <span class="shTileD">Switches, Lighting, Wires, Fans, Switchgear, Misc, Pro Lighting.</span>
+   </span>
+   <span class="shTileArrow">&rsaquo;</span>
+  </button>
+ </div>
+</div>
+
 <div class="panel" id="recentPanel" style="display:none">
  <div class="lbl">&#9889; Recently used &mdash; tap to add 1</div>
  <div id="recentBox" class="rechips"></div>
@@ -534,6 +625,26 @@ body.finalMode{background:#e6f4f2}
  </div>
 </div>
 </div>
+<div class="panel" id="pastePanel" style="display:none">
+ <div class="lbl" style="display:flex;justify-content:space-between;align-items:center">
+  <span>Paste customer list</span>
+  <button onclick="hidePaste()" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:13px;cursor:pointer">&times; Close</button>
+ </div>
+ <div class="frm">
+  <label>Default series
+   <select id="pcSeries" class="ddselect" onchange="onPasteDefaultChange()"></select></label>
+  <label>Finish
+   <select id="pcFinish" class="ddselect" onchange="onPasteDefaultChange()"></select></label>
+ </div>
+ <label style="display:block;margin-top:10px">Paste the customer's message
+  <textarea id="pcText" placeholder="e.g.&#10;18 Model Plate = 2 pc&#10;16 Model Plate = 8 pc&#10;6 amp Switch = 150 pc&#10;16 amp MCB = 6 pc" style="width:100%;min-height:180px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;font:inherit;font-size:13px;resize:vertical"></textarea></label>
+ <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+  <button onclick="runMatcher()" style="border:0;background:var(--ink);color:#fff;border-radius:10px;padding:11px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Match items</button>
+  <button onclick="clearPaste()" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Clear</button>
+ </div>
+ <div id="pcResults" style="margin-top:14px"></div>
+</div>
+
 <div class="panel" id="mainp" style="display:none">
  <div class="tabs" id="subtabs"></div>
  <div id="pairInfo" class="pair"></div>
@@ -677,6 +788,76 @@ body.finalMode{background:#e6f4f2}
 </div></div>
 </div>
 
+<div id="pasteModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100;padding:20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch">
+ <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:14px;padding:16px;box-shadow:0 20px 60px rgba(15,23,42,.35)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+   <div style="font-size:15px;font-weight:800;color:var(--ink)">Paste customer list</div>
+   <button onclick="closePasteList()" style="border:0;background:#eef1f5;border-radius:8px;padding:6px 12px;font:inherit;font-weight:700;font-size:12px;cursor:pointer">Close</button>
+  </div>
+  <div style="background:#f4f9f8;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:11px;line-height:1.5">
+   <div><b>Customer:</b> <span id="pasteCustName" style="color:#0f766e">\u2014</span> <span style="color:var(--ink2)">(set on Review tab)</span></div>
+   <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+    <label style="flex:1;min-width:130px"><div style="font-size:10px;color:var(--ink2);font-weight:700;letter-spacing:1px;text-transform:uppercase">Default series</div>
+     <select id="pasteSeries" class="ddselect" onchange="onPasteSeriesChange(this.value)" style="width:100%;margin-top:3px"></select></label>
+    <label style="flex:1;min-width:130px"><div style="font-size:10px;color:var(--ink2);font-weight:700;letter-spacing:1px;text-transform:uppercase">Finish</div>
+     <select id="pasteFinish" class="ddselect" onchange="onPasteFinishChange(this.value)" style="width:100%;margin-top:3px"></select></label>
+   </div>
+  </div>
+  <textarea id="pasteInput" placeholder="Paste the customer's WhatsApp / message list here. Example:&#10;&#10;18 Model Plate = 2 pc&#10;6 amp Switch = 150 pc&#10;16 amp Socket = 20 pc&#10;20 amp MCB = 6 pc&#10;63 amp Isolator = 4 pc" style="width:100%;min-height:130px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+   <button onclick="runPasteMatch()" style="border:0;background:var(--ink);color:#fff;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;font-size:13px;cursor:pointer">Match items</button>
+   <button id="pasteAddBtn" onclick="commitPaste()" style="display:none;border:0;background:#0f766e;color:#fff;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;font-size:13px;cursor:pointer">Add matched to basket</button>
+  </div>
+  <div id="pasteResults" style="margin-top:12px"></div>
+ </div>
+</div>
+
+<!-- Paste-list modal -->
+<div id="pasteOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:20;overflow-y:auto;-webkit-overflow-scrolling:touch">
+ <div id="pasteModal" style="max-width:520px;margin:20px auto;background:#f4f9f8;border-radius:16px;padding:14px 14px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+   <div style="font-weight:800;font-size:16px;color:#0f766e">&#128203; Paste customer list</div>
+   <button onclick="closePasteList()" style="border:0;background:#eef1f5;color:var(--ink);border-radius:8px;width:32px;height:32px;font:inherit;font-size:16px;font-weight:700;cursor:pointer">&times;</button>
+  </div>
+  <div id="pasteStep1">
+   <div class="frm" style="grid-template-columns:1fr 1fr">
+    <label>Default series<select id="plSeries" class="ddselect" onchange="rememberSeries()"></select></label>
+    <label>Finish<select id="plFinish" class="ddselect" onchange="rememberSeries()"></select></label>
+   </div>
+   <label style="display:block;margin-top:10px">Customer's message
+    <textarea id="plText" placeholder="Paste the whole message here &mdash; bullets, numbers, quantities, anything." style="width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;font-size:13px;line-height:1.5;background:#fff;resize:vertical"></textarea>
+   </label>
+   <div style="display:flex;gap:8px;margin-top:12px">
+    <button onclick="doMatch()" style="flex:1;border:0;background:#0f766e;color:#fff;border-radius:10px;padding:12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Match items &rarr;</button>
+    <button onclick="fillDemo()" style="border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:12px 14px;font:inherit;font-size:12px;font-weight:600;cursor:pointer" title="Fill with sample list">Demo</button>
+   </div>
+  </div>
+  <div id="pasteStep2" style="display:none">
+   <div id="plResults"></div>
+   <div style="display:flex;gap:8px;margin-top:14px">
+    <button onclick="backToStep1()" style="border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:12px 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">&larr; Back</button>
+    <button id="plAddBtn" onclick="addAllMatches()" style="flex:1;border:0;background:#0f766e;color:#fff;border-radius:10px;padding:12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Add matched to basket</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Manual-match search overlay (paste flow) -->
+<div id="pmmOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.78);z-index:30;padding:20px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;align-items:flex-start;justify-content:center">
+ <div style="max-width:520px;width:100%;margin:0 auto;background:#fff;border-radius:14px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+   <div style="flex:1"><div style="font-size:10.5px;font-weight:800;letter-spacing:1.6px;color:var(--ink2);text-transform:uppercase">Match manually</div>
+    <div id="pmmFor" style="font-size:12px;color:var(--ink);margin-top:3px;font-weight:600"></div></div>
+   <button onclick="pmmClose()" style="border:0;background:none;color:var(--ink2);font:inherit;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">&times;</button>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;background:#f5f3ee;border-radius:10px;padding:8px 10px;margin-top:8px">
+   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+   <input id="pmmInput" oninput="pmmSearch(this.value)" placeholder="Search all products (name, code, size, wattage, colour)" style="flex:1;border:0;background:transparent;font:inherit;font-size:13px;padding:4px 2px;outline:none"/>
+  </div>
+  <div id="pmmResults" style="margin-top:10px;max-height:65vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px"></div>
+ </div>
+</div>
+
 <div id="bar">
  <div class="stats">
   <div class="stat"><div class="n">Lines</div><div class="v" id="bL">0</div></div>
@@ -816,7 +997,297 @@ function renderRecent(){
  }).join('');
 }
 
-// ===== Custom items — for anything not in the price list, saved on this device =====
+// ===== Paste customer list — auto-match to Havells SKUs =====
+// storage: {overrides:{customerName:{"raw phrase":sku_key}}, defaults:{customerName:{series:"Adiva",finish:"White"}}}
+function loadPasteMap(){try{return JSON.parse(localStorage.getItem('sh_paste_map')||'{"overrides":{},"defaults":{}}');}catch(e){return {overrides:{},defaults:{}};}}
+function savePasteMap(m){try{localStorage.setItem('sh_paste_map',JSON.stringify(m));}catch(e){}}
+function pasteCustDefaults(name){const m=loadPasteMap();return m.defaults[name||'']||{series:'Adiva',finish:'White / Standard'};}
+function pasteCustOverride(name,phrase){const m=loadPasteMap();return (m.overrides[name||'']||{})[phrase.toLowerCase()];}
+function saveCustDefaults(name,series,finish){const m=loadPasteMap();m.defaults[name||'']={series,finish};savePasteMap(m);}
+function saveCustOverride(name,phrase,skuKey){const m=loadPasteMap();m.overrides[name||'']=m.overrides[name||'']||{};m.overrides[name||''][phrase.toLowerCase()]=skuKey;savePasteMap(m);}
+
+// Match one text line to SKU candidates. Returns {qty, text, matches:[{k,label,rate,confidence}]}
+// confidence: 'auto' (single clear match), 'ask' (multiple candidates), 'nomatch'
+function matchLine(line,series,finish){
+ // strip bullets and clean
+ let s=line.replace(/^[\s\*\-\u2022\u25CF>\|]+/,'').trim();
+ if(!s)return null;
+ // extract quantity: "= 5 pc", "x5", "(5)", "5 nos", "- 10", trailing digits
+ let qty=1;const qm=s.match(/[=\-x\u00d7]\s*(\d+)\s*(pc|pcs|no|nos|nos\.|pieces?|units?)?\s*\.?\s*$/i)
+   || s.match(/[\(\[]\s*(\d+)\s*[\)\]]\s*$/) || s.match(/\s(\d+)\s*(pc|pcs|no|nos|pieces?|units?)\s*\.?\s*$/i);
+ if(qm){qty=parseInt(qm[1])||1;s=s.slice(0,qm.index).trim();}
+ // strip trailing " = " or ":" or "-"
+ s=s.replace(/[\s:=\-]+$/,'').trim();
+ if(!s)return null;
+ const lower=s.toLowerCase();
+ // skip section headers (short lines with no qty digits and no product-code keywords)
+ const hasNum=/\d/.test(s);
+ const hasAmp=/\b(amp|amps|ax|a\b)/i.test(s);
+ const hasCommonProdWord=/\b(plate|switch|socket|mcb|isolator|adapter|strip|light|bell|fan|lamp|starter|regulator|blank|dp|indicator|point|wire|cable|coil|led|batten)\b/i.test(s);
+ if(!hasNum && !hasCommonProdWord) return {header:s,qty:0,text:s,confidence:'header'};
+ // typical section-heading phrases
+ if(/^[\w\s&,\-\/\.]{2,60}$/i.test(s) && /^(plates?\b|switches\b|accessor|adapt|mcbs?\b|isolator|misc|other|light|fan|wire|module|extras?)/i.test(s) && !hasNum) return {header:s,qty:0,text:s,confidence:'header'};
+
+ // digit extractor for size/amp
+ const num=(re)=>{const m=lower.match(re);return m?parseInt(m[1]):null;};
+ const mSize=num(/\b(\d+)\s*(?:m|module|model|mod)\b/);
+ const mAmp=num(/\b(\d+)\s*(?:a|amp|amps|ax|amps?\.?)\b/);
+
+ const cands=[];
+ // ---- SW Plates: "N Model Plate", "N M Plate", "8 Model Long Plate" (=8M(H))
+ if(mSize && /plate/i.test(lower) && !/foot\s*lamp|indicator/i.test(lower)){
+  const isLong=/long/i.test(lower);
+  const rows=(D.SW[series]||{}).plates?.[finish]||[];
+  rows.forEach(r=>{
+   const sz=String(r.s||'');
+   const szNum=parseInt(sz);
+   if(szNum!==mSize)return;
+   // 8M has (S) and (H): "long" = (H) horizontal, otherwise (S) or plain
+   const isH=/\(H\)/i.test(sz),isS=/\(S\)/i.test(sz);
+   if(isLong && !isH)return;
+   if(!isLong && isH && rows.some(x=>parseInt(x.s)===mSize && !/\(H\)/.test(x.s)))return;
+   cands.push({k:r.c,label:series+' '+sz+' Plate \u00b7 '+finish,rate:r.p,cat:'SW_PLATE',_s:sz});
+  });
+ }
+ // ---- SW Accessories: "6 amp switch", "16 amp socket", "bell push", "starter/ac switch", "2 way switch", "blank switch", "foot lamp"
+ const accItems=(D.SW[series]||{}).acc||{};
+ const accKey=Object.keys(accItems).find(k=>k.toLowerCase().startsWith(finish.toLowerCase().split(' /')[0])) || finish;
+ const acc=accItems[accKey]||accItems[Object.keys(accItems)[0]]||[];
+ if(!/plate\b/i.test(lower) || /foot\s*lamp/i.test(lower)){
+  acc.forEach(r=>{
+   const n=String(r.n).toLowerCase();
+   let ok=false;
+   // 25A/32A starter / AC switch
+   if(/starter|ac\s*switch/i.test(lower) && /starter/i.test(n)){
+    if(!mAmp || String(r.n).includes(mAmp+'A'))ok=true;
+   }
+   // Bell push
+   else if(/bell\s*push/i.test(lower) && /bell\s*push/i.test(n) && !/ind/i.test(n) && !/mega|flat/i.test(n))ok=true;
+   // 2-way / two-way switch
+   else if(/(2|two)[-\s]*way\s*switch/i.test(lower) && /(two|2)\s*way/i.test(n) && !/flat|mega|ind/i.test(n)){
+    if(!mAmp || String(r.n).includes(mAmp+'A'))ok=true;
+   }
+   // 1-way / one-way / plain switch (with amp)
+   else if(mAmp && /switch/i.test(lower) && !/socket|starter|bell|foot|blank|dp|heavy/i.test(lower)
+       && /one\s*way/i.test(n) && !/flat|mega|ind/i.test(n) && String(r.n).includes(mAmp+'A'))ok=true;
+   // Socket (with amp)
+   else if(mAmp && /socket/i.test(lower)){
+    if(/heavy|hd/i.test(lower) && /heavy/i.test(n))ok=true;
+    else if(!/heavy/i.test(n) && /socket/i.test(n) && String(r.n).match(new RegExp('\\b'+mAmp+'[A/]'))) ok=true;
+   }
+   // Blank plate/switch
+   else if(/blank/i.test(lower) && /blank/i.test(n))ok=true;
+   // Foot lamp / footlight
+   else if(/foot\s*(lamp|light)/i.test(lower) && /foot(light|lamp)/i.test(n)){
+    if(!mSize || String(r.n).includes(mSize+'M'))ok=true;
+   }
+   // Fan regulator
+   else if(/fan\s*regulator|regulator/i.test(lower) && /regulator/i.test(n))ok=true;
+   if(ok)cands.push({k:r.c,label:series+' '+r.n+' \u00b7 '+accKey,rate:r.p,cat:'SW_ACC'});
+  });
+ }
+ // ---- MCB / Isolator (single-pole default, but ask if ambiguous)
+ if(mAmp && /mcb\b/i.test(lower)){
+  const mcbGroups=(D.SG.MCB)||{};
+  Object.entries(mcbGroups).forEach(([grp,rows])=>{
+   const row=rows.find(r=>r.a===mAmp);
+   if(row)row.o.forEach(o=>{
+    cands.push({k:'DHMG_MCB_'+o.pl+'_'+o.cv+'_'+mAmp,label:'Havells '+mAmp+'A MCB \u00b7 '+o.pl+' \u00b7 '+o.cv+' ('+grp+')',rate:o.p,cat:'SG_MCB',_seriesGrp:grp,_pl:o.pl,_cv:o.cv,_a:mAmp,_baseRow:row,_baseOpt:o});
+   });
+  });
+ }
+ if(mAmp && /isolator/i.test(lower)){
+  const isoGroups=(D.SG.Isolator)||{};
+  Object.entries(isoGroups).forEach(([grp,rows])=>{
+   const row=rows.find(r=>r.a===mAmp);
+   if(row)row.o.forEach(o=>{
+    cands.push({k:'DHMG_ISO_'+o.pl+'_'+mAmp,label:'Havells '+mAmp+'A Isolator \u00b7 '+o.pl+' ('+grp+')',rate:o.p,cat:'SG_ISO',_seriesGrp:grp,_pl:o.pl,_a:mAmp,_baseRow:row,_baseOpt:o});
+   });
+  });
+ }
+ // dedupe by k, keep first
+ const seen={};const uniq=[];
+ cands.forEach(c=>{if(!seen[c.k]){seen[c.k]=1;uniq.push(c);}});
+ // Sort SW plates so standard sizes come first
+ let confidence='nomatch',preselect=null;
+ if(uniq.length===1){confidence='auto';preselect=uniq[0].k;}
+ else if(uniq.length>1){
+  // Auto-pick lowest-price DEFAULT variant for MCB/Isolator: SP+BCurve for MCB, DP for isolator
+  if(uniq[0].cat==='SG_MCB'){
+   const def=uniq.find(x=>x._pl==='SP'&&x._cv==='B Curve')||uniq[0];
+   confidence='auto';preselect=def.k;
+  }
+  else if(uniq[0].cat==='SG_ISO'){
+   const def=uniq.find(x=>x._pl==='DP')||uniq[0];
+   confidence='auto';preselect=def.k;
+  }
+  else if(uniq[0].cat==='SW_PLATE'){
+   // Plate size like "8M" has both (S) and (H) — if user didn't say "long", prefer non-H
+   const def=uniq.find(x=>!/\(H\)/i.test(x._s))||uniq[0];
+   if(uniq.length===2 && /\(H\)|\(S\)/i.test(uniq[0]._s||''))
+    {confidence='ask';preselect=def.k;}
+   else {confidence='auto';preselect=def.k;}
+  }
+  else if(uniq[0].cat==='SW_ACC'){
+   // Multiple accessory matches — cheapest first, ask user
+   uniq.sort((a,b)=>a.rate-b.rate);
+   confidence='ask';preselect=uniq[0].k;
+  } else {confidence='ask';preselect=uniq[0].k;}
+ }
+ return {text:s,qty,matches:uniq,confidence,preselect,rawLine:line};
+}
+
+function parsePasteList(text){
+ return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+}
+
+let PASTE_RESULTS=[];
+let PASTE_SERIES='Adiva',PASTE_FINISH='White / Standard';
+function seriesOptions(){return Object.keys(D.SW).filter(k=>!k.startsWith('GI Box')&&!k.startsWith('Surface'));}
+function finishOptions(series){return Object.keys((D.SW[series]||{}).plates||{});}
+
+function openPasteList(){
+ document.getElementById('pasteModal').style.display='flex';
+ // prefill from customer
+ const cust=(F.cust||'').trim();
+ const d=pasteCustDefaults(cust);
+ PASTE_SERIES=d.series;PASTE_FINISH=d.finish;
+ refreshPasteControls();
+ document.getElementById('pasteResults').innerHTML='';
+ document.getElementById('pasteInput').value='';
+ document.getElementById('pasteAddBtn').style.display='none';
+}
+function closePasteList(){document.getElementById('pasteModal').style.display='none';}
+function refreshPasteControls(){
+ const cust=(F.cust||'').trim();
+ const sSel=document.getElementById('pasteSeries'),fSel=document.getElementById('pasteFinish');
+ if(sSel){sSel.innerHTML=seriesOptions().map(s=>`<option${s===PASTE_SERIES?' selected':''}>${esc(s)}</option>`).join('');sSel.value=PASTE_SERIES;}
+ if(fSel){const fins=finishOptions(PASTE_SERIES);
+  if(!fins.includes(PASTE_FINISH))PASTE_FINISH=fins[0]||'White / Standard';
+  fSel.innerHTML=fins.map(f=>`<option${f===PASTE_FINISH?' selected':''}>${esc(f)}</option>`).join('');fSel.value=PASTE_FINISH;}
+ document.getElementById('pasteCustName').textContent=cust||'(no customer set on Review tab)';
+}
+function onPasteSeriesChange(v){PASTE_SERIES=v;refreshPasteControls();}
+function onPasteFinishChange(v){PASTE_FINISH=v;}
+
+function runPasteMatch(){
+ const text=document.getElementById('pasteInput').value;
+ const lines=parsePasteList(text);
+ const cust=(F.cust||'').trim();
+ saveCustDefaults(cust,PASTE_SERIES,PASTE_FINISH);
+ const results=[];
+ for(const line of lines){
+  const m=matchLine(line,PASTE_SERIES,PASTE_FINISH);
+  if(!m)continue;
+  if(m.confidence==='header')continue;  // silently drop section headers
+  // apply any saved override for this customer + phrase
+  const ov=pasteCustOverride(cust,m.text);
+  if(ov && m.matches.some(x=>x.k===ov)){m.preselect=ov;m.confidence='auto';}
+  results.push(m);
+ }
+ PASTE_RESULTS=results;
+ renderPasteResults();
+}
+
+function pasteSetSel(idx,val){PASTE_RESULTS[idx].preselect=val;PASTE_RESULTS[idx].confidence='auto';renderPasteResults();}
+function pasteSetCustomFor(idx){
+ const r=PASTE_RESULTS[idx];
+ const rate=parseFloat(prompt('Rate (\u20b9) for "'+r.text+'":'));
+ if(!rate||rate<=0)return;
+ const cat=prompt('Category (Switches & Plates, Lighting, Wires & Cables, Fans, MCBs & Switchgear, PVC Items, Professional Lighting, Other):','Other')||'Other';
+ // save as a custom item permanently
+ const list=loadCustomItems();
+ const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ list.unshift({id,name:r.text,cat,rate,unit:''});
+ saveCustomItemsList(list);
+ r.customId=id;r.confidence='custom';renderPasteResults();
+}
+function pasteSkip(idx){PASTE_RESULTS[idx].skip=!PASTE_RESULTS[idx].skip;renderPasteResults();}
+
+function renderPasteResults(){
+ const box=document.getElementById('pasteResults');
+ if(!PASTE_RESULTS.length){box.innerHTML='';document.getElementById('pasteAddBtn').style.display='none';return;}
+ const auto=PASTE_RESULTS.filter(r=>r.confidence==='auto'&&!r.skip);
+ const ask=PASTE_RESULTS.filter(r=>r.confidence==='ask'&&!r.skip);
+ const nom=PASTE_RESULTS.filter(r=>r.confidence==='nomatch'&&!r.skip);
+ const cus=PASTE_RESULTS.filter(r=>r.confidence==='custom'&&!r.skip);
+ const skipped=PASTE_RESULTS.filter(r=>r.skip);
+ let h='';
+ const row=(r,idx,section)=>{
+  const sel=r.matches.find(m=>m.k===r.preselect);
+  let right='';
+  if(section==='auto'&&sel){
+   right=`<div class="prm-match"><b>${esc(sel.label)}</b><span class="prm-rate">${inr(sel.rate)}</span></div>`;
+  } else if(section==='ask'){
+   right=`<select class="ddselect prm-sel" onchange="pasteSetSel(${idx},this.value)">${r.matches.map(m=>`<option value="${esc(m.k)}"${m.k===r.preselect?' selected':''}>${esc(m.label)} \u2014 ${inr(m.rate)}</option>`).join('')}</select>`;
+  } else if(section==='nomatch'){
+   right=`<div class="prm-nomatch">No Havells match found. <button class="prm-btn" onclick="pasteSetCustomFor(${idx})">\u2795 Add as custom</button></div>`;
+  } else if(section==='custom'){
+   const cust=loadCustomItems().find(c=>c.id===r.customId);
+   right=cust?`<div class="prm-match" style="color:#8a6d1f"><b>Custom: ${esc(cust.name)}</b><span class="prm-rate">${inr(cust.rate)}</span></div>`:'';
+  }
+  return `<div class="prm-row prm-${section}">
+   <div class="prm-line"><span class="prm-qty">\u00d7${r.qty}</span> <span class="prm-said">${esc(r.text)}</span></div>
+   <div class="prm-right">${right}</div>
+   <button class="prm-skip" title="Skip this line" onclick="pasteSkip(${idx})">${r.skip?'undo':'skip'}</button>
+  </div>`;};
+ const globalIdx=(r)=>PASTE_RESULTS.indexOf(r);
+ if(auto.length)h+=`<div class="prm-sec"><div class="prm-shdr">\u2713 Auto-matched (${auto.length})</div>${auto.map(r=>row(r,globalIdx(r),'auto')).join('')}</div>`;
+ if(ask.length)h+=`<div class="prm-sec"><div class="prm-shdr">\u26a0 Need your attention (${ask.length})</div>${ask.map(r=>row(r,globalIdx(r),'ask')).join('')}</div>`;
+ if(nom.length)h+=`<div class="prm-sec"><div class="prm-shdr">\ud83d\udce6 Not in catalog (${nom.length})</div>${nom.map(r=>row(r,globalIdx(r),'nomatch')).join('')}</div>`;
+ if(cus.length)h+=`<div class="prm-sec"><div class="prm-shdr">\ud83d\udcdd Added as custom (${cus.length})</div>${cus.map(r=>row(r,globalIdx(r),'custom')).join('')}</div>`;
+ if(skipped.length)h+=`<div class="prm-sec"><div class="prm-shdr" style="color:var(--ink2)">Skipped (${skipped.length})</div>${skipped.map(r=>`<div class="prm-row" style="opacity:.55"><div class="prm-line"><span class="prm-qty">\u00d7${r.qty}</span> <span class="prm-said">${esc(r.text)}</span></div><button class="prm-skip" onclick="pasteSkip(${globalIdx(r)})">undo</button></div>`).join('')}</div>`;
+ box.innerHTML=h;
+ const willAdd=auto.length+ask.filter(r=>r.preselect).length+cus.length;
+ const btn=document.getElementById('pasteAddBtn');
+ btn.textContent='Add matched ('+willAdd+') to basket';
+ btn.style.display=willAdd?'inline-block':'none';
+}
+
+function commitPaste(){
+ const cust=(F.cust||'').trim();
+ let added=0;
+ for(const r of PASTE_RESULTS){
+  if(r.skip)continue;
+  if(r.confidence==='custom'&&r.customId){
+   const item=loadCustomItems().find(c=>c.id===r.customId);
+   if(!item)continue;
+   const key=customKey(r.customId);
+   Q[key]={q:(Q[key]?Q[key].q:0)+r.qty,p:item.rate,n:item.name+(item.unit?' \u00b7 '+item.unit:''),g:(item.cat||'Other')+' \u2014 Custom Items',code:'CUSTOM'};
+   added++;continue;
+  }
+  if(r.confidence!=='auto'&&r.confidence!=='ask')continue;
+  const sel=r.matches.find(m=>m.k===r.preselect);
+  if(!sel)continue;
+  // save override for this customer if they picked something non-default (or accepted an "ask")
+  if(cust)saveCustOverride(cust,r.text,sel.k);
+  // Route to correct in-basket shape depending on category type
+  let key=sel.k, entry={q:r.qty,p:sel.rate,n:sel.label,g:''};
+  if(sel.cat==='SW_PLATE'||sel.cat==='SW_ACC'){
+   entry.g='Switches \u2014 '+PASTE_SERIES+' \u00b7 '+PASTE_FINISH;
+   entry.code=sel.k;
+   entry.n=sel.label;
+  } else if(sel.cat==='SG_MCB'){
+   const grp=sel._seriesGrp;
+   const row=sel._baseRow,o=sel._baseOpt;
+   key='SG::MCB::'+grp+'::'+sel._a+'A::'+o.pl+'|'+o.cv;
+   entry.g='MCBs & Switchgear \u2014 MCB \u00b7 '+grp;
+   entry.code=o.c;entry.n=sel._a+'A MCB \u00b7 '+o.pl+' \u00b7 '+o.cv;entry.p=o.p;
+  } else if(sel.cat==='SG_ISO'){
+   const grp=sel._seriesGrp;const o=sel._baseOpt;
+   key='SG::Isolator::'+grp+'::'+sel._a+'A::'+o.pl;
+   entry.g='MCBs & Switchgear \u2014 Isolator \u00b7 '+grp;
+   entry.code=o.c;entry.n=sel._a+'A Isolator \u00b7 '+o.pl;entry.p=o.p;
+  }
+  // merge quantities if same key already in basket
+  if(Q[key])entry.q+=Q[key].q;
+  Q[key]=entry;
+  added++;
+ }
+ calc();closePasteList();toast('Added '+added+' line'+(added===1?'':'s')+' to basket');view('basket');
+}
+
+
 function loadCustomItems(){try{return JSON.parse(localStorage.getItem('sh_custom_items')||'[]');}catch(e){return [];}}
 function saveCustomItemsList(arr){try{localStorage.setItem('sh_custom_items',JSON.stringify(arr));}catch(e){}}
 function customKey(id){return 'CUSTOM::'+id;}
@@ -862,6 +1333,376 @@ function addCustomToBasket(id){
  calc();renderCustomItems();
  toast('Added '+item.name);
 }
+// ===== Paste customer list — auto-match to Havells SKUs =====
+// Generic phrases (as customers write them) mapped to a search pattern for our catalog.
+// Format: { pattern: 'text to look for', where: 'SW'|'SG'|'FAN'|'LI'|'PL', name: 'matches accessory name substring', sizeCode: 'plate size code', mcbAmp: number, isolatorAmp: number }
+const PC_MAP=[
+ // Plates (Adiva/Fabio/etc. — series comes from user default)
+ {re:/^\s*(\d{1,2})\s*(?:m|model|module)?\s*long\s*plate/i, kind:'plate', size:m=>m[1]+'M(H)'},
+ {re:/^\s*(\d{1,2})\s*(?:m|model|module)?\s*(?:h|horizontal)\s*plate/i, kind:'plate', size:m=>m[1]+'M(H)'},
+ {re:/^\s*(\d{1,2})\s*(?:m|model|module)?\s*plate/i, kind:'plate', size:m=>m[1]+'M'},
+ // Common switch accessories — order matters, longer/more-specific first
+ {re:/\b16\s*a?\s*(?:mp)?\s*one\s*way\s*switch/i, kind:'acc', match:'16AX One way switch'},
+ {re:/\b16\s*a?\s*(?:mp)?\s*(?:2|two)\s*way\s*switch/i, kind:'acc', match:'16AX Two way switch'},
+ {re:/\b16\s*a?\s*(?:mp)?\s*switch(?!\w)/i, kind:'acc', match:'16AX One way switch'},
+ {re:/\b16\s*a?\s*(?:mp)?\s*(?:heavy\s*duty\s*)?socket/i, kind:'acc', match:'16A Heavy Duty Socket'},
+ {re:/\b(?:6\s*\/\s*16|6\/16)\s*a?\s*(?:mp)?\s*socket/i, kind:'acc', match:'6/16A Socket'},
+ {re:/\b25\s*a?\s*(?:mp)?\s*(?:motor\s*)?starter/i, kind:'acc', match:'25A Motor Starter'},
+ {re:/\b25\s*a?\s*(?:mp)?\s*(?:ac|a\.c\.)\s*switch/i, kind:'acc', match:'25A Motor Starter'},
+ {re:/\b32\s*a?\s*(?:mp)?\s*(?:dp|d\.p\.)\s*switch/i, kind:'acc', match:'32A DP switch'},
+ {re:/\b20\s*a?\s*(?:mp)?\s*(?:dp|d\.p\.)\s*switch/i, kind:'acc', match:'20A DP Switch'},
+ {re:/\b6\s*a?\s*(?:mp)?\s*one\s*way\s*switch/i, kind:'acc', match:'6AX One way switch'},
+ {re:/\b6\s*a?\s*(?:mp)?\s*(?:2|two)\s*way\s*switch/i, kind:'acc', match:'6AX Two way switch'},
+ {re:/\b6\s*a?\s*(?:mp)?\s*switch(?!\w)/i, kind:'acc', match:'6AX One way switch'},
+ {re:/\b6\s*a?\s*(?:mp)?\s*(?:3\s*pin\s*)?socket/i, kind:'acc', match:'6A 3 pin socket'},
+ {re:/(?:^|\s)(?:2|two)\s*way\s*switch/i, kind:'acc', match:'6AX Two way switch'},
+ {re:/bell\s*push(?:\s*switch)?/i, kind:'acc', match:'6AX Bell push switch'},
+ {re:/blank\s*(?:switch|plate|module)?/i, kind:'acc', match:'Blank Plate'},
+ {re:/indicator(?:\s*lamp)?/i, kind:'acc', match:'Indicator lamp'},
+ {re:/\b(?:1\s*m\s*)?fan\s*regulator/i, kind:'acc', match:'1M Fan regulator'},
+ {re:/\b2\s*m\s*fan\s*regulator/i, kind:'acc', match:'2M Fan regulator'},
+ {re:/\btv\s*socket/i, kind:'acc', match:'TV Socket'},
+ {re:/\b(?:rj[\s-]?11|telephone)\s*socket/i, kind:'acc', match:'RJ-11 Telephone socket'},
+ {re:/\bbuzzer/i, kind:'acc', match:'2M Buzzer'},
+ // Footlight — try specific size, but if not found in catalog fall back to any footlight
+ {re:/(\d)\s*m(?:odel)?\s*foot\s*(?:light|lamp)/i, kind:'acc', match:m=>m[1]+'M Footlight', fallback:'Footlight'},
+ {re:/foot\s*(?:light|lamp)/i, kind:'acc', match:'Footlight'},
+ // MCBs — sizeAmp captured
+ {re:/\b(\d+)\s*a?\s*(?:mp)?\s*mcb/i, kind:'mcb', amp:m=>+m[1]},
+ // Isolators
+ {re:/\b(\d+)\s*a?\s*(?:mp)?\s*(?:isolator|iso)/i, kind:'isolator', amp:m=>+m[1]},
+];
+
+const PC_STATE={cands:[],pending:{}, customerKey:''};
+
+function pcLoadOverrides(cust){try{return JSON.parse(localStorage.getItem('sh_pc_overrides_'+cust)||'{}');}catch(e){return {};}}
+function pcSaveOverride(cust,phrase,resolvedKey){
+ const map=pcLoadOverrides(cust);
+ map[phrase.toLowerCase()]=resolvedKey;
+ try{localStorage.setItem('sh_pc_overrides_'+cust,JSON.stringify(map));}catch(e){}
+}
+
+function showPaste(){
+ const p=document.getElementById('pastePanel'),bp=document.getElementById('pasteBtnPanel');
+ p.style.display='block';bp.style.display='none';
+ // populate series/finish based on catalog
+ const sSel=document.getElementById('pcSeries'),fSel=document.getElementById('pcFinish');
+ const seriesList=Object.keys(D.SW);
+ const cust=F.cust||'default';
+ const stored=(function(){try{return JSON.parse(localStorage.getItem('sh_pc_pref_'+cust)||'{}');}catch(e){return {};}})();
+ const defSeries=stored.series||'Adiva';
+ const defFinish=stored.finish||'White / Standard';
+ sSel.innerHTML=seriesList.map(s=>`<option value="${esc(s)}"${s===defSeries?' selected':''}>${esc(s)}</option>`).join('');
+ refreshFinishOptions(defFinish);
+ PC_STATE.customerKey=cust;
+}
+function refreshFinishOptions(preferred){
+ const sSel=document.getElementById('pcSeries'),fSel=document.getElementById('pcFinish');
+ const finishes=Object.keys(D.SW[sSel.value].plates||{});
+ fSel.innerHTML=finishes.map(f=>`<option value="${esc(f)}"${f===preferred?' selected':''}>${esc(f)}</option>`).join('');
+ // if preferred not in list, fall back to first
+ if(!finishes.includes(preferred))fSel.value=finishes[0];
+}
+function onPasteDefaultChange(){
+ const cust=PC_STATE.customerKey||F.cust||'default';
+ const s=document.getElementById('pcSeries').value;
+ const f=document.getElementById('pcFinish').value;
+ // when series changes, finishes might not include the current one
+ if(document.activeElement && document.activeElement.id==='pcSeries')refreshFinishOptions(f);
+ try{localStorage.setItem('sh_pc_pref_'+cust,JSON.stringify({series:s,finish:document.getElementById('pcFinish').value}));}catch(e){}
+}
+function hidePaste(){
+ document.getElementById('pastePanel').style.display='none';
+ document.getElementById('pasteBtnPanel').style.display='block';
+ document.getElementById('pcResults').innerHTML='';
+}
+function clearPaste(){
+ document.getElementById('pcText').value='';
+ document.getElementById('pcResults').innerHTML='';
+}
+
+// find plate SKU by size in given series/finish
+function pcFindPlate(series, finish, size){
+ const arr=(D.SW[series]&&D.SW[series].plates&&D.SW[series].plates[finish])||[];
+ return arr.find(p=>p.s.toLowerCase()===size.toLowerCase())||null;
+}
+// find all plates matching size across all finishes (for the "size but not H/S variants" ambiguity)
+function pcFindPlateVariants(series, finish, sizeBase){
+ // sizeBase like "8M" — find both "8M" (if present), "8M(S)", "8M(H)"
+ const arr=(D.SW[series]&&D.SW[series].plates&&D.SW[series].plates[finish])||[];
+ const base=sizeBase.replace(/\(.\)$/,'').toUpperCase();
+ return arr.filter(p=>p.s.toUpperCase().replace(/\(.\)$/,'')===base);
+}
+// find accessory by name substring (strict: exact or startsWith only, no loose word match)
+function pcFindAcc(series, finish, needle){
+ // accessories store under acc[finish], but finish names differ (e.g. "White" vs "White / Standard")
+ const accFinishes=Object.keys((D.SW[series]&&D.SW[series].acc)||{});
+ const accFinish=accFinishes.find(af=>af.toLowerCase()===finish.toLowerCase()||
+   (finish.toLowerCase().includes('white')&&af.toLowerCase().includes('white'))||
+   af.toLowerCase().split(' ')[0]===finish.toLowerCase().split(' ')[0])||accFinishes[0];
+ const arr=(D.SW[series]&&D.SW[series].acc&&D.SW[series].acc[accFinish])||[];
+ const n=needle.toLowerCase();
+ // 1) exact match
+ let hit=arr.find(x=>x.n.toLowerCase()===n);
+ if(hit)return {item:hit,finish:accFinish};
+ // 2) starts with the needle followed by a word boundary (so "6AX One way switch" won't match "6AX One way switch with ind")
+ hit=arr.find(x=>{const s=x.n.toLowerCase();return s===n||s.startsWith(n+' ')||s.startsWith(n+'.');});
+ if(hit)return {item:hit,finish:accFinish};
+ // 3) contains needle as a whole phrase
+ hit=arr.find(x=>x.n.toLowerCase().includes(n));
+ if(hit)return {item:hit,finish:accFinish};
+ return null;
+}
+
+// find MCB option for a given amp rating (default SP, B curve)
+function pcFindMCB(amp){
+ const series=Object.keys(D.SG.MCB)[0];
+ const rows=D.SG.MCB[series];
+ for(const r of rows){
+  for(const o of r.o){
+   if(o.a===amp && o.pl==='SP' && (o.cv||'').startsWith('B'))return {row:r,opt:o,series};
+  }
+ }
+ // fallback: any option matching amp
+ for(const r of rows){
+  const o=r.o.find(o=>o.a===amp);
+  if(o)return {row:r,opt:o,series};
+ }
+ return null;
+}
+function pcFindIsolator(amp){
+ const series=Object.keys(D.SG.Isolator)[0];
+ const rows=D.SG.Isolator[series];
+ for(const r of rows){
+  for(const o of r.o){
+   if(o.a===amp && o.pl==='DP')return {row:r,opt:o,series};
+  }
+ }
+ for(const r of rows){
+  const o=r.o.find(o=>o.a===amp);
+  if(o)return {row:r,opt:o,series};
+ }
+ return null;
+}
+
+// parse quantity from a raw line
+function pcParseQty(line){
+ // patterns: "= 10 pc", "= 10", "x 10", "10 nos", "10 pc", "(10)"
+ let m;
+ m=line.match(/=\s*(\d+)/); if(m)return +m[1];
+ m=line.match(/(?:^|\s)[x×]\s*(\d+)/i); if(m)return +m[1];
+ m=line.match(/\((\d+)\)/); if(m)return +m[1];
+ m=line.match(/(\d+)\s*(?:pc|pcs|no\.?s?|piece)/i); if(m)return +m[1];
+ m=line.match(/(\d+)\s*$/); if(m)return +m[1];  // ends with number
+ return 0;
+}
+// remove qty from line to get the item phrase
+function pcParseItemPhrase(line){
+ // strip common bullet chars FIRST so quantity-detection regexes below aren't confused by "* qty pc"
+ let s=line.replace(/^\s*[-*•·➤>]+\s*/,'').trim();
+ s=s.replace(/=\s*\d+\s*(?:pc|pcs|no\.?s?|piece)?/i,'')
+    .replace(/(?:^|\s)[x×]\s*\d+\s*(?:pc|pcs|no\.?s?|piece)?/i,'')
+    .replace(/\(\s*\d+\s*\)/,'')
+    .replace(/\d+\s*(?:pc|pcs|no\.?s?|piece)/i,'')
+    .trim();
+ return s;
+}
+// determine if line looks like a section header (no digits + qty pattern)
+function pcIsHeader(line){
+ return !!(line.length<40 && !/=|\d+\s*(?:pc|nos)|\(\d+\)/i.test(line));
+}
+
+function runMatcher(){
+ const raw=document.getElementById('pcText').value;
+ if(!raw.trim()){alert('Paste the customer\u2019s list first.');return;}
+ const series=document.getElementById('pcSeries').value;
+ const finish=document.getElementById('pcFinish').value;
+ const cust=PC_STATE.customerKey||F.cust||'default';
+ const overrides=pcLoadOverrides(cust);
+ const lines=raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+ const out=[];
+ for(const line of lines){
+  if(pcIsHeader(line))continue;
+  const qty=pcParseQty(line);
+  if(!qty)continue;
+  const phrase=pcParseItemPhrase(line);
+  const entry={raw:line,phrase,qty,status:'unmatched',match:null,alternatives:[]};
+  // check saved override first
+  const ovKey=overrides[phrase.toLowerCase()];
+  if(ovKey){entry.savedOverride=ovKey;}
+  // try each mapping
+  for(const rule of PC_MAP){
+   const m=phrase.match(rule.re);if(!m)continue;
+   if(rule.kind==='plate'){
+    const size=typeof rule.size==='function'?rule.size(m):rule.size;
+    const variants=pcFindPlateVariants(series,finish,size);
+    if(variants.length===1){
+     entry.status='matched';
+     entry.match={key:variants[0].c, code:variants[0].c, rate:variants[0].p,
+                  name:variants[0].s+' Plate \u00b7 '+finish,
+                  group:'Switches \u2014 '+series+' \u00b7 '+finish};
+    } else if(variants.length>1){
+     entry.status='ambiguous';
+     entry.alternatives=variants.map(v=>({key:v.c,code:v.c,rate:v.p,
+       name:v.s+' Plate \u00b7 '+finish,
+       group:'Switches \u2014 '+series+' \u00b7 '+finish,
+       label:v.s+' plate \u2014 '+inr(v.p)}));
+    }
+   } else if(rule.kind==='acc'){
+    const needle=typeof rule.match==='function'?rule.match(m):rule.match;
+    const hit=pcFindAcc(series,finish,needle);
+    if(hit){
+     entry.status='matched';
+     entry.match={key:hit.item.c, code:hit.item.c, rate:hit.item.p,
+                  name:hit.item.n+' \u00b7 '+hit.finish,
+                  group:'Switches \u2014 '+series+' \u00b7 '+hit.finish};
+    }
+   } else if(rule.kind==='mcb'){
+    const amp=rule.amp(m);
+    const mcb=pcFindMCB(amp);
+    if(mcb){
+     const key=mcb.opt.c+'::'+mcb.row.n+'::'+(mcb.opt.pl||'')+'|'+(mcb.opt.cv||'');
+     entry.status='matched';
+     entry.match={key:key, code:mcb.opt.c, rate:mcb.opt.p,
+                  name:mcb.row.n+' \u00b7 '+(mcb.opt.pl||'')+' \u00b7 '+(mcb.opt.cv||''),
+                  group:'Switchgear \u2014 MCB \u00b7 '+mcb.series};
+    }
+   } else if(rule.kind==='isolator'){
+    const amp=rule.amp(m);
+    const iso=pcFindIsolator(amp);
+    if(iso){
+     const key=iso.opt.c+'::'+iso.row.n+'::'+(iso.opt.pl||'');
+     entry.status='matched';
+     entry.match={key:key, code:iso.opt.c, rate:iso.opt.p,
+                  name:iso.row.n+' \u00b7 '+(iso.opt.pl||''),
+                  group:'Switchgear \u2014 Isolator \u00b7 '+iso.series};
+    }
+   }
+   if(entry.status!=='unmatched')break;
+  }
+  out.push(entry);
+ }
+ PC_STATE.cands=out;
+ renderMatcherResults();
+}
+
+function renderMatcherResults(){
+ const box=document.getElementById('pcResults');
+ const out=PC_STATE.cands;
+ if(!out.length){box.innerHTML='<div class="empty">Nothing to match. Check the format of your paste \u2014 each line should have a quantity like <code>= 10 pc</code>.</div>';return;}
+ const matched=out.filter(o=>o.status==='matched');
+ const ambig=out.filter(o=>o.status==='ambiguous');
+ const unm=out.filter(o=>o.status==='unmatched');
+ let h='';
+ if(matched.length){
+  h+=`<div class="wcgrouphdr" style="margin-top:0">&#10003; Auto-matched (${matched.length})</div>`;
+  matched.forEach((e,i)=>{
+   const gi=out.indexOf(e);
+   h+=`<div class="wcard has" style="padding:8px 11px">
+    <div class="wctop">
+     <div><div class="wcname" style="font-size:12px">${esc(e.phrase)} <span style="color:var(--ink2);font-weight:400">\u00d7 ${e.qty}</span></div>
+      <div style="font-size:11px;color:var(--ok);margin-top:3px">&rarr; ${esc(e.match.name)} \u00b7 <b>${inr(e.match.rate)}</b></div></div>
+     <div><label style="font-size:10px;color:var(--ink2);display:flex;align-items:center;gap:5px"><input type="checkbox" checked class="pcInc" data-i="${gi}"/>Add</label></div>
+    </div>
+   </div>`;
+  });
+ }
+ if(ambig.length){
+  h+=`<div class="wcgrouphdr">&#9888; Need your attention (${ambig.length})</div>`;
+  ambig.forEach((e,i)=>{
+   const gi=out.indexOf(e);
+   h+=`<div class="wcard" style="border-color:var(--warn);padding:8px 11px">
+    <div class="wctop">
+     <div><div class="wcname" style="font-size:12px">${esc(e.phrase)} <span style="color:var(--ink2);font-weight:400">\u00d7 ${e.qty}</span></div>
+      <select class="ddselect" data-i="${gi}" onchange="pcPickAlt(${gi},this.value)" style="margin-top:6px;max-width:100%;width:100%">
+       <option value="">\u2014 Pick a match \u2014</option>
+       ${e.alternatives.map((a,ai)=>`<option value="${ai}">${esc(a.label)}</option>`).join('')}
+      </select></div>
+     <div><label style="font-size:10px;color:var(--ink2);display:flex;align-items:center;gap:5px"><input type="checkbox" class="pcInc" data-i="${gi}" disabled/>Add</label></div>
+    </div>
+   </div>`;
+  });
+ }
+ if(unm.length){
+  h+=`<div class="wcgrouphdr">&#128230; Not in catalog (${unm.length})</div>`;
+  unm.forEach((e,i)=>{
+   const gi=out.indexOf(e);
+   h+=`<div class="wcard" style="border-color:var(--hot);padding:8px 11px">
+    <div class="wctop">
+     <div style="flex:1"><div class="wcname" style="font-size:12px">${esc(e.phrase)} <span style="color:var(--ink2);font-weight:400">\u00d7 ${e.qty}</span></div>
+      <div style="font-size:11px;color:var(--ink2);margin-top:3px">No Havells match found. Add as a custom item:</div>
+      <div class="frm" style="margin-top:6px">
+       <label>Category<select class="ddselect pcCustCat" data-i="${gi}">${CUSTOM_CATS.map(c=>`<option>${esc(c)}</option>`).join('')}</select></label>
+       <label>Rate (\u20b9)<input type="number" class="pcCustRate" data-i="${gi}" min="0" placeholder="Rate"/></label>
+      </div></div>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px">
+     <button onclick="pcAddCustom(${gi})" style="border:0;background:var(--ink);color:#fff;border-radius:8px;padding:7px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Save & add</button>
+     <button onclick="pcSkipUnmatched(${gi})" style="border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Skip</button>
+    </div>
+   </div>`;
+  });
+ }
+ const canAddCount=matched.length;
+ h+=`<div style="margin-top:12px;display:flex;gap:8px">
+   <button onclick="pcAddAllToBasket()" style="border:0;background:var(--ok);color:#fff;border-radius:10px;padding:11px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Add matched (${canAddCount}) to basket</button>
+   <button onclick="hidePaste()" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Cancel</button>
+  </div>`;
+ box.innerHTML=h;
+}
+function pcPickAlt(i,ai){
+ const e=PC_STATE.cands[i];if(!e||ai==='')return;
+ e.status='matched';e.match=e.alternatives[+ai];
+ renderMatcherResults();
+}
+function pcAddCustom(i){
+ const e=PC_STATE.cands[i];if(!e)return;
+ const cat=document.querySelector(`.pcCustCat[data-i="${i}"]`).value;
+ const rateEl=document.querySelector(`.pcCustRate[data-i="${i}"]`);
+ const rate=parseFloat(rateEl.value);
+ if(!rate||rate<=0){alert('Enter a rate for this custom item.');rateEl.focus();return;}
+ // save to permanent Custom Items list
+ const list=loadCustomItems();
+ const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ list.unshift({id,name:e.phrase,cat,rate,unit:''});
+ saveCustomItemsList(list);
+ // mark as matched for this session
+ e.status='matched';
+ e.match={key:customKey(id), code:'CUSTOM', rate, name:e.phrase, group:cat+' \u2014 Custom Items', mi:0};
+ renderMatcherResults();
+}
+function pcSkipUnmatched(i){
+ PC_STATE.cands[i].status='skipped';
+ renderMatcherResults();
+}
+function pcAddAllToBasket(){
+ const cust=PC_STATE.customerKey||F.cust||'default';
+ let added=0;
+ // gather every matched entry whose Add checkbox is on (or no checkbox if it wasn't rendered — treat as on)
+ const inc={};
+ document.querySelectorAll('.pcInc:checked').forEach(el=>{inc[el.dataset.i]=true;});
+ // also include matched items via custom-item flow (which have no checkbox)
+ for(let i=0;i<PC_STATE.cands.length;i++){
+  const e=PC_STATE.cands[i];
+  if(e.status!=='matched'||!e.match)continue;
+  if(document.querySelector(`.pcInc[data-i="${i}"]`) && !inc[i])continue;  // checkbox was rendered but unchecked
+  const m=e.match;
+  Q[m.key]={q:e.qty,p:m.rate,n:m.name,g:m.group,code:m.code||''};
+  trackRecent(m.key);
+  added++;
+  // save override so this phrase auto-picks this SKU next time for this customer
+  pcSaveOverride(cust,e.phrase,m.key);
+ }
+ calc();
+ if(added){
+  toast('Added '+added+' item'+(added===1?'':'s')+' to basket');
+  hidePaste();
+  view('basket');
+ } else {
+  alert('Nothing to add. Resolve the flagged lines first, or check that "Add" is ticked.');
+ }
+}
+
 function renderCustomItems(){
  document.getElementById('subtabs').innerHTML='';
  document.getElementById('accSel').style.display='none';
@@ -909,6 +1750,478 @@ function renderCustomItems(){
  document.getElementById('list').innerHTML=h;
  document.getElementById('flag').innerHTML='<div class="flag">Items you add here are saved on this device and stay available for every future quotation.</div>';
 }
+
+// ===== Paste customer list — smart matcher =====
+// Rule store: per-customer "override memory" so that the same phrase from same customer defaults to your chosen SKU next time.
+function loadPasteRules(){try{return JSON.parse(localStorage.getItem('sh_paste_rules')||'{}');}catch(e){return {};}}
+function savePasteRules(o){try{localStorage.setItem('sh_paste_rules',JSON.stringify(o));}catch(e){}}
+function pasteRuleKey(cust,phrase){return (cust||'*')+'::'+phrase.toLowerCase().replace(/\s+/g,' ').trim();}
+function pasteRememberRule(cust,phrase,itemKey,itemName,itemPrice,groupHint){
+ const rules=loadPasteRules();
+ rules[pasteRuleKey(cust,phrase)]={k:itemKey,n:itemName,p:itemPrice,g:groupHint};
+ savePasteRules(rules);
+}
+function pasteRecallRule(cust,phrase){
+ const rules=loadPasteRules();
+ return rules[pasteRuleKey(cust,phrase)]||rules[pasteRuleKey('*',phrase)];
+}
+
+// Series presets per customer
+function loadCustSeries(){try{return JSON.parse(localStorage.getItem('sh_cust_series')||'{}');}catch(e){return {};}}
+function saveCustSeries(o){try{localStorage.setItem('sh_cust_series',JSON.stringify(o));}catch(e){}}
+function rememberSeries(){
+ const s=(document.getElementById('plSeries')||{}).value;
+ const f=(document.getElementById('plFinish')||{}).value;
+ fillFinishDropdown();
+ if(F.cust){const map=loadCustSeries();map[F.cust]={s,f};saveCustSeries(map);}
+}
+function fillSeriesDropdown(){
+ const sel=document.getElementById('plSeries');if(!sel)return;
+ const series=Object.keys(D.SW);
+ sel.innerHTML=series.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ const map=loadCustSeries(); const saved=F.cust?map[F.cust]:null;
+ if(saved&&series.includes(saved.s))sel.value=saved.s;
+ fillFinishDropdown();
+ if(saved){const f=document.getElementById('plFinish');if(f&&saved.f)f.value=saved.f;}
+}
+function fillFinishDropdown(){
+ const s=(document.getElementById('plSeries')||{}).value;
+ const finSel=document.getElementById('plFinish');if(!finSel||!s||!D.SW[s])return;
+ const finishes=Object.keys(D.SW[s].plates||{});
+ finSel.innerHTML=finishes.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+}
+
+function openPasteList(){
+ document.getElementById('pasteOverlay').style.display='block';
+ document.getElementById('pasteStep1').style.display='block';
+ document.getElementById('pasteStep2').style.display='none';
+ fillSeriesDropdown();
+}
+function closePasteList(){document.getElementById('pasteOverlay').style.display='none';}
+function backToStep1(){
+ document.getElementById('pasteStep1').style.display='block';
+ document.getElementById('pasteStep2').style.display='none';
+}
+function fillDemo(){
+ document.getElementById('plText').value=
+`Plates & Boxes
+* 18 Model Plate = 2 pc
+* 16 Model Plate = 8 pc
+* 12 Model Plate = 5 pc
+* 8 Model Long Plate = 10 pc
+* 6 Model Plate = 25 pc
+* 4 Model Plate = 10 pc
+* 3 Model Plate = 5 pc
+* 2 Model Plate = 15 pc
+
+Switches, Sockets & Accessories
+* 6 amp Switch = 150 pc
+* 6 amp Socket = 30 pc
+* 16 amp Switch = 10 pc
+* 16 amp Socket = 20 pc
+* 25 amp Starter / AC Switch = 6 pc
+* Bell Push = 2 pc
+* 2 way Switch = 10 pc
+* 4 Model Foot Lamp = 5 pc
+* 3 Model Foot Lamp = 3 pc
+* Blank Switch = 20 pc
+
+Adapters & Strips
+* 12V 5amp Adapter = 10 pc
+* 12V 10amp Adapter = 10 pc
+* Strip light 5m = 20 pc
+
+MCBs & Isolators
+* 63 amp Isolator = 4 pc
+* 20 amp MCB = 6 pc
+* 16 amp MCB = 6 pc
+* 10 amp MCB = 10 pc
+* 6 amp MCB = 10 pc`;
+}
+
+// Parse a raw line into {phrase, qty}, or null if it's a header/blank
+function pasteParseLine(raw){
+ let s=String(raw||'').trim();
+ if(!s)return null;
+ // strip bullet chars, list markers, leading dashes/stars/numbers
+ s=s.replace(/^[\*\u2022\u2013\u2014\-\u25aa\u25cf\+]+\s*/,'');
+ s=s.replace(/^\d+[\.\)]\s+/,'');
+ if(!s)return null;
+ // find qty: '=', 'x', 'X', ':', '@', or trailing number with unit
+ let m=s.match(/^(.+?)\s*[=:x\u00d7@]\s*(\d+)\s*(?:pc|pcs|nos|no|nos\.|pc\.|pieces?)?\s*$/i);
+ if(!m)m=s.match(/^(.+?)\s+(\d+)\s*(?:pc|pcs|nos|no|nos\.|pc\.|pieces?)\s*$/i);
+ if(!m)m=s.match(/^(.+?)\s*[\-\u2013\u2014]\s*(\d+)\s*(?:pc|pcs|nos|no)?\s*$/i);
+ if(!m)m=s.match(/^(.+?)\s*\((\d+)\s*(?:pc|pcs|nos|no)?\s*\)\s*$/i);
+ if(!m){
+  // no obvious separator — if the whole line looks like a section header (no digits), skip
+  if(!/\d/.test(s))return null;
+  // trailing bare number
+  m=s.match(/^(.+?)\s+(\d+)\s*$/);
+  if(!m)return null;
+ }
+ const phrase=m[1].trim().replace(/[:\-]$/,'').trim();
+ const qty=parseInt(m[2],10);
+ if(!phrase||!qty)return null;
+ return {phrase,qty};
+}
+
+// Extract amp value from a phrase, e.g. "6 amp Switch" -> 6
+function pasteAmps(s){const m=s.match(/(\d+)\s*(?:a|amp|amps)\b/i);return m?parseInt(m[1],10):null;}
+// Extract module count, e.g. "8 Model Plate" -> 8
+function pasteModules(s){const m=s.match(/(\d+)\s*(?:m|mod|model|module|modul)\b/i);return m?parseInt(m[1],10):null;}
+
+// Given the customer's phrase, return { auto:{k,n,p,g}, options:[{k,n,p,g,label}], notInCatalog:bool }
+function pasteMatch(phrase){
+ const s=phrase.toLowerCase();
+ const series=(document.getElementById('plSeries')||{}).value||'Adiva';
+ const finish=(document.getElementById('plFinish')||{}).value||'White / Standard';
+ const swSeries=D.SW[series]||{};
+ const plates=(swSeries.plates||{})[finish]||[];
+ const accs=(swSeries.acc||{})[finish]||[];
+
+ // ---- PLATES ----
+ // "N Model Plate", "N M Plate", etc.
+ const mod=pasteModules(s);
+ if(mod!=null && /plate|box/.test(s)){
+  const isLong=/long|horiz/.test(s);
+  // find plates matching this module count
+  const cands=plates.filter(p=>String(p.s).replace(/[^0-9]/g,'')===String(mod));
+  if(cands.length){
+   // prefer non-H (standard) unless "long"/"horiz" specified
+   let auto=cands.find(p=>isLong?/H/i.test(p.s):!/H/i.test(p.s))||cands[0];
+   if(cands.length>1){
+    return {auto:plateToItem(series,finish,auto),
+            options:cands.map(p=>plateToItem(series,finish,p,cands.length>1)),ambiguous:cands.length>1};
+   }
+   return {auto:plateToItem(series,finish,auto),options:[plateToItem(series,finish,auto)]};
+  }
+ }
+
+ // ---- ACCESSORIES ----
+ // helper to find accessories by keyword+amps
+ function findAcc(pred){return accs.filter(pred).sort((a,b)=>a.p-b.p);}
+ const amps=pasteAmps(s);
+
+ // Sockets
+ if(/socket/.test(s)){
+  const cands=findAcc(a=>{
+   if(!/socket/i.test(a.n))return false;
+   if(amps==null)return true;
+   return new RegExp('\\b'+amps+'\\s*a','i').test(a.n);
+  });
+  if(cands.length){
+   const opts=cands.map(a=>accToItem(series,finish,a));
+   return {auto:opts[0],options:opts,ambiguous:opts.length>1};
+  }
+ }
+ // Starter/motor starter
+ if(/starter|motor/.test(s)){
+  const cands=findAcc(a=>/starter/i.test(a.n));
+  if(cands.length){
+   let auto=cands[0];
+   if(amps){const m=cands.find(a=>new RegExp('\\b'+amps+'\\s*a','i').test(a.n));if(m)auto=m;}
+   return {auto:accToItem(series,finish,auto),options:cands.map(a=>accToItem(series,finish,a))};
+  }
+ }
+ // Bell push
+ if(/bell\s*push/.test(s)){
+  const cands=findAcc(a=>/bell\s*push/i.test(a.n));
+  if(cands.length){
+   return {auto:accToItem(series,finish,cands[0]),options:cands.map(a=>accToItem(series,finish,a))};
+  }
+ }
+ // 2-way switch
+ if(/2\s*way|two\s*way/.test(s)){
+  const cands=findAcc(a=>/two\s*way|2\s*way/i.test(a.n) && !/flat/i.test(a.n));
+  if(cands.length){
+   let auto=cands[0];
+   if(amps){const m=cands.find(a=>new RegExp('\\b'+amps+'a?x?\\b','i').test(a.n));if(m)auto=m;}
+   return {auto:accToItem(series,finish,auto),options:cands.map(a=>accToItem(series,finish,a))};
+  }
+ }
+ // Blank / Blank plate
+ if(/blank/.test(s)){
+  const cands=findAcc(a=>/blank/i.test(a.n));
+  if(cands.length){
+   return {auto:accToItem(series,finish,cands[0]),options:cands.map(a=>accToItem(series,finish,a))};
+  }
+ }
+ // Indicator / foot lamp / footer lamp
+ if(/foot\s*lamp|indicator|lamp/.test(s)){
+  const cands=findAcc(a=>/indicator|lamp/i.test(a.n));
+  if(cands.length){
+   return {auto:accToItem(series,finish,cands[0]),options:cands.map(a=>accToItem(series,finish,a)),ambiguous:true};
+  }
+ }
+ // Generic switch (one way, default)
+ if(/switch/.test(s) && !/starter|bell|blank|isolator|flat/.test(s)){
+  const cands=findAcc(a=>/one\s*way|1\s*way|^\s*\d+\s*a/i.test(a.n) && !/flat|two|2 way|bell/i.test(a.n));
+  if(cands.length){
+   let auto=cands[0];
+   if(amps){
+    const m=cands.find(a=>new RegExp('\\b'+amps+'a?x?\\b','i').test(a.n));
+    if(m)auto=m;
+   }
+   return {auto:accToItem(series,finish,auto),options:cands.map(a=>accToItem(series,finish,a))};
+  }
+ }
+
+ // ---- MCB / SWITCHGEAR ----
+ if(/mcb/.test(s)){
+  if(amps!=null){
+   // find matching amp in default MCB series
+   const mcbSeries=Object.keys(D.SG.MCB||{})[0];
+   if(mcbSeries){
+    const rows=D.SG.MCB[mcbSeries];
+    const row=rows.find(r=>r.a===amps || String(r.n).match(new RegExp('\\b'+amps+'a','i')));
+    if(row){
+     // pick SP + B curve by default
+     const preferred=row.o.find(o=>o.pl==='SP'&&/b/i.test(o.cv||''))||row.o[0];
+     return {auto:{k:preferred.c,n:row.n+(preferred.pl?' \u00b7 '+preferred.pl:'')+(preferred.cv?' \u00b7 '+preferred.cv:''),p:preferred.p,g:'MCBs & Switchgear \u2014 MCB \u00b7 '+mcbSeries,mi:0,code:preferred.c},
+             options:row.o.map(o=>({k:o.c,n:row.n+(o.pl?' \u00b7 '+o.pl:'')+(o.cv?' \u00b7 '+o.cv:''),p:o.p,g:'MCBs & Switchgear \u2014 MCB \u00b7 '+mcbSeries,mi:0,code:o.c}))};
+    }
+   }
+  }
+ }
+ if(/isolator/.test(s)){
+  if(amps!=null){
+   const isoSeries=Object.keys(D.SG.Isolator||{})[0];
+   if(isoSeries){
+    const rows=D.SG.Isolator[isoSeries];
+    const row=rows.find(r=>r.a===amps || String(r.n).match(new RegExp('\\b'+amps+'a','i')));
+    if(row){
+     const preferred=row.o.find(o=>o.pl==='DP')||row.o[0];
+     return {auto:{k:preferred.c,n:row.n+(preferred.pl?' \u00b7 '+preferred.pl:''),p:preferred.p,g:'MCBs & Switchgear \u2014 Isolator \u00b7 '+isoSeries,mi:0,code:preferred.c},
+             options:row.o.map(o=>({k:o.c,n:row.n+(o.pl?' \u00b7 '+o.pl:''),p:o.p,g:'MCBs & Switchgear \u2014 Isolator \u00b7 '+isoSeries,mi:0,code:o.c}))};
+    }
+   }
+  }
+ }
+
+ // nothing matched
+ return {auto:null,options:[],notInCatalog:true};
+}
+
+function plateToItem(series,finish,p,ambig){
+ return {k:p.c,n:p.s+' plate \u00b7 '+finish,p:p.p,g:'Switches \u2014 '+series+' \u00b7 '+finish,mi:0,code:p.c,
+         label:p.s+' plate ('+series+' '+finish+') \u2014 \u20b9'+p.p};
+}
+function accToItem(series,finish,a){
+ return {k:a.c,n:a.n,p:a.p,g:'Switches \u2014 '+series+' \u00b7 '+finish,mi:0,code:a.c,
+         label:a.n+' ('+series+' '+finish+') \u2014 \u20b9'+a.p};
+}
+
+let PASTE_LINES=[];
+function doMatch(){
+ const raw=(document.getElementById('plText')||{}).value||'';
+ const parsed=raw.split(/\r?\n/).map(pasteParseLine).filter(Boolean);
+ if(!parsed.length){alert('No item lines found. Include quantities like "= 5 pc" or "x 5".');return;}
+ // dedupe within pasted list — sum qtys of identical phrases
+ const merged={};
+ parsed.forEach(p=>{const k=p.phrase.toLowerCase();merged[k]=merged[k]||{phrase:p.phrase,qty:0};merged[k].qty+=p.qty;});
+ const lines=Object.values(merged);
+ const cust=F.cust||'';
+ PASTE_LINES=lines.map((ln,idx)=>{
+  const remembered=pasteRecallRule(cust,ln.phrase);
+  if(remembered){
+   return {phrase:ln.phrase,qty:ln.qty,idx,status:'ok',auto:remembered,options:[remembered],chosen:remembered.k};
+  }
+  const m=pasteMatch(ln.phrase);
+  if(m.notInCatalog||!m.auto){
+   return {phrase:ln.phrase,qty:ln.qty,idx,status:'custom',auto:null,options:[],chosen:null};
+  }
+  return {phrase:ln.phrase,qty:ln.qty,idx,status:m.ambiguous?'ambig':'ok',auto:m.auto,options:m.options,chosen:m.auto.k};
+ });
+ renderMatchResults();
+ document.getElementById('pasteStep1').style.display='none';
+ document.getElementById('pasteStep2').style.display='block';
+}
+
+function renderMatchResults(){
+ const box=document.getElementById('plResults');
+ const ok=PASTE_LINES.filter(x=>x.status==='ok');
+ const ambig=PASTE_LINES.filter(x=>x.status==='ambig');
+ const custom=PASTE_LINES.filter(x=>x.status==='custom');
+ const total=PASTE_LINES.length;
+ const willAdd=ok.length+ambig.filter(x=>x.chosen).length+custom.filter(x=>x.chosen).length;
+ let h='';
+ h+=`<div style="font-size:12px;color:var(--ink2);margin-bottom:12px"><b>${total} lines</b> parsed &middot; ${ok.length} auto-matched, ${ambig.length} need attention, ${custom.length} not in catalog</div>`;
+
+ if(ok.length){
+  h+=`<div style="font-weight:800;font-size:11px;letter-spacing:1px;color:#2f5d54;margin:14px 0 6px">&#10003; AUTO-MATCHED (${ok.length})</div>`;
+  h+='<div class="wcards">';
+  ok.forEach(ln=>{
+   const opts=ln.options.map(o=>`<option value="${esc(o.k)}"${ln.chosen===o.k?' selected':''}>${esc(o.n)}</option>`).join('');
+   h+=`<div class="wcard has" style="padding:8px 10px">
+    <div class="wctop" style="align-items:flex-start"><div class="wcname" style="font-size:12px">${esc(ln.phrase)} &times; ${ln.qty}</div></div>
+    <div class="wcvars" style="margin-top:6px">
+     ${ln.options.length>1?`<select class="pk" style="max-width:none;flex:1" onchange="pasteChoose(${ln.idx},this.value)">${opts}</select>`:`<span class="vbadge" style="flex:1">${esc(ln.auto.n)}</span>`}
+    </div>
+    <div style="font-size:10.5px;color:var(--ink2);margin-top:4px">Rate \u20b9${ln.auto.p} \u00b7 line total \u20b9${ln.auto.p*ln.qty}</div>
+   </div>`;
+  });
+  h+='</div>';
+ }
+ if(ambig.length){
+  h+=`<div style="font-weight:800;font-size:11px;letter-spacing:1px;color:#8a6d1f;margin:16px 0 6px">&#9888; PICK A MATCH (${ambig.length})</div>`;
+  h+='<div class="wcards">';
+  ambig.forEach(ln=>{
+   const opts=ln.options.map(o=>`<option value="${esc(o.k)}"${ln.chosen===o.k?' selected':''}>${esc(o.n)} &mdash; \u20b9${o.p}</option>`).join('');
+   h+=`<div class="wcard" style="padding:8px 10px;border-color:#e8dcb5;background:#fdf9ea">
+    <div class="wctop" style="align-items:flex-start"><div class="wcname" style="font-size:12px">${esc(ln.phrase)} &times; ${ln.qty}</div></div>
+    <div class="wcvars" style="margin-top:6px">
+     <select class="pk" style="max-width:none;flex:1" onchange="pasteChoose(${ln.idx},this.value)"><option value="">&mdash; skip this line &mdash;</option>${opts}</select>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+     <button onclick="pasteMatchManually(${ln.idx})" style="flex:1;border:1px solid #b39457;background:#fff;color:#8a6d1f;border-radius:8px;padding:7px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">&#128269; Match manually</button>
+     <button onclick="pasteMakeCustomAsk(${ln.idx})" style="flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:8px;padding:7px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer">Or add as custom</button>
+    </div>
+   </div>`;
+  });
+  h+='</div>';
+ }
+ if(custom.length){
+  h+=`<div style="font-weight:800;font-size:11px;letter-spacing:1px;color:var(--hot);margin:16px 0 6px">&#128230; NOT IN CATALOG (${custom.length})</div>`;
+  h+=`<div style="font-size:11px;color:var(--ink2);margin-bottom:8px">These lines didn't auto-match. Search the full catalog manually, or save them as custom items.</div>`;
+  h+='<div class="wcards">';
+  custom.forEach(ln=>{
+   h+=`<div class="wcard" style="padding:8px 10px;border-color:#e6c4c1;background:#fdf5f4">
+    <div class="wctop" style="align-items:flex-start"><div class="wcname" style="font-size:12px">${esc(ln.phrase)} &times; ${ln.qty}</div></div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+     <button onclick="pasteMatchManually(${ln.idx})" style="flex:1;border:0;background:#0f766e;color:#fff;border-radius:8px;padding:9px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">&#128269; Match manually</button>
+     <button onclick="pasteToggleCustomForm(${ln.idx})" style="flex:1;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">+ Add as custom</button>
+     <button onclick="pasteSkip(${ln.idx})" style="flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:8px;padding:9px 12px;font:inherit;font-size:12px;font-weight:600;cursor:pointer">Skip</button>
+    </div>
+    <div id="pcf_${ln.idx}" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed #e6c4c1">
+     <div style="font-size:10.5px;color:var(--ink2);margin-bottom:6px">Save as a custom item with its own rate:</div>
+     <div style="display:flex;gap:6px">
+      <input type="number" placeholder="Rate \u20b9" id="pcr_${ln.idx}" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:13px" min="0"/>
+      <input type="text" placeholder="Category" id="pcc_${ln.idx}" value="Custom" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:12px"/>
+     </div>
+     <button onclick="pasteMakeCustom(${ln.idx})" style="width:100%;margin-top:6px;border:0;background:var(--ink);color:#fff;border-radius:8px;padding:8px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Save custom item</button>
+    </div>
+   </div>`;
+  });
+  h+='</div>';
+ }
+ box.innerHTML=h;
+ document.getElementById('plAddBtn').textContent='Add matched to basket ('+willAdd+')';
+}
+
+function pasteChoose(idx,val){
+ const ln=PASTE_LINES.find(x=>x.idx===idx);
+ if(!ln)return;
+ ln.chosen=val||null;
+ if(val){
+  const opt=ln.options.find(o=>o.k===val);
+  if(opt){ln.auto=opt;
+   pasteRememberRule(F.cust||'',ln.phrase,opt.k,opt.n,opt.p,opt.g);}
+ }
+ renderMatchResults();
+}
+function pasteSkip(idx){
+ const ln=PASTE_LINES.find(x=>x.idx===idx);if(ln){ln.chosen=null;ln.status='skipped';}
+ renderMatchResults();
+}
+function pasteMakeCustom(idx){
+ const ln=PASTE_LINES.find(x=>x.idx===idx);if(!ln)return;
+ const rate=parseFloat((document.getElementById('pcr_'+idx)||{}).value);
+ const cat=(document.getElementById('pcc_'+idx)||{}).value||'Custom';
+ if(!rate||rate<=0){alert('Enter a rate for this custom item.');return;}
+ const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ const list=loadCustomItems();
+ list.unshift({id,name:ln.phrase,cat,rate,unit:''});
+ saveCustomItemsList(list);
+ const key=customKey(id);
+ ln.status='ok';ln.chosen=key;
+ ln.auto={k:key,n:ln.phrase,p:rate,g:cat+' \u2014 Custom Items',code:'CUSTOM'};
+ ln.options=[ln.auto];
+ pasteRememberRule(F.cust||'',ln.phrase,key,ln.phrase,rate,cat+' \u2014 Custom Items');
+ renderMatchResults();
+}
+
+// --- Manual match & custom-form toggle (added 2026-09) ---
+// Toggle the custom-item form inline within an unmatched card.
+function pasteToggleCustomForm(idx){
+ const el=document.getElementById('pcf_'+idx);
+ if(!el)return;
+ el.style.display=(el.style.display==='none'||!el.style.display)?'block':'none';
+ if(el.style.display==='block'){setTimeout(()=>document.getElementById('pcr_'+idx)?.focus(),50);}
+}
+// Push an ambiguous line into the "custom" bucket so user can add it as a custom item.
+function pasteMakeCustomAsk(idx){
+ const ln=PASTE_LINES.find(x=>x.idx===idx);if(!ln)return;
+ ln.status='custom';ln.chosen=null;ln.auto=null;ln.options=[];
+ renderMatchResults();
+ setTimeout(()=>{pasteToggleCustomForm(idx);
+  document.getElementById('pcr_'+idx)?.scrollIntoView({behavior:'smooth',block:'center'});},60);
+}
+// Open a full-catalog search overlay to pick any SKU for this line.
+let PMM_TARGET=null;
+function pasteMatchManually(idx){
+ PMM_TARGET=idx;
+ const ln=PASTE_LINES.find(x=>x.idx===idx);if(!ln)return;
+ document.getElementById('pmmOverlay').style.display='flex';
+ const inp=document.getElementById('pmmInput');
+ // seed with the phrase to give a running start
+ inp.value=ln.phrase.replace(/\s+/g,' ').trim();
+ document.getElementById('pmmFor').textContent='Matching: '+ln.phrase+'  \u00d7'+ln.qty;
+ pmmSearch(inp.value);
+ setTimeout(()=>{inp.focus();inp.select&&inp.select();},60);
+}
+function pmmClose(){document.getElementById('pmmOverlay').style.display='none';PMM_TARGET=null;}
+function pmmSearch(q){
+ q=(q||'').trim().toLowerCase();
+ const box=document.getElementById('pmmResults');
+ if(q.length<2){box.innerHTML='<div style="padding:14px;text-align:center;color:var(--ink2);font-size:12px">Type at least 2 characters. Try a code, size (16mm), wattage (18w), or colour temp (4000k).</div>';return;}
+ const idx=buildIndex();
+ const terms=q.split(/\s+/);
+ const hits=idx.filter(x=>terms.every(t=>x.hay.includes(t)));
+ if(!hits.length){box.innerHTML='<div style="padding:14px;text-align:center;color:var(--ink2);font-size:12px">No matches. Try fewer words.</div>';return;}
+ const show=hits.slice(0,60);window.__pmm=show;
+ let h='<div style="font-size:11px;color:var(--ink2);padding:2px 4px 8px">'+hits.length+' match'+(hits.length>1?'es':'')+(hits.length>60?' — showing first 60':'')+'. Tap one to match this line.</div>';
+ h+=show.map((x,i)=>{
+  const sub=[x.code,x.extra.trim(),x.catlabel].filter(Boolean).join(' \u00b7 ');
+  return `<button onclick="pmmPick(${i})" style="display:flex;width:100%;text-align:left;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);background:#fff;border-radius:8px;margin-bottom:6px;cursor:pointer;font:inherit">
+   <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:var(--ink)">${esc(x.name)}</div>
+    <div style="font-size:10.5px;color:var(--ink2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sub)}</div></div>
+   <div style="flex:0 0 auto;text-align:right"><div style="font-size:13px;font-weight:700;color:var(--ink)">&#8377;${x.price}</div>
+    <div style="font-size:9.5px;letter-spacing:.6px;color:var(--ink2);text-transform:uppercase;margin-top:2px">${esc(x.catlabel)}</div></div>
+  </button>`;}).join('');
+ box.innerHTML=h;
+}
+function pmmPick(i){
+ const x=window.__pmm&&window.__pmm[i];if(!x||PMM_TARGET==null)return;
+ const ln=PASTE_LINES.find(l=>l.idx===PMM_TARGET);if(!ln){pmmClose();return;}
+ const key=x.mi?('MI::'+x.name):(x.code||('K::'+x.name));
+ const opt={k:key,n:x.disp||x.name,p:x.price,g:x.g,code:x.code||''};
+ if(x.mi)opt.mi=1;
+ ln.status='ok';ln.chosen=key;ln.auto=opt;ln.options=[opt];
+ // remember for this customer so this phrase auto-matches next time
+ pasteRememberRule(F.cust||'',ln.phrase,key,opt.n,opt.p,opt.g);
+ pmmClose();
+ renderMatchResults();
+ toast('Matched to '+opt.n);
+}
+
+function addAllMatches(){
+ let added=0;
+ PASTE_LINES.forEach(ln=>{
+  if(!ln.chosen||!ln.auto)return;
+  const k=ln.chosen;
+  const it=ln.auto;
+  if(Q[k]){Q[k].q=(Q[k].q||0)+ln.qty;}
+  else{Q[k]={q:ln.qty,p:it.p,n:it.n,g:it.g,code:it.code||k};
+       if(it.mi)Q[k].mi=1;}
+  trackRecent(k);
+  added++;
+ });
+ calc();
+ closePasteList();
+ toast(added?('Added '+added+' line'+(added>1?'s':'')+' to basket'):'Nothing added');
+ if(added)view('basket');
+}
+
 
 let catDDOpen=false;
 function toggleCatDD(force){
@@ -1009,9 +2322,12 @@ function fillDD2(){
 function pick2(x){B=x;C=null;FS={};LS={};PLS={};
  if(CAT==='WI'){
   document.getElementById('mainp').style.display='none';
-  fillDD2();fillDD3();return;}
+  setTimeout(function(){fillDD2();fillDD3();},0);return;}
  document.getElementById('mainp').style.display='block';
- fillDD2();subtabs();render();
+ subtabs();render();
+ // defer dropdown rebuild: rewriting dd2.innerHTML during the native change event
+ // makes iOS Safari's picker snap back visually to the old choice.
+ setTimeout(fillDD2,0);
  document.getElementById('mainp').scrollIntoView({behavior:'smooth',block:'start'});}
 function fillDD3(){
  const opts=L3().map(x=>{
@@ -1024,7 +2340,8 @@ function fillDD3(){
  dd3.disabled=false;
 }
 function pick3(x){C=x;
- document.getElementById('mainp').style.display='block';fillDD3();subtabs();render();
+ document.getElementById('mainp').style.display='block';subtabs();render();
+ setTimeout(fillDD3,0);
  document.getElementById('mainp').scrollIntoView({behavior:'smooth',block:'start'});}
 
 function subtabs(){
