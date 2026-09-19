@@ -2813,27 +2813,6 @@ function grpKey(){
  return 'Wires \u2014 '+B+(C==='pack'?'':' \u00b7 '+C);}
 
 
-// ---- Fix misleading colour temperatures in lighting row names ----
-// Some rows are named after their first variant ("6W 3000K") but actually offer
-// several colour temperatures, so every variant appeared as 3000K. Where a row
-// has more than one colour temperature, the temperature is dropped from the row
-// name and only the per-variant value is shown.
-(function stripRowKelvin(){
- var KTOK=/\s*\b(?:\d{3,4}\s*K|[2-9]\s*K|3-?in-?1)\b/ig;
- function clean(n){
-  var out=String(n).replace(KTOK,' ').replace(/\s{2,}/g,' ').replace(/[\s,·-]+$/,'').trim();
-  return out||String(n);}
- function walk(o){
-  if(Array.isArray(o)){o.forEach(walk);return;}
-  if(!o||typeof o!=='object')return;
-  if(typeof o.n==='string'&&Array.isArray(o.o)){
-   var ks={},c=0,i;
-   for(i=0;i<o.o.length;i++){var kk=o.o[i]&&o.o[i].k;if(kk&&!ks[kk]){ks[kk]=1;c++;}}
-   if(c>1)o.n=clean(o.n);}
-  for(var key in o){if(Object.prototype.hasOwnProperty.call(o,key))walk(o[key]);}}
- try{walk(D.LI);walk(D.PL);}catch(e){}
-})();
-
 // ================= PRICE-LIST (matrix) VIEW =================
 // Lays switches out the way the Havells price list does: one row per item,
 // one column per finish, so a code can be found by eye instead of by scrolling.
