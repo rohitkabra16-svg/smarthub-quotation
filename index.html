@@ -799,6 +799,17 @@ table.plt{min-width:0}
   </div>
   <div class="hint">Choose how the customer sees pricing, then press <b>Print quotation</b> in the bar below.</div>
  </div>
+ <div class="panel"><div class="lbl">Rate rounding (after discount)</div>
+  <div class="fmtrow">
+   <button class="fmtb" id="rndP" onclick="setRnd(2)">
+    <b>Paise (2 decimals)</b><small>Recommended. Rate kept to 2 decimals &mdash; nothing is given away.</small></button>
+   <button class="fmtb" id="rndR" onclick="setRnd(1)">
+    <b>Nearest &#8377;1</b><small>Rate rounded to whole rupees. Neat, but a part-rupee can be lost per unit.</small></button>
+   <button class="fmtb" id="rndN" onclick="setRnd(0)">
+    <b>No rounding</b><small>Full decimal rate used in the maths. Old behaviour.</small></button>
+  </div>
+  <div class="hint">The rate you see is the rate used. <b>Amount = rate &times; qty</b> exactly, and every subtotal, GST figure and grand total is built up from these rates, so the bill ties with the quotation. Keep this on <b>Paise</b> unless you deliberately want whole-rupee rates &mdash; on <b>Nearest &#8377;1</b> a rate of &#8377;68.44 becomes &#8377;68, which costs you 44 paise on every unit. Fixed prices set with the pencil (&#9998;) always stay exact.</div>
+ </div>
  <div class="panel"><div class="lbl">Review before printing</div><div id="rvbody"></div></div>
 </div>
 
@@ -996,8 +1007,23 @@ const D={"SW":{"Adiva":{"plates":{"White / Standard":[{"c":"AHAPLCWV01","p":95,"
 const ACOL={"White / Standard":"#f0ede8","Grey":"#8d9195","Black":"#1c1e21","Carbon":"#24262a"};
 let CAT=null,A=null,B=null,C=null,T='P',TIER='Regular',col=null,Q={},GD={},V='browse',INNER=1,SHAPE=null;
 const F={cust:'',no:'',site:'',val:'',prep:'',phone:''};let PFMT='net';let MR={};let SHOWMARGIN=false;let EXPANDED={};
+/* Rate rounding AFTER discount. 1 = nearest rupee (default, matches handmade quotations),
+   2 = keep paise (DEFAULT - never gives away part of a rupee), 0 = no rounding at all.
+   Every amount, subtotal, GST figure and grand total is derived from this rate, so
+   rate x qty always ties out with what is printed. */
+let RND=(function(){try{const v=localStorage.getItem('sh_rnd');return v===null?2:(+v||0);}catch(e){return 2;}})();
+function rnd(n){n=+n||0;
+ if(RND===1)return Math.round(n);
+ if(RND===2)return Math.round(n*100)/100;
+ return n;}
+function syncRndBtns(){const map={1:'rndR',2:'rndP',0:'rndN'};
+ for(const kk in map){const b=document.getElementById(map[kk]);if(b)b.className='fmtb'+(RND===+kk?' on':'');}}
+function setRnd(v){RND=+v;try{localStorage.setItem('sh_rnd',String(RND));}catch(e){}
+ syncRndBtns();drawBk();calc();if(typeof V!=='undefined'&&V==='review')drawRv();}
 function toggleGrp(g){EXPANDED[g]=!EXPANDED[g];drawBk();}
-const inr=n=>'\u20B9'+Math.round(n).toLocaleString('en-IN');
+const inr=n=>{const v=Math.round((+n||0)*100)/100;
+ return '\u20B9'+(Number.isInteger(v)?v.toLocaleString('en-IN')
+  :v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}));};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const J=s=>JSON.stringify(s).replace(/"/g,'&quot;');
 const COLS='<colgroup><col class="c1"/><col class="c2"/><col class="c3"/><col class="c4"/><col class="c5"/><col class="c6"/><col class="c7"/></colgroup>';
@@ -2429,9 +2455,27 @@ function fillDD1(){
  dd1.innerHTML='<option value="" disabled'+(A?'':' selected')+'>'+esc(meta().s[0])+'</option>'+opts;
  dd1.disabled=false;
 }
+function accColFor(series,finish){
+ // Pick the module (accessory) colour that belongs with the selected PLATE finish.
+ // Plates carry decorative names ("Grey PC Rose Bezel", "Matt Grey", "Acrylic SRK Black")
+ // while modules only come in a few body colours, so match on the colour word.
+ const acc=(D.SW[series]&&D.SW[series].acc)?Object.keys(D.SW[series].acc):[];
+ if(!acc.length)return null;
+ const has=n=>acc.find(k=>k.toLowerCase()===n.toLowerCase());
+ if(!finish)return acc[0];
+ const exact=has(finish); if(exact)return exact;                 // e.g. "White / Standard", "Grey"
+ const f=finish.toLowerCase();
+ const white=acc.find(k=>/white|standard/i.test(k))||acc[0];
+ if(/grey|gray/.test(f))   return has('Grey')||white;
+ if(/black|raven|charcoal/.test(f)) return has('Black')||has('Carbon')||white;
+ if(/carbon/.test(f))      return has('Carbon')||white;
+ if(/white|igloo|pearl/.test(f))    return white;
+ return white;             // bezel / glass / metal / wood finishes use the standard body
+}
+function accAuto(){return (CAT==='SW'&&A)?accColFor(A,B):null;}
 function pick1(x){A=x;B=C=null;T='P';FS={};LS={};PLS={};
  document.getElementById('mainp').style.display='none';
- if(CAT==='SW')col=Object.keys(D.SW[A].acc)[0]||null;
+ if(CAT==='SW')col=accColFor(A,null);
  fillDD1();fillDD2();}
 function fillDD2(){
  const opts=L2().map(x=>{
@@ -2452,6 +2496,7 @@ function pick2(x){B=x;C=null;FS={};LS={};PLS={};
  if(CAT==='WI'){
   document.getElementById('mainp').style.display='none';
   setTimeout(function(){fillDD2();fillDD3();},0);return;}
+ if(CAT==='SW')col=accColFor(A,B);   // modules follow the plate finish you just chose
  document.getElementById('mainp').style.display='block';
  subtabs();render();
  // defer dropdown rebuild: rewriting dd2.innerHTML during the native change event
@@ -2488,8 +2533,13 @@ function drawCols(){
   `<button class="opt${col===c?' sel':''}" onclick="setCol(${J(c)})">
    <span class="dot" style="background:${ACOL[c]||'#ccc'}"></span>
    <em>${esc(c)}<small>${D.SW[A].acc[c].length} items</small></em></button>`).join('');
- document.getElementById('accNote').textContent=D.SW[A].accFrom?
-  A+' is a plate-only range \u2014 accessories shown are from the '+D.SW[A].accFrom+' series.':'';}
+ const auto=accAuto();
+ let note=D.SW[A].accFrom?(A+' is a plate-only range \u2014 accessories shown are from the '+D.SW[A].accFrom+' series. '):'';
+ if(auto&&B){
+  note+=(col===auto)
+   ? 'Matched to your plate finish ('+B+'). Change it only if the customer wants a different module colour.'
+   : '\u26a0\ufe0f You are quoting '+col+' modules behind a '+B+' plate. Tap '+auto+' to go back to the matching colour.';}
+ document.getElementById('accNote').textContent=note;}
 function setCol(c){col=c;drawCols();render();}
 function setInner(v){INNER=v;render();}
 
@@ -3024,7 +3074,7 @@ function render(){
  if(CAT==='SW'){
   document.getElementById('pairInfo').innerHTML=PLVIEW
     ? `<span class="chip">${esc(A)}</span> <span class="chip" style="background:#5a6472">all finishes</span>`
-    : `<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span>${T==='A'?' with <span class="chip">'+esc(col)+'</span>':''}`;
+    : `<span class="chip">${esc(A)} \u00b7 ${esc(B)}</span>${T==='A'?' with <span class="chip"'+((accAuto()&&col!==accAuto())?' style="background:#b4541f"':'')+'>'+esc(col)+' modules</span>':''}`;
   const inner=D.SW[A].inner;
   if(PLVIEW){
    document.getElementById('list').innerHTML=(T==='P')?renderPlateTable(A):renderAccTable(A);
@@ -3174,19 +3224,20 @@ function lineDisc(k){const e=Q[k];return e.d!=null?e.d:(GD[e.g]||0);}
 // effective PRE-GST unit rate for a line (manual override beats discount/premium)
 // MR[k] stores the GST-INCLUSIVE rate the user typed; pre-GST = MR/1.18
 function effRate(k){const v=Q[k];
- if(MR[k]!=null)return MR[k]/1.18;
- if(v.mi)return v.p*(1+(GP[v.g]||0)/100);
- return v.p*(1-lineDisc(k)/100);}
+ if(MR[k]!=null)return MR[k]/1.18;   // fixed all-in price: left exact so the agreed incl-GST figure holds
+ if(v.mi)return rnd(v.p*(1+(GP[v.g]||0)/100));
+ return rnd(v.p*(1-lineDisc(k)/100));}
 function effRateIncl(k){return effRate(k)*1.18;}
 function totals(){let af=0,gross=0,dis=0,l=0;
  for(const k in Q){const v=Q[k];const r=effRate(k);const lineNet=r*v.q;
   af+=lineNet;l++;
   // 'gross' and 'dis' are only meaningful for the disc-format display of Havells lines
-  if(!v.mi&&MR[k]==null){const a=v.q*v.p;gross+=a;dis+=a*lineDisc(k)/100;}
+  if(!v.mi&&MR[k]==null){const a=v.q*v.p;gross+=a;dis+=a-lineNet;}
   else{gross+=lineNet;}}
- return{g:gross,dis:dis,l,af,gst:af*.18,net:af*1.18};}
+ const netRaw=af*1.18,net=Math.round(netRaw);
+ return{g:gross,dis:dis,l,af,gst:af*.18,netRaw:netRaw,net:net,ro:net-netRaw};}
 function setGP(g,v){GP[g]=(v===''||v==null)?0:Math.max(0,parseFloat(v)||0);refresh();}
-function miSale(v){return v.q*v.p*(1+(GP[v.g]||0)/100);}
+function miSale(v){return v.q*rnd(v.p*(1+(GP[v.g]||0)/100));}
 function toggleMargin(){SHOWMARGIN=!SHOWMARGIN;
  const b=document.getElementById('marginBtn');
  if(b)b.textContent=SHOWMARGIN?'\u{1f512} Hide margin':'\u{1f4b0} Show margin';
@@ -3210,6 +3261,7 @@ function totHTML(t){return `<div><span>Gross</span><span>${inr(t.g)}</span></div
  <div><span>Total discount</span><span>&minus; ${inr(t.dis)}</span></div>
  <div><span>Taxable value</span><span>${inr(t.af)}</span></div>
  <div><span>GST 18%</span><span>${inr(t.gst)}</span></div>
+ ${Math.abs(t.ro)>=0.005?`<div><span>Round off</span><span>${t.ro>0?'+':'\u2212'} ${inr(Math.abs(t.ro))}</span></div>`:''}
  <div class="big"><span>Net payable</span><span>${inr(t.net)}</span></div>`;}
 
 function setGD(g,v){GD[g]=(v===''||v==null)?0:Math.min(90,Math.max(0,parseFloat(v)||0));
@@ -3223,15 +3275,15 @@ function refresh(){
   const isMI=gs[g][0]&&gs[g][0][1].mi;
   if(isMI){const prem=GP[g]||0;let cost=0,sale=0;
    for(const [k,v] of gs[g]){cost+=v.q*v.p;const s=miSale(v);sale+=s;
-    const sr=document.getElementById('sr_'+gid(k));if(sr)sr.textContent=inr(v.p*(1+prem/100));
+    const sr=document.getElementById('sr_'+gid(k));if(sr)sr.textContent=inr(rnd(v.p*(1+prem/100)));
     const c=document.getElementById('amt_'+gid(k));if(c)c.textContent=inr(s);}
    const su=document.getElementById('sum_'+gid(g));
    if(su)su.innerHTML=`${gs[g].length} item${gs[g].length>1?'s':''} &middot; cost ${inr(cost)} &rarr; ${inr(sale)}`;
    continue;}
   let sub=0,sd=0;
-  for(const [k,v] of gs[g]){const d=lineDisc(k),a=v.q*v.p;sub+=a;sd+=a*d/100;
+  for(const [k,v] of gs[g]){const d=lineDisc(k),a=v.q*v.p,net=effRate(k)*v.q;sub+=a;sd+=a-net;
    const c=document.getElementById('amt_'+gid(k));
-   if(c)c.innerHTML=d?`<span class="ov">${inr(a)}</span> ${inr(a*(1-d/100))}`:inr(a);
+   if(c)c.innerHTML=(d||MR[k]!=null)?`<span class="ov">${inr(a)}</span> ${inr(net)}`:inr(net);
    const li=document.getElementById('ld_'+gid(k));
    if(li&&li!==document.activeElement)li.placeholder=(GD[g]||0);}
   const su=document.getElementById('sum_'+gid(g));
@@ -3262,7 +3314,7 @@ function drawBk(){
    h+='<table class="bt">'+(SHOWMARGIN?COLS_M:COLS)+'<thead><tr><th>Item</th><th>Unit</th><th class="num">Cost</th><th class="mid">Qty</th><th class="num">Sale rate</th><th class="num">Amount</th>'+(SHOWMARGIN?'<th class="num">Margin</th>':'')+'<th></th></tr></thead><tbody>';
    for(const [k,v] of rows){const parts=String(v.n).split(' \u00b7 ');
     const manMI=MR[k]!=null;
-    const sr=manMI?MR[k]/1.18:v.p*(1+prem/100);  // display pre-GST in sale-rate col; MR stores incl.
+    const sr=manMI?MR[k]/1.18:rnd(v.p*(1+prem/100));  // display pre-GST in sale-rate col; MR stores incl.
     const lineMarg=(sr-v.p)*v.q;
     h+=`<tr><td class="it" data-label="Item">${esc(parts[0])}</td>
      <td class="cd" data-label="Unit">${parts.length>1?esc(parts.slice(1).join(' \u00b7 ')):'&mdash;'}</td>
@@ -3286,10 +3338,11 @@ function drawBk(){
    h+=`<tr><td class="cd ${v.prov?'pv':''}" data-label="Code">${esc(v.code||k)}${v.prov?'<span class="pvb">prov</span>':''}</td>
     <td class="it" data-label="Item">${esc(parts[0])}${parts.length>1?`<div class="sub">${esc(parts.slice(1).join(' \u00b7 '))}</div>`:''}</td>
     <td class="num" data-label="Rate"><div class="ratecell">${MR[k]!=null?`<span class="mrtag" title="Manual price set (incl. GST)">SET</span> `:''}${inr(v.p)}
-      <span class="edit${MR[k]!=null?' on':''}" title="Set a fixed price (incl. GST)" onclick="editMR(${J(k)})">&#9998;</span></div></td>
+      <span class="edit${MR[k]!=null?' on':''}" title="Set a fixed price (incl. GST)" onclick="editMR(${J(k)})">&#9998;</span></div>
+      ${(d||MR[k]!=null)?`<div class="cd" title="Net rate per unit after discount \u2014 this is what is multiplied by qty">net ${inr(effRate(k))}<span style="opacity:.6"> / unit</span></div>`:''}</td>
     <td class="mid" data-label="Qty"><input class="qty" type="number" min="0" value="${v.q}" oninput="bkQ(${J(k)},this.value)"/></td>
     <td class="mid" data-label="Disc %">${MR[k]!=null?'<span class="cd">\u2014</span>':`<input class="dq" id="ld_${gid(k)}" type="number" min="0" max="90" value="${ov?v.d:''}" placeholder="${GD[g]||0}" title="Blank = group rate" oninput="setLD(${J(k)},this.value)"/>`}</td>
-    <td class="num" id="amt_${gid(k)}" data-label="Amount">${MR[k]!=null?`<span class="mrtag" title="Fixed price incl. GST">SET \u00b7 ${inr(MR[k])} incl</span> ${inr(effRate(k)*v.q)}`:(d?`<span class="ov">${inr(a)}</span> ${inr(a*(1-d/100))}`:inr(a))}</td>
+    <td class="num" id="amt_${gid(k)}" data-label="Amount">${MR[k]!=null?`<span class="mrtag" title="Fixed price incl. GST">SET \u00b7 ${inr(MR[k])} incl</span> ${inr(effRate(k)*v.q)}`:(d?`<span class="ov">${inr(a)}</span> ${inr(effRate(k)*v.q)}`:inr(effRate(k)*v.q))}</td>
     <td class="mid frdel"><button class="xb" onclick="del(${J(k)})">&times;</button></td></tr>`;}
   h+='</tbody></table></div></div>';}
  h+=`<div class="tot" id="tot">${totHTML(totals())}</div>
@@ -3319,15 +3372,15 @@ function drawRv(){
      return `<tr><td class="it">${esc(parts[0])}</td><td class="cd">${parts.length>1?esc(parts.slice(1).join(' \u00b7 ')):'&mdash;'}</td>
      <td class="num">${inr(v.p)}</td><td class="mid">${v.q}</td><td class="mid">${prem?'+'+prem+'%':'&mdash;'}</td>
      <td class="num">${inr(miSale(v))}</td></tr>`}).join('')+'</tbody></table></div>';continue;}
-  const sub=rows.reduce((a,[k,v])=>a+v.q*v.p*(1-lineDisc(k)/100),0);
+  const sub=rows.reduce((a,[k,v])=>a+effRate(k)*v.q,0);
   h+=`<div class="grpwrap"><div class="ghead"><b>${esc(g)}</b>${gd?`<span class="dlab">group ${gd}%</span>`:''}
    <span class="gsum">${rows.length} line${rows.length>1?'s':''} &middot; net ${inr(sub)}</span></div>`;
   h+='<table class="bt">'+COLS6+'<thead><tr><th>Code</th><th>Item</th><th class="num">Rate</th><th class="mid">Qty</th><th class="mid">Disc</th><th class="num">Net</th></tr></thead><tbody>'+
    rows.map(([k,v])=>{const d=lineDisc(k);const parts=String(v.n).split(' \u00b7 ');
     return `<tr><td class="cd ${v.prov?'pv':''}">${esc(v.code||k)}${v.prov?'<span class="pvb">prov</span>':''}</td>
     <td class="it">${esc(parts[0])}${parts.length>1?`<div class="sub">${esc(parts.slice(1).join(' \u00b7 '))}</div>`:''}</td>
-    <td class="num">${inr(v.p)}</td><td class="mid">${v.q}</td><td class="mid">${d?d+'%'+(v.d!=null?' *':''):'&mdash;'}</td>
-    <td class="num">${inr(v.q*v.p*(1-d/100))}</td></tr>`}).join('')+'</tbody></table></div>';}
+    <td class="num">${inr(v.p)}${d?`<div class="cd">net ${inr(effRate(k))}</div>`:''}</td><td class="mid">${v.q}</td><td class="mid">${d?d+'%'+(v.d!=null?' *':''):'&mdash;'}</td>
+    <td class="num">${inr(effRate(k)*v.q)}</td></tr>`}).join('')+'</tbody></table></div>';}
  h+=`<div class="tot">${totHTML(t)}</div><div class="hint">* line-level override. Edit in the Basket tab.</div>`;
  B2.innerHTML=h;}
 
@@ -3364,7 +3417,7 @@ function prt(mode){const t=totals();
    const man=(MR[k]!=null);
    const disc=(isMI||man)?0:lineDisc(k);
    const base=effRate(k);                    // pre-GST unit rate (handles manual, disc, premium)
-   const lp=isMI ? v.p*(1+prem/100) : v.p;    // list price column (disc format)
+   const lp=isMI ? rnd(v.p*(1+prem/100)) : v.p;    // list price column (disc format)
    const rate=base*gm;                        // displayed rate (×1.18 if inclusive)
    const amt=rate*v.q;
    const sub=parts0(v).length>1?`<div class="cd">${esc(v.code?v.code+' \u00b7 ':'')}${esc(parts0(v).slice(1).join(' \u00b7 '))}</div>`
@@ -3392,13 +3445,16 @@ function prt(mode){const t=totals();
  if(qsh){qsh.classList.remove('dn2','dn3');
   if(sl>30)qsh.classList.add('dn3'); else if(sl>18)qsh.classList.add('dn2');}
  // totals block
+ const roRow=Math.abs(t.ro)>=0.005?`<div class="r"><span>Round off</span><span>${t.ro>0?'+':'\u2212'} ${inr(Math.abs(t.ro))}</span></div>`:'';
  document.getElementById('qtot').innerHTML= (PFMT==='inc')
-  ? `<div class="r"><span>Subtotal (incl. GST)</span><span>${inr(t.net)}</span></div>
+  ? `<div class="r"><span>Subtotal (incl. GST)</span><span>${inr(t.netRaw)}</span></div>
      <div class="r" style="font-size:11px;color:#5a616b"><span>Includes GST @ 18%</span><span>${inr(t.gst)}</span></div>
+     ${roRow}
      <div class="grand"><span>Grand Total</span><span>${inr(t.net)}</span></div>
      <div class="qword">${rupeeWords(t.net)}</div>`
   : `<div class="r"><span>Taxable value</span><span>${inr(t.af)}</span></div>
      <div class="r"><span>GST @ 18%</span><span>${inr(t.gst)}</span></div>
+     ${roRow}
      <div class="grand"><span>Grand Total</span><span>${inr(t.net)}</span></div>
      <div class="qword">${rupeeWords(t.net)}</div>`;
  // meta
@@ -3619,10 +3675,10 @@ function rupeeWords(n){
 
 // serialise the whole quotation state
 function snapshot(){
- return {Q:Q,GD:GD,GP:GP,MR:MR,F:F,PFMT:PFMT,at:new Date().toISOString()};
+ return {Q:Q,GD:GD,GP:GP,MR:MR,F:F,PFMT:PFMT,RND:RND,at:new Date().toISOString()};
 }
 function restore(s){
- Q=s.Q||{};GD=s.GD||{};GP=s.GP||{};MR=s.MR||{};PFMT=s.PFMT||'net';
+ Q=s.Q||{};GD=s.GD||{};GP=s.GP||{};MR=s.MR||{};PFMT=s.PFMT||'net';RND=(s.RND==null?RND:+s.RND);syncRndBtns();
  Object.assign(F,s.F||{});
  fCust.value=F.cust||'';fNo.value=F.no||'';fSite.value=F.site||'';fVal.value=F.val||'';
  const fp=document.getElementById('fPrep');if(fp)fp.value=F.prep||'';
@@ -3766,6 +3822,6 @@ function dupQuote(no){
  catch(e){alert('Could not duplicate.');}
 }
 
-drawCats();drawBk();calc();renderRecent();
+syncRndBtns();drawCats();drawBk();calc();renderRecent();
 if(syncOn())syncPull(false);
 </script></body></html>
