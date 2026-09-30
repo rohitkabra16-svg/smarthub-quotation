@@ -78,20 +78,38 @@ tr.has{background:#fff}
    using the empty margin instead of a full-width strip across the bottom ===== */
 @media(min-width:1180px){
  #bar{left:auto;right:16px;bottom:auto;top:50%;transform:translateY(-50%);
-  width:196px;border-radius:16px;padding:14px 12px;box-shadow:0 10px 40px rgba(0,0,0,.28);
-  max-height:92vh;overflow-y:auto}
- #bar .stats{flex-direction:column;overflow:visible;gap:7px;padding-bottom:11px;margin-bottom:11px}
- #bar .stat{min-width:0;width:100%;padding:7px 11px}
- #bar .v{font-size:16px}
- #bar .actions{flex-direction:column;overflow:visible;gap:7px}
- #bar .abtn{width:100%;flex-direction:row;justify-content:flex-start;gap:9px;padding:10px 12px}
- #bar .abtn .ic{font-size:15px;width:17px;text-align:center}
- #bar .abtn .lb{font-size:12px}
- .wrap{padding-right:226px;padding-bottom:48px}
- #toast{bottom:32px;left:calc(50% - 113px)}
+  width:236px;border-radius:16px;padding:13px 11px;box-shadow:0 10px 40px rgba(0,0,0,.28);
+  max-height:94vh;overflow:visible}
+ /* totals: two per row, Net payable across the full width */
+ #bar .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;overflow:visible;padding-bottom:10px;margin-bottom:10px}
+ #bar .stat{min-width:0;width:auto;padding:6px 9px}
+ #bar .stat.hi{grid-column:1/-1;padding:8px 11px}
+ #bar .n{font-size:8.5px;letter-spacing:1px}
+ #bar .v{font-size:14px}
+ #bar .stat.hi .v{font-size:18px}
+ /* actions: two per row so all of them stay on screen - no inner scrollbar,
+    Print is always visible without scrolling the rail */
+ #bar .actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;overflow:visible}
+ #bar .abtn{width:auto;min-width:0;flex-direction:row;justify-content:flex-start;gap:7px;padding:9px 9px}
+ #bar .abtn.primary{grid-column:1/-1;justify-content:center}
+ #bar .abtn .ic{font-size:14px;width:15px;text-align:center;flex:0 0 auto}
+ #bar .abtn .lb{font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+ .wrap{padding-right:268px;padding-bottom:48px}
+ #toast{bottom:32px;left:calc(50% - 133px)}
+}
+/* short windows: shrink the rail rather than hiding buttons behind a scrollbar */
+@media(min-width:1180px) and (max-height:760px){
+ #bar{padding:10px 9px}
+ #bar .stats{gap:5px;padding-bottom:8px;margin-bottom:8px}
+ #bar .stat{padding:5px 8px}
+ #bar .v{font-size:13px}
+ #bar .stat.hi .v{font-size:16px}
+ #bar .actions{gap:5px}
+ #bar .abtn{padding:7px 8px}
+ #bar .abtn .lb{font-size:11px}
 }
 @media(min-width:1180px) and (max-height:620px){
- #bar{top:12px;transform:none;max-height:calc(100vh - 24px)}
+ #bar{top:12px;transform:none;max-height:calc(100vh - 24px);overflow-y:auto}
 }
 .empty{padding:26px;text-align:center;color:var(--ink2);font-size:13px;border:1px dashed var(--line)}
 .pair{font-size:12px;color:var(--ink2);margin-bottom:10px}
@@ -1063,6 +1081,41 @@ function setFmt(f){PFMT=f;
  document.getElementById('fmt1').className='fmtb'+(f==='net'?' on':'');
  document.getElementById('fmt3').className='fmtb'+(f==='inc'?' on':'');
  document.getElementById('fmt2').className='fmtb'+(f==='disc'?' on':'');}
+
+
+// ===== Enter key = add the quantity you just typed =====
+// Works on every quantity box in the browse list: Switches/Wires cards and plate
+// cells (.swq, with their own Add button) and the button categories (lq_<row>).
+// After adding, focus jumps to the next quantity box so a whole list can be keyed
+// in without touching the mouse.
+function qtyBoxes(){return Array.prototype.slice.call(
+ document.querySelectorAll('#list .swq, #list input[id^="lq_"]'));}
+function focusNextQty(idx){
+ setTimeout(function(){
+  const all=qtyBoxes();
+  const nx=all[idx+1]||all[idx];
+  if(nx){try{nx.focus();nx.select&&nx.select();}catch(e){}}
+ },0);}
+document.addEventListener('keydown',function(e){
+ if(e.key!=='Enter'&&e.keyCode!==13)return;
+ const t=e.target;
+ if(!t||t.tagName!=='INPUT')return;
+ // basket quantity boxes: Enter just commits the value and closes the keyboard
+ if(t.classList.contains('qty')&&t.closest('#bkbody')){e.preventDefault();t.blur();return;}
+ const isSW=t.classList.contains('swq');
+ const isLQ=/^lq_\d+$/.test(t.id||'');
+ if(!isSW&&!isLQ)return;
+ e.preventDefault();
+ const idx=qtyBoxes().indexOf(t);
+ if(isSW){
+  const row=t.closest('.plcell,tr,.wcard');
+  const btn=row&&row.querySelector('.addb');
+  if(btn)btn.click();
+ }else{
+  addLine(parseInt(t.id.slice(3),10));
+ }
+ focusNextQty(idx);
+},true);
 
 // ===== Quotation numbering: SH/<FY>/<serial>, serial starts at 600 =====
 // The next number is derived from the quotations already logged (local + whatever
@@ -2627,7 +2680,7 @@ function renderFan(){
    ${(swPart||finPart)?`<div class="wcvars">${swPart}${finPart}</div>`:''}
    <div class="wcrates"><span>Rate <b>${inr(o.p)}</b></span></div>
    <div class="wcqty">
-    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <input class="qty" id="lq_${ri}" type="number" min="0" value="${inb?inb.q:''}" placeholder="0"/>
     <button class="addb" onclick="addFanLine(${ri})">${inb?'Update':'Add'}</button>
    </div></div>`}).join('')+'</div>';
  document.getElementById('list').innerHTML=h+addAllBar();
@@ -2681,7 +2734,7 @@ function renderSG(){
    ${vars?`<div class="wcvars">${vars}</div>`:''}
    <div class="wcrates"><span>Rate <b>${inr(sel.p)}</b></span></div>
    <div class="wcqty">
-    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <input class="qty" id="lq_${ri}" type="number" min="0" value="${inb?inb.q:''}" placeholder="0"/>
     <button class="addb" onclick="addSGLine(${ri})">${inb?'Update':'Add'}</button>
    </div></div>`}).join('')+'</div>'+addAllBar();
  document.getElementById('list').innerHTML=h;
@@ -2716,7 +2769,7 @@ function renderMI(){
    <div class="wctop"><div class="wcname">${esc(r.n)}</div>${r.u?`<div class="wccode">${esc(r.u)}</div>`:''}</div>
    <div class="wcrates"><span>Purchase cost <b>${inr(r.c)}</b></span></div>
    <div class="wcqty">
-    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <input class="qty" id="lq_${ri}" type="number" min="0" value="${inb?inb.q:''}" placeholder="0"/>
     <button class="addb" onclick="addMILine(${ri})">${inb?'Update':'Add'}</button>
    </div></div>`}).join('')+'</div>'+addAllBar();
  document.getElementById('list').innerHTML=h;
@@ -2772,7 +2825,7 @@ function renderPL(){
    ${vars?`<div class="wcvars">${vars}</div>`:''}
    <div class="wcrates"><span>List price <b>${inr(sel.lp)}</b></span></div>
    <div class="wcqty">
-    <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+    <input class="qty" id="lq_${ri}" type="number" min="0" value="${inb?inb.q:''}" placeholder="0"/>
     <button class="addb" onclick="addPLLine(${ri})">${inb?'Update':'Add'}</button>
    </div></div>`}).join('')+'</div>';
  document.getElementById('list').innerHTML=h+addAllBar();
@@ -3224,7 +3277,7 @@ function render(){
      ${(wBadge||fsel||ksel)?`<div class="wcvars">${wBadge}${fsel}${ksel}</div>`:''}
      <div class="wcrates"><span>Rate <b>${inr(sel.p)}</b></span></div>
      <div class="wcqty">
-      <input class="qty" id="lq_${ri}" type="number" min="1" value="${inb?inb.q:''}" placeholder="0"/>
+      <input class="qty" id="lq_${ri}" type="number" min="0" value="${inb?inb.q:''}" placeholder="0"/>
       <button class="addb" onclick="addLine(${ri})">${inb?'Update':'Add'}</button>
      </div></div>`}).join('')+'</div>';
   if(rows.some(r=>r.o.some(o=>o.prov)))f='Lines marked <b>prov</b> are provisional \u2014 the variant was added on your instruction but its code and rate are not in the uploaded price list. Confirm with Havells before ordering.';
