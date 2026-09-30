@@ -188,6 +188,8 @@ tr.has{background:#fff}
 .cloud .who{color:#cdd9ef;font-size:11.5px}
 .cloud .who b{color:#fff}
 .savedrow{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:14px;align-items:center;padding:12px 8px;border-bottom:1px solid var(--line)}
+.savedrow .sacts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:700px){.savedrow{grid-template-columns:auto 1fr auto;gap:8px}.savedrow .sacts{grid-column:1/-1;justify-content:flex-start}}
 .savedrow:last-child{border-bottom:0}
 .savedrow .qn{font-weight:700;color:#0a2f6b;font-family:'Sora',inherit}
 .savedrow .cust{font-weight:600}
@@ -198,6 +200,7 @@ tr.has{background:#fff}
 .savedrow .open{background:#0a2f6b;color:#fff}
 .savedrow .revise{background:#f4b731;color:#3a2c05}
 .savedrow .dup{background:#eef1f5;color:var(--ink)}
+.savedrow .del{background:#fdecec;color:#a02020}
 .savedhint{color:var(--ink2);font-size:12.5px;padding:10px 2px}
 .plmrp{color:var(--ink2);font-size:10.5px;margin-top:2px}.plmrp b{color:#0a2f6b}
 .gsearch{margin-bottom:14px}
@@ -780,10 +783,10 @@ table.plt{min-width:0}
   <div class="frm">
    <label>Customer name<input id="fCust" list="custNames" oninput="saveF()" onblur="tryAutofillCust()" placeholder="e.g. Sharma Electricals"/></label>
    <datalist id="custNames"></datalist>
-   <label>Quotation no.<input id="fNo" oninput="saveF()" placeholder="e.g. SG-2026-014"/></label>
+   <label>Quotation no.<input id="fNo" oninput="saveF()" placeholder="SH/26-27/600"/><small style="display:block;margin-top:4px;color:var(--ink2);font-size:11px">Filled in automatically — next free number in this financial year. <a href="#" onclick="ensureQNo(true);return false" style="color:#0a2f6b;font-weight:700">Get next number</a></small></label>
    <label>Site / reference<input id="fSite" oninput="saveF()" placeholder="e.g. Block B, Beltola"/></label>
    <label>Phone<input id="fPhone" oninput="saveF()" placeholder="e.g. 98xxxxxxxx"/></label>
-   <label>Validity<input id="fVal" oninput="saveF()" placeholder="e.g. 15 days"/></label>
+   <label>Validity<input id="fVal" oninput="saveF()" onblur="normVal()" placeholder="15 days"/><small style="display:block;margin-top:4px;color:var(--ink2);font-size:11px">Type just a number and it becomes days — 7 → 7 days.</small></label>
    <label>Prepared by<input id="fPrep" oninput="saveF()" placeholder="Staff name"/></label>
   </div>
   <button onclick="saveCustomer()" style="margin-top:10px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">&#128190; Save this customer</button>
@@ -828,6 +831,7 @@ table.plt{min-width:0}
  </div>
  <div class="panel"><div class="lbl">Quotation history</div>
   <div class="hint">Every quotation you finish (Final Ready / Print / Download) is logged here automatically, and pushed to your sheet when cloud sync is on. Tap the bottom bar's <b>Save</b> button any time to log the current draft without finishing it.</div>
+  <div style="margin-top:10px"><button onclick="newQuote()" style="border:0;background:var(--ink);color:#fff;border-radius:8px;padding:9px 16px;font:inherit;font-size:12px;font-weight:700;cursor:pointer">&#10010; New quotation</button></div>
   <div id="localHistList" style="margin-top:10px"></div>
  </div>
 </div>
@@ -994,6 +998,7 @@ table.plt{min-width:0}
  </div>
  <div class="actions">
   <button class="abtn" onclick="back()"><span class="ic">&#8617;</span><span class="lb">Category</span></button>
+  <button class="abtn" onclick="newQuote()"><span class="ic">&#10010;</span><span class="lb">New</span></button>
   <button class="abtn" onclick="clr()"><span class="ic">&#10005;</span><span class="lb">Clear</span></button>
   <button class="abtn" id="saveBtn" onclick="saveQuote()"><span class="ic">&#9729;</span><span class="lb">Save</span></button>
   <button class="abtn" onclick="prt('download')"><span class="ic">&#8681;</span><span class="lb">Download</span></button>
@@ -1058,7 +1063,59 @@ function setFmt(f){PFMT=f;
  document.getElementById('fmt1').className='fmtb'+(f==='net'?' on':'');
  document.getElementById('fmt3').className='fmtb'+(f==='inc'?' on':'');
  document.getElementById('fmt2').className='fmtb'+(f==='disc'?' on':'');}
-function saveF(){F.cust=fCust.value;F.no=fNo.value;F.site=fSite.value;F.val=fVal.value;F.prep=(document.getElementById('fPrep')||{}).value||'';F.phone=(document.getElementById('fPhone')||{}).value||'';}
+
+// ===== Quotation numbering: SH/<FY>/<serial>, serial starts at 600 =====
+// The next number is derived from the quotations already logged (local + whatever
+// cloud sync has pulled down), so every device lands on the same next free number
+// without needing a separate counter anywhere.
+const QNO_START=600;let QNO_AUTO=false;
+function fyTag(d){d=d||new Date();const y=d.getFullYear(),m=d.getMonth();
+ const s=(m>=3)?y:y-1;                       // financial year runs April -> March
+ return String(s%100).padStart(2,'0')+'-'+String((s+1)%100).padStart(2,'0');}
+function qnoParse(no){const m=/^SH\/(\d{2}-\d{2})\/(\d+)\s*$/i.exec(String(no||'').trim());
+ return m?{fy:m[1],n:parseInt(m[2],10)}:null;}
+function qnoHighest(fy){let max=QNO_START-1;
+ loadHistory().forEach(x=>{const p=qnoParse(x.no);if(p&&p.fy===fy&&p.n>max)max=p.n;});
+ try{const r=parseInt(localStorage.getItem('sh_qno_'+fy)||'0',10);if(r>max)max=r;}catch(e){}
+ return max;}
+function nextQNo(){const fy=fyTag();return 'SH/'+fy+'/'+(qnoHighest(fy)+1);}
+// remember a number the moment it is actually used, so a saved quote never gets reissued
+function claimQNo(no){const p=qnoParse(no);if(!p)return;
+ try{const k='sh_qno_'+p.fy;if(p.n>parseInt(localStorage.getItem(k)||'0',10))localStorage.setItem(k,String(p.n));}catch(e){}}
+function ensureQNo(force){
+ if(!force&&F.no)return F.no;
+ const n=nextQNo();F.no=n;QNO_AUTO=true;
+ const el=document.getElementById('fNo');if(el)el.value=n;
+ return n;}
+// after a cloud pull another device may have taken the number we were holding
+function refreshAutoQNo(){
+ if(!QNO_AUTO||!F.no)return;
+ const taken=loadHistory().some(x=>x.no===F.no);
+ if(taken)ensureQNo(true);}
+// ===== Validity: always carries a unit =====
+function valText(){const v=String(F.val||'').trim();
+ if(!v)return '15 days';
+ return /^\d+$/.test(v)?(v+' days'):v;}
+function normVal(){const el=document.getElementById('fVal');if(!el)return;
+ let v=(el.value||'').trim();
+ if(/^\d+$/.test(v))v=v+' days';
+ if(!v)v='15 days';
+ el.value=v;saveF();}
+// ===== Start a fresh quotation =====
+function newQuote(){
+ if(Object.keys(Q).length&&!confirm('Start a new quotation?\n\nThe current basket and customer details will be cleared. Tap Save first if you still need them.'))return;
+ Q={};GD={};GP={};MR={};EXPANDED={};
+ F.cust='';F.site='';F.phone='';F.no='';F.val='15 days';
+ const g=id=>document.getElementById(id);
+ if(g('fCust'))g('fCust').value='';
+ if(g('fSite'))g('fSite').value='';
+ if(g('fPhone'))g('fPhone').value='';
+ if(g('fVal'))g('fVal').value=F.val;
+ ensureQNo(true);
+ drawBk();calc();if(B)render();
+ toast('New quotation \u2014 '+F.no);
+ view('review');}
+function saveF(){F.cust=fCust.value;if(fNo.value!==F.no)QNO_AUTO=false;F.no=fNo.value;F.site=fSite.value;F.val=fVal.value;F.prep=(document.getElementById('fPrep')||{}).value||'';F.phone=(document.getElementById('fPhone')||{}).value||'';}
 
 // ===== Saved customers (localStorage, no sign-in needed) =====
 function loadCustomers(){try{return JSON.parse(localStorage.getItem('sh_customers')||'[]');}catch(e){return [];}}
@@ -2812,7 +2869,12 @@ function addSW(btn){
  const d=btn.dataset;const row=btn.closest('.plcell,tr,.wcard');
  const inp=row.querySelector('.swq');
  const q=Math.max(0,parseInt(inp.value)||0);
- if(!q){alert('Enter a quantity first.');return;}
+ // 0 (or a cleared box) on an item already in the basket means REMOVE it.
+ if(!q){
+  if(Q[d.c]||(d.ic&&Q[d.ic])){
+   delete Q[d.c];if(d.ic)delete Q[d.ic];
+   inp.value='';calc();render();toast('Removed \u2014 '+d.n);return;}
+  alert('Enter a quantity first.');return;}
  const g=grpKey();
  Q[d.c]={q,p:+d.p,n:d.n,g};
  if(d.ic){Q[d.ic]={q,p:+d.ip,n:d.in,g};}
@@ -2826,7 +2888,12 @@ function addAllEntered(){
  let n=0;
  // Switches / Wires: rows carry .swq inputs with data-c on the input
  document.querySelectorAll('#list .swq').forEach(inp=>{
-  const q=Math.max(0,parseInt(inp.value)||0);if(!q)return;
+  const q=Math.max(0,parseInt(inp.value)||0);
+  const d0=inp.dataset;
+  if(!q){ // explicit 0 on a line already in the basket removes it
+   if(String(inp.value).trim()==='0'&&(Q[d0.c]||(d0.ic&&Q[d0.ic]))){
+    delete Q[d0.c];if(d0.ic)delete Q[d0.ic];inp.value='';n++;}
+   return;}
   const d=inp.dataset,g=grpKey();
   Q[d.c]={q,p:+d.p,n:d.n,g};
   if(d.ic)Q[d.ic]={q,p:+d.ip,n:d.in,g};
@@ -3202,7 +3269,9 @@ function addLine(ri){
  const r=liRows()[ri],o=curOpt(r,ri);
  const el=document.getElementById('lq_'+ri);
  const q=Math.max(0,parseInt(el.value)||0);
- if(!q){alert('Enter a quantity first.');return;}
+ if(!q){
+  if(Q[o.c]){delete Q[o.c];el.value='';calc();render();toast('Removed \u2014 '+r.n);return;}
+  alert('Enter a quantity first.');return;}
  const nm=r.n+(r.w?' '+r.w+'W':'')+(o.f?' \u00b7 '+o.f:'')+(o.k?' \u00b7 '+o.k:'')+(o.s?' \u00b7 '+o.s:'');
  Q[o.c]={q,p:o.p,n:nm,g:grpKey(),prov:o.prov?1:0};
  trackRecent(o.c);
@@ -3291,8 +3360,15 @@ function refresh(){
  const T2=document.getElementById('tot');if(T2)T2.innerHTML=totHTML(totals());
  calc();}
 function del(k){delete Q[k];drawBk();calc();}
-function bkQ(k,v){const q=Math.max(0,parseInt(v)||0);
- if(q){Q[k].q=q;refresh();}else{delete Q[k];drawBk();calc();}}
+function bkQ(k,v){
+ // an empty box is mid-edit, not a removal - wait for blur (bkBlur) before deciding
+ if(v===''||v==null){return;}
+ const q=Math.max(0,parseInt(v)||0);
+ if(q){if(Q[k])Q[k].q=q;refresh();}
+ else{delete Q[k];drawBk();calc();toast('Line removed');}}
+function bkBlur(k,v){
+ if(String(v).trim()!=='')return;
+ delete Q[k];drawBk();calc();toast('Line removed');}
 
 function drawBk(){
  const gs=groups(),ks=Object.keys(gs),B2=document.getElementById('bkbody');
@@ -3319,7 +3395,7 @@ function drawBk(){
     h+=`<tr><td class="it" data-label="Item">${esc(parts[0])}</td>
      <td class="cd" data-label="Unit">${parts.length>1?esc(parts.slice(1).join(' \u00b7 ')):'&mdash;'}</td>
      <td class="num" data-label="Cost">${inr(v.p)}</td>
-     <td class="mid" data-label="Qty"><input class="qty" type="number" min="0" value="${v.q}" oninput="bkQ(${J(k)},this.value)"/></td>
+     <td class="mid" data-label="Qty"><input class="qty" type="number" min="0" value="${v.q}" oninput="bkQ(${J(k)},this.value)" onblur="bkBlur(${J(k)},this.value)"/></td>
      <td class="num" id="sr_${gid(k)}" data-label="Sale rate"><div class="ratecell">${manMI?`<span class="mrtag" title="Fixed price incl. GST \u20b9${Math.round(MR[k])}">SET \u00b7 \u20b9${Math.round(MR[k])} incl</span>`:inr(sr)}
        <span class="edit${manMI?' on':''}" title="Set a fixed price (incl. GST)" onclick="editMR(${J(k)})">&#9998;</span></div></td>
      <td class="num" id="amt_${gid(k)}" data-label="Amount">${inr(v.q*sr)}</td>
@@ -3340,7 +3416,7 @@ function drawBk(){
     <td class="num" data-label="Rate"><div class="ratecell">${MR[k]!=null?`<span class="mrtag" title="Manual price set (incl. GST)">SET</span> `:''}${inr(v.p)}
       <span class="edit${MR[k]!=null?' on':''}" title="Set a fixed price (incl. GST)" onclick="editMR(${J(k)})">&#9998;</span></div>
       ${(d||MR[k]!=null)?`<div class="cd" title="Net rate per unit after discount \u2014 this is what is multiplied by qty">net ${inr(effRate(k))}<span style="opacity:.6"> / unit</span></div>`:''}</td>
-    <td class="mid" data-label="Qty"><input class="qty" type="number" min="0" value="${v.q}" oninput="bkQ(${J(k)},this.value)"/></td>
+    <td class="mid" data-label="Qty"><input class="qty" type="number" min="0" value="${v.q}" oninput="bkQ(${J(k)},this.value)" onblur="bkBlur(${J(k)},this.value)"/></td>
     <td class="mid" data-label="Disc %">${MR[k]!=null?'<span class="cd">\u2014</span>':`<input class="dq" id="ld_${gid(k)}" type="number" min="0" max="90" value="${ov?v.d:''}" placeholder="${GD[g]||0}" title="Blank = group rate" oninput="setLD(${J(k)},this.value)"/>`}</td>
     <td class="num" id="amt_${gid(k)}" data-label="Amount">${MR[k]!=null?`<span class="mrtag" title="Fixed price incl. GST">SET \u00b7 ${inr(MR[k])} incl</span> ${inr(effRate(k)*v.q)}`:(d?`<span class="ov">${inr(a)}</span> ${inr(effRate(k)*v.q)}`:inr(effRate(k)*v.q))}</td>
     <td class="mid frdel"><button class="xb" onclick="del(${J(k)})">&times;</button></td></tr>`;}
@@ -3461,7 +3537,7 @@ function prt(mode){const t=totals();
  const g2=id=>document.getElementById(id);
  g2('qxno').textContent=F.no||'\u2014';
  g2('qxdate').textContent=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
- g2('qxval').textContent=F.val||'15 days';
+ g2('qxval').textContent=valText();
  g2('qxcust').textContent=F.cust||'\u2014';
  g2('qxsite').textContent=F.site||'\u2014';
  g2('qxprep').textContent=F.prep||'\u2014';
@@ -3489,7 +3565,7 @@ function buildFinal(){
     '<div class="frmeta">'+
     '<div class="chip"><div class="l">Quotation No.</div><div class="v">'+esc(F.no||'\u2014')+'</div></div>'+
     '<div class="chip"><div class="l">Date</div><div class="v">'+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'+
-    '<div class="chip"><div class="l">Valid for</div><div class="v">'+esc(F.val||'15 days')+'</div></div>'+
+    '<div class="chip"><div class="l">Valid for</div><div class="v">'+esc(valText())+'</div></div>'+
     '</div>'+
     '<div class="frparty"><div class="frpavatar">'+custInit+'</div><div>'+
     '<div class="k">Quotation for</div><div class="nm">'+esc(F.cust||'\u2014')+'</div>'+
@@ -3679,7 +3755,7 @@ function snapshot(){
 }
 function restore(s){
  Q=s.Q||{};GD=s.GD||{};GP=s.GP||{};MR=s.MR||{};PFMT=s.PFMT||'net';RND=(s.RND==null?RND:+s.RND);syncRndBtns();
- Object.assign(F,s.F||{});
+ Object.assign(F,s.F||{});QNO_AUTO=false;
  fCust.value=F.cust||'';fNo.value=F.no||'';fSite.value=F.site||'';fVal.value=F.val||'';
  const fp=document.getElementById('fPrep');if(fp)fp.value=F.prep||'';
  const fph=document.getElementById('fPhone');if(fph)fph.value=F.phone||'';
@@ -3733,14 +3809,15 @@ function syncPull(showMsg){
    if(!d||!d.ok){syncStatus('Could not connect: '+((d&&d.error)||'check URL and secret'),'err');return null;}
    mergeFromCloud(d);
    syncStatus('Synced \u2014 '+(d.quotes||[]).length+' quotations, '+(d.customers||[]).length+' customers','ok');
-   renderLocalHistory();renderCustPicker();
+   renderLocalHistory();renderCustPicker();refreshAutoQNo();
    return d;
   })
   .catch(e=>{syncStatus('Could not connect \u2014 check the URL, or you may be offline','err');return null;});
 }
 function mergeFromCloud(d){
  // Cloud is the shared record. Keep any local rows the cloud hasn't seen yet and push them up.
- const cloudQ=d.quotes||[],localQ=loadHistory();
+ const gone=loadDeleted();
+ const cloudQ=(d.quotes||[]).filter(q=>gone.indexOf(q.no)<0),localQ=loadHistory();
  const byNo={};cloudQ.forEach(q=>byNo[q.no]=q);
  const unsynced=localQ.filter(q=>!byNo[q.no]);
  saveHistoryList(cloudQ.concat(unsynced).slice(0,500));
@@ -3776,9 +3853,22 @@ function logQuotation(){
   list.unshift({no:F.no,cust:F.cust||'',site:F.site||'',phone:F.phone||'',total:t.net,date:today,status:'Sent',json:snapJson});
  }
  saveHistoryList(list.slice(0,500));
+ claimQNo(F.no);
  const rec=list.find(x=>x.no===F.no);
  syncPost({action:'save',quote:rec});
 }
+// Quotations you delete are remembered here so a later cloud pull doesn't bring them back.
+function loadDeleted(){try{return JSON.parse(localStorage.getItem('sh_deleted')||'[]');}catch(e){return [];}}
+function markDeleted(no){const d=loadDeleted();if(d.indexOf(no)<0){d.push(no);
+ try{localStorage.setItem('sh_deleted',JSON.stringify(d.slice(-500)));}catch(e){}}}
+function delQuote(no){
+ if(!confirm('Delete quotation '+no+'?\n\nIt is removed from this history and will not come back on the next sync. The row already written to your Google Sheet stays there as a record.'))return;
+ saveHistoryList(loadHistory().filter(x=>x.no!==no));
+ markDeleted(no);
+ syncPost({action:'delete',no:no});
+ if(F.no===no){F.no='';const el=document.getElementById('fNo');if(el)el.value='';}
+ renderLocalHistory();
+ toast('Deleted '+no);}
 function setHistStatus(no,status){
  const list=loadHistory();
  const i=list.findIndex(x=>x.no===no);
@@ -3800,8 +3890,9 @@ function renderLocalHistory(){
    <div><select onchange="setHistStatus(${J(x.no)},this.value)" style="border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;font-size:11px;font-weight:700;color:${badge[x.status]||'#5a6472'}">
     ${statuses.map(s=>`<option value="${s}"${s===x.status?' selected':''}>${s}</option>`).join('')}
    </select></div>
-   ${x.json?`<div><button class="open" onclick="openHist(${J(x.no)})">Open</button></div>
-   <div><button class="dup" onclick="dupQuote(${J(x.no)})">Duplicate</button></div>`:''}
+   <div class="sacts">${x.json?`<button class="open" onclick="openHist(${J(x.no)})">Open</button>
+    <button class="dup" onclick="dupQuote(${J(x.no)})">Duplicate</button>`:''}
+    <button class="del" onclick="delQuote(${J(x.no)})">Delete</button></div>
   </div>`).join('');
 }
 function openHist(no){
@@ -3818,10 +3909,16 @@ function loadSaved(){
 function dupQuote(no){
  const x=loadHistory().find(h=>h.no===no);
  if(!x||!x.json){alert('This quotation has no saved contents on this device yet.');return;}
- try{restore(JSON.parse(x.json));F.no='';fNo.value='';toast('Loaded as a new draft \u2014 set a new Quotation No.');view('review');}
+ try{restore(JSON.parse(x.json));F.no='';ensureQNo(true);toast('Copied to a new draft \u2014 '+F.no);view('review');}
  catch(e){alert('Could not duplicate.');}
 }
 
 syncRndBtns();drawCats();drawBk();calc();renderRecent();
+// give every fresh session its quotation number and a validity with units
+(function(){
+ const fv=document.getElementById('fVal');
+ if(fv&&!fv.value){F.val='15 days';fv.value=F.val;}
+ ensureQNo(false);
+})();
 if(syncOn())syncPull(false);
 </script></body></html>
