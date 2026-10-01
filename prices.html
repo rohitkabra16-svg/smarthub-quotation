@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Smarthub — Havells Price List</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23dc2626'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='Arial' font-weight='bold' fill='white'>H</text></svg>"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0d0d0f;color:#e8e4dc;display:flex;flex-direction:column;font-size:14px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#dc2626;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#ef4444}
+#hdr{flex-shrink:0;background:#111116;border-bottom:1px solid #1e1e28;padding:8px 14px}
+.hdr-top{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.logo{width:34px;height:34px;background:#dc2626;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0}
+.brand{font-size:14px;font-weight:600;color:#fff}.brand-sub{font-size:10px;color:#4a4a5a;margin-top:1px}
+.sku-box{display:flex;align-items:center;gap:6px;background:#0d0d0f;border:1px solid #1e1e28;border-radius:7px;padding:5px 10px;flex:1;max-width:260px;min-width:140px}
+.sku-box input{border:none;background:transparent;outline:none;font-size:11px;color:#e8e4dc;width:100%;font-family:monospace}
+#srch{width:100%;background:#0d0d0f;border:1px solid #1e1e28;border-radius:8px;padding:9px 12px;font-size:13px;color:#e8e4dc;outline:none;font-family:inherit}
+#srch:focus{border-color:#dc2626}#srch::placeholder{color:#3a3a4a}
+#toolbar{flex-shrink:0;background:#0d0d0f;border-bottom:1px solid #1e1e28}
+.tabs{display:flex;gap:3px;overflow-x:auto;padding:8px 14px 0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{padding:5px 11px;border-radius:7px 7px 0 0;font-size:11px;cursor:pointer;border:1px solid #1e1e28;border-bottom:none;background:#0a0a0c;color:#6a6a7a;white-space:nowrap;transition:all .15s}
+.tab.on{background:#111116;color:#e8e4dc;font-weight:500}
+.stats{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;scrollbar-width:none}.stats::-webkit-scrollbar{display:none}
+.stat{flex-shrink:0;background:#111116;border:1px solid #1e1e28;border-radius:8px;padding:6px 10px;min-width:58px;text-align:center}
+.stat-n{font-size:15px;font-weight:600}.stat-l{font-size:9px;color:#4a4a5a;text-transform:uppercase;letter-spacing:.3px;margin-top:1px}
+.cats{display:flex;gap:5px;overflow-x:auto;padding:0 14px 8px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+.cat{padding:3px 9px;border-radius:20px;font-size:10px;cursor:pointer;border:1px solid #1e1e28;background:transparent;color:#6a6a7a;white-space:nowrap}
+.cat.on{background:rgba(220,38,38,0.15);border-color:#dc2626;color:#fca5a5}
+.meta{display:flex;justify-content:space-between;align-items:center;padding:5px 14px 6px;font-size:11px;color:#4a4a5a;border-bottom:1px solid #1e1e28}
+.sbtn{background:none;border:none;cursor:pointer;color:#4a4a5a;font-size:11px;padding:2px 6px;font-family:inherit}.sbtn.on{color:#e8e4dc}
+#main{display:flex;flex:1;overflow:hidden}
+#list{flex:1;overflow-y:auto;padding:10px 14px}
+.card{background:#111116;border:1px solid #1e1e28;border-radius:10px;padding:12px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:#333}.card.sel{border-color:#dc2626;background:rgba(220,38,38,0.06)}
+.cn{font-size:14px;font-weight:500;color:#e8e4dc;line-height:1.4;margin-bottom:6px}
+.cr2{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;border:1px solid;white-space:nowrap}
+.ccat{font-size:11px;color:#4a4a5a}.ccode{font-size:11px;color:#6a6a7a;font-family:monospace;margin-bottom:7px;letter-spacing:.3px}
+.cprow{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #1e1e28;padding-top:7px;flex-wrap:wrap;gap:6px}
+.cprice{font-size:17px;font-weight:600;color:#e8e4dc}.cunit{font-size:11px;color:#4a4a5a;margin-left:5px}
+.cgst{font-size:10px;color:#4a4a5a;background:#0a0a0c;padding:2px 7px;border-radius:20px}
+.mrp-tag{font-size:11px;color:#9ca3af;text-decoration:line-through}
+.lp-tag{font-size:10px;color:#10b981;background:rgba(16,185,129,0.1);padding:2px 7px;border-radius:20px;border:1px solid rgba(16,185,129,0.3)}
+.upd-tag{font-size:9px;color:#fbbf24;background:rgba(251,191,36,0.12);padding:2px 6px;border-radius:20px;border:1px solid rgba(251,191,36,0.35);white-space:nowrap;font-weight:600}
+.empty{text-align:center;padding:60px 20px;color:#3a3a4a;font-size:14px}
+#dp{width:310px;flex-shrink:0;border-left:1px solid #1e1e28;background:#111116;overflow-y:auto;display:none}
+#dp.open{display:block}
+.dph{padding:14px 16px;border-bottom:1px solid #1e1e28;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dpt{font-size:14px;font-weight:500;color:#e8e4dc;line-height:1.4;margin-top:8px}
+.xbtn{background:none;border:none;color:#4a4a5a;cursor:pointer;font-size:22px;line-height:1;padding:0;flex-shrink:0}
+.dpb{padding:14px 16px}
+.pbox{background:#0d0d0f;border-radius:8px;padding:14px;margin-bottom:14px}
+.pbox-l{font-size:10px;color:#4a4a5a;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.pbox-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.pbox-lbl{font-size:11px;color:#6a6a7a}.pbox-val{font-size:20px;font-weight:600;color:#e8e4dc}
+.pbox-mrp{font-size:14px;color:#9ca3af;text-decoration:line-through}
+.pbox-lp-badge{font-size:10px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:3px 8px;border-radius:20px}
+.pbox-disc{font-size:12px;color:#fbbf24;margin-top:4px}
+.dtbl{width:100%;font-size:12px;border-collapse:collapse;margin-bottom:14px}
+.dtbl td{padding:8px 0;border-bottom:1px solid #1e1e28;vertical-align:top}
+.dtbl td:first-child{color:#4a4a5a;width:72px;font-size:11px}
+.dtbl td:last-child{padding-left:10px;color:#e8e4dc;word-break:break-all}
+.mono{font-family:monospace;font-size:11px}
+.brk{background:#0d0d0f;border-radius:8px;padding:12px;margin-bottom:14px}
+.brk-t{font-size:10px;color:#4a4a5a;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.br{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.br.tot{border-top:1px solid #1e1e28;margin-top:5px;padding-top:7px;font-weight:600;color:#c8f135}
+.rl-t{font-size:10px;color:#4a4a5a;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.rl{padding:8px 10px;border-radius:7px;cursor:pointer;margin-bottom:4px;background:#0d0d0f}
+.rl:hover{background:#161620}
+.rl-n{font-size:12px;color:#e8e4dc;margin-bottom:3px;line-height:1.3}
+.rl-b{display:flex;justify-content:space-between;gap:8px}
+.rl-c{font-size:10px;color:#4a4a5a;font-family:monospace}.rl-p{font-size:12px;font-weight:500;color:#e8e4dc}
+
+/* ── Grid / Table View ── */
+.view-toggle{display:flex;gap:6px;align-items:center}
+.vtbtn{padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid #1e1e28;background:transparent;color:#6a6a7a;font-family:inherit;transition:all .15s}
+.vtbtn.on{background:#dc2626;border-color:#dc2626;color:#fff;font-weight:600}
+.grid-table{width:100%;border-collapse:collapse;font-size:12px}
+.grid-table th{padding:7px 10px;background:#111116;color:#fca5a5;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #dc2626;text-align:left;position:sticky;top:0;z-index:2}
+.grid-table th.right{text-align:right}
+.grid-table td{padding:7px 10px;border-bottom:1px solid #1e1e28;vertical-align:middle;color:#e8e4dc}
+.grid-table tr:hover td{background:rgba(255,255,255,0.03);cursor:pointer}
+.grid-table tr.sel-row td{background:rgba(220,38,38,0.08);border-bottom-color:#dc2626}
+.grid-table .td-name{max-width:280px}
+.grid-table .td-code{font-family:monospace;font-size:11px;color:#6a6a7a;white-space:nowrap}
+.grid-table .td-cat{font-size:10px;color:#4a4a5a;white-space:nowrap}
+.grid-table .td-price{text-align:right;font-weight:600;white-space:nowrap}
+.grid-table .td-mrp{text-align:right;font-size:10px;color:#9ca3af;text-decoration:line-through;white-space:nowrap}
+.grid-table .td-off{text-align:right}
+.grid-grp-hdr td{background:#0d0d0f!important;color:#dc2626!important;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:5px 10px;border-top:1px solid #1e1e28}
+
+.sh-add{border:0;background:#0a2f6b;color:#fff;padding:5px 11px;border-radius:6px;
+  font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+.sh-add:hover{background:#0d3c89}
+.sh-add:active{transform:translateY(1px)}
+</style>
+<script src="catalog.js"></script>
+</head>
+<body>
+<div id="hdr">
+  <div class="hdr-top">
+    <div class="logo">H</div>
+    <div style="flex:1"><div class="brand">Smarthub — Havells Price List</div><div class="brand-sub" id="hdr-sub">Loading...</div></div>
+    <div class="sku-box">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#4a4a5a" stroke-width="1.3"/><path d="M11 11l3.5 3.5" stroke="#4a4a5a" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <input id="sku-inp" placeholder="Jump to model code..." autocomplete="off"/>
+    </div>
+  </div>
+  <input id="srch" type="text" placeholder="Search by name, code or category..." autocomplete="off"/>
+</div>
+<div id="upd-banner" style="display:none;flex-shrink:0;background:rgba(251,191,36,0.08);border-bottom:1px solid rgba(251,191,36,0.25);padding:6px 14px;font-size:11px;color:#fbbf24;display:flex;align-items:center;gap:6px"></div>
+<div id="toolbar">
+  <div class="tabs" id="tabs"></div>
+  <div class="stats" id="stats"></div>
+  <div class="cats" id="cats"></div>
+  <div class="meta"><span id="meta-txt"></span><div style="display:flex;align-items:center;gap:8px"><button class="sbtn" id="supd" onclick="toggleUpd()">↻ Recently Updated</button><button class="sbtn" id="sn" onclick="srt('name')">Name &#8597;</button><button class="sbtn" id="sp" onclick="srt('price')">Price &#8597;</button><div class="view-toggle"><button class="vtbtn" id="vcard" onclick="setView('card')">&#9646; Cards</button><button class="vtbtn" id="vgrid" onclick="setView('grid')">&#9776; Grid</button></div></div></div>
+</div>
+<div id="main">
+  <div id="list"></div>
+  <div id="dp">
+    <div class="dph"><div><span id="dp-badge"></span><div class="dpt" id="dp-title"></div></div><button class="xbtn" onclick="closeDP()">&#215;</button></div>
+    <div class="dpb">
+      <div class="pbox">
+        <div class="pbox-l">Pricing</div>
+        <div id="dp-mrp-row"></div>
+        <div class="pbox-row"><span class="pbox-lbl">List Price</span><span class="pbox-val" id="dp-lp"></span></div>
+        <div class="pbox-disc" id="dp-disc"></div>
+        <div id="dp-upd"></div>
+        <div class="pbox-u" id="dp-unit" style="font-size:11px;color:#4a4a5a;margin-top:4px"></div>
+      </div>
+      <table class="dtbl">
+        <tr><td>Name</td><td id="dp-name"></td></tr>
+        <tr><td>Code</td><td class="mono" id="dp-code"></td></tr>
+        <tr><td>Category</td><td id="dp-cat"></td></tr>
+        <tr><td>Type</td><td id="dp-type"></td></tr>
+      </table>
+      <div class="brk" id="dp-brk">
+        <div class="brk-t">Price Breakdown (on LP)</div>
+        <div class="br"><span style="color:#6a6a7a">Base (excl. GST 18%)</span><span id="dp-base"></span></div>
+        <div class="br"><span style="color:#6a6a7a">GST @ 18%</span><span id="dp-gst-amt"></span></div>
+        <div class="br tot"><span>Total (incl. GST)</span><span id="dp-tot"></span></div>
+      </div>
+      <div id="dp-rel"></div>
+    </div>
+  </div>
+</div>
+<script>
+const ALL_ITEMS=window.SH_CATALOG||[];
+/* catalog.js holds the 3,547 items and must sit in the same folder as this page.
+   Without it the page would render blank, so say what is wrong instead. */
+if(!ALL_ITEMS.length){
+  window.addEventListener('load',()=>{
+    const sub=document.getElementById('hdr-sub');
+    if(sub)sub.textContent='Catalogue file missing';
+    const box=document.getElementById('list');
+    if(box)box.innerHTML='<div style="padding:48px 20px;text-align:center;color:#9aa1ad;line-height:1.7;font-size:14px">'+
+      '<div style="font-size:16px;color:#e9eaec;margin-bottom:8px">The price data did not load</div>'+
+      'This page reads its prices from <b style="color:#f59e0b">catalog.js</b>.<br>'+
+      'Keep that file in the same folder as this one, then reload.</div>';
+  });
+}
+const SRC={
+  ewa:     {l:'EWA',       c:'#f59e0b',bg:'rgba(245,158,11,0.12)', bd:'#78501a'},
+  fan:     {l:'Fan',       c:'#3b82f6',bg:'rgba(59,130,246,0.12)', bd:'#1e3a6e'},
+  light:   {l:'Light',     c:'#8b5cf6',bg:'rgba(139,92,246,0.12)', bd:'#4a2880'},
+  wire:    {l:'Hvls Wire', c:'#10b981',bg:'rgba(16,185,129,0.12)', bd:'#064e3b'},
+  mcb:     {l:'MCB EII',   c:'#ef4444',bg:'rgba(239,68,68,0.12)',  bd:'#7f1d1d'},
+  mcb_x7:  {l:'MCB X7',   c:'#f97316',bg:'rgba(249,115,22,0.12)', bd:'#7c2d12'},
+  std_wire:{l:'Std Wire',  c:'#0891b2',bg:'rgba(8,145,178,0.12)',  bd:'#064e5b'},
+  welkm:   {l:'Welkm',     c:'#0d9488',bg:'rgba(13,148,136,0.12)', bd:'#065f52'},
+  geyser:  {l:'Geyser',    c:'#0284c7',bg:'rgba(2,132,199,0.12)',  bd:'#075985'},
+  cooler:  {l:'Cooler',    c:'#06b6d4',bg:'rgba(6,182,212,0.12)',  bd:'#164e63'},
+  sda:     {l:'Appliances',c:'#db2777',bg:'rgba(219,39,119,0.12)', bd:'#831843'},
+  chimney: {l:'Kitchen',   c:'#d97706',bg:'rgba(217,119,6,0.12)',  bd:'#92400e'},
+  purifier:{l:'Purifier',  c:'#7c3aed',bg:'rgba(124,58,237,0.12)', bd:'#4c1d95'},
+  pro:     {l:'Pro Light', c:'#e11d48',bg:'rgba(225,29,72,0.12)',  bd:'#881337'},
+  ip:      {l:'Industrial',c:'#64748b',bg:'rgba(100,116,139,0.14)',bd:'#334155'},
+};
+const TABS=[
+  {v:'all',l:'All'},{v:'ewa',l:'EWA'},{v:'fan',l:'Fans'},{v:'light',l:'Lighting'},
+  {v:'wire',l:'Havells Wire'},{v:'mcb',l:'MCB Euro II'},{v:'mcb_x7',l:'MCB X7'},
+  {v:'std_wire',l:'Standard Wire'},{v:'welkm',l:'Welkm'},
+  {v:'geyser',l:'Geyser'},{v:'cooler',l:'Coolers'},{v:'sda',l:'Appliances'},
+  {v:'chimney',l:'Kitchen'},{v:'purifier',l:'Purifier'},{v:'pro',l:'Pro Lighting'},{v:'ip',l:'Industrial'},
+];
+const fmt=p=>'Rs.'+Number(p).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtUpd=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});};
+const updBadge=item=>item.updated?`<span class="upd-tag" title="Price list revised">↻ Updated ${fmtUpd(item.updated)}</span>`:'';
+let S={src:'all',cat:'All',q:'',sc:'name',sd:'asc',sel:null,view:'card',updOnly:false};
+const cnt={};ALL_ITEMS.forEach(i=>cnt[i.source]=(cnt[i.source]||0)+1);
+function bdg(src){const m=SRC[src]||{l:src,c:'#888',bg:'transparent',bd:'#444'};return`<span class="badge" style="color:${m.c};background:${m.bg};border-color:${m.bd}">${m.l}</span>`;}
+function base(){return S.src==='all'?ALL_ITEMS:ALL_ITEMS.filter(i=>i.source===S.src);}
+function filt(){
+  let l=base();
+  if(S.cat!=='All')l=l.filter(i=>i.category===S.cat);
+  if(S.updOnly)l=l.filter(i=>!!i.updated);
+  if(S.q){const q=S.q.toLowerCase();l=l.filter(i=>i.name.toLowerCase().includes(q)||i.code.toLowerCase().includes(q)||i.category.toLowerCase().includes(q));}
+  return [...l].sort((a,b)=>{const av=S.sc==='price'?Number(a.price):a[S.sc].toLowerCase();const bv=S.sc==='price'?Number(b.price):b[S.sc].toLowerCase();return av<bv?(S.sd==='asc'?-1:1):av>bv?(S.sd==='asc'?1:-1):0;});
+}
+function render(){
+  const f=filt(),b=base();
+  const lastUpd=ALL_ITEMS.reduce((mx,i)=>i.updated&&i.updated>mx?i.updated:mx,'');
+  document.getElementById('hdr-sub').textContent='w.e.f. April 2026 — '+ALL_ITEMS.length.toLocaleString()+' SKUs'+(lastUpd?' • Last price update: '+fmtUpd(lastUpd):'');
+  const updCount=ALL_ITEMS.filter(i=>i.updated).length;
+  const bnr=document.getElementById('upd-banner');
+  if(lastUpd){bnr.style.display='flex';bnr.innerHTML=`<span>↻</span><span>Prices last revised <b>${fmtUpd(lastUpd)}</b> — ${updCount.toLocaleString()} item${updCount===1?'':'s'} updated.</span><span style="text-decoration:underline;cursor:pointer;margin-left:auto" onclick="toggleUpd()">View changed items</span>`;}
+  else{bnr.style.display='none';}
+  document.getElementById('tabs').innerHTML=TABS.map(t=>`<div class="tab${S.src===t.v?' on':''}" onclick="setSrc('${t.v}')">${t.l} <span style="opacity:.5;font-size:9px">(${(t.v==='all'?ALL_ITEMS.length:cnt[t.v]||0).toLocaleString()})</span></div>`).join('');
+  document.getElementById('stats').innerHTML=[
+    {l:'Total',v:ALL_ITEMS.length,c:'#e8e4dc'},{l:'EWA',v:cnt.ewa||0,c:SRC.ewa.c},
+    {l:'Fans',v:cnt.fan||0,c:SRC.fan.c},{l:'Lighting',v:cnt.light||0,c:SRC.light.c},
+    {l:'Hvls Wire',v:cnt.wire||0,c:SRC.wire.c},{l:'MCB EII',v:cnt.mcb||0,c:SRC.mcb.c},
+    {l:'MCB X7',v:cnt.mcb_x7||0,c:SRC.mcb_x7.c},{l:'Std Wire',v:cnt.std_wire||0,c:SRC.std_wire.c},
+    {l:'Welkm',v:cnt.welkm||0,c:SRC.welkm.c},{l:'Geyser',v:cnt.geyser||0,c:SRC.geyser.c},
+    {l:'Cooler',v:cnt.cooler||0,c:SRC.cooler.c},{l:'SDA',v:cnt.sda||0,c:SRC.sda.c},
+    {l:'Kitchen',v:cnt.chimney||0,c:SRC.chimney.c},{l:'Purifier',v:cnt.purifier||0,c:SRC.purifier.c},
+    {l:'Showing',v:f.length,c:'#e8e4dc'},
+    {l:'Updated',v:ALL_ITEMS.filter(i=>i.updated).length,c:'#fbbf24'},
+  ].map(s=>`<div class="stat"><div class="stat-n" style="color:${s.c}">${s.v.toLocaleString()}</div><div class="stat-l">${s.l}</div></div>`).join('');
+  const cats=['All',...new Set(base().map(i=>i.category))].sort((a,b)=>a==='All'?-1:b==='All'?1:a.localeCompare(b));
+  document.getElementById('cats').innerHTML=cats.slice(0,35).map(c=>`<button class="cat${S.cat===c?' on':''}" onclick="setCat(this.dataset.c)" data-c="${esc(c)}">${esc(c)}</button>`).join('')+(cats.length>35?`<span style="font-size:10px;color:#4a4a5a;padding:3px 8px">+${cats.length-35} more</span>`:'');
+  document.getElementById('meta-txt').innerHTML=`<b style="color:#e8e4dc">${f.length.toLocaleString()}</b> of ${b.length.toLocaleString()} items${S.q?` &mdash; "${esc(S.q)}"`:''}`; 
+  ['n','p'].forEach(x=>{const el=document.getElementById('s'+x);if(el){const col=x==='n'?'name':'price';el.className='sbtn'+(S.sc===col?' on':'');el.textContent=(col==='name'?'Name':'Price')+' '+(S.sc===col?(S.sd==='asc'?'▲':'▼'):'⇅');}});
+  const supdEl=document.getElementById('supd');if(supdEl)supdEl.className='sbtn'+(S.updOnly?' on':'');
+  window._f=f;
+  if(!f.length){document.getElementById('list').innerHTML='<div class="empty">No results &mdash; try different keywords</div>';return;}
+  if(S.view==='grid'){buildGrid(f);}else{buildCards(f);}
+}
+function buildCards(f){
+  document.getElementById('list').innerHTML=f.map((item,i)=>{
+    const sel=S.sel&&S.sel.code===item.code&&S.sel.name===item.name;
+    const hasMRP=item.mrp&&item.mrp>item.price;
+    const gn=item.unit&&item.unit.includes('excl')?'excl. GST':'incl. GST';
+    return`<div class="card${sel?' sel':''}" onclick="pick(${i})">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <span style="font-size:11px;color:#4a4a5a;min-width:22px;padding-top:2px;font-family:monospace;flex-shrink:0">${i+1}.</span>
+        <div style="flex:1">
+          <div class="cn">${esc(item.name)}</div>
+          <div class="cr2">${bdg(item.source)}<span class="ccat">${esc(item.category)}</span></div>
+          <div class="ccode">${esc(item.code)}</div>
+          <div class="cprow">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div><span class="cprice">${fmt(item.price)}</span>${item.unit?`<span class="cunit">${esc(item.unit)}</span>`:''}</div>
+              ${hasMRP?`<div style="display:flex;align-items:center;gap:6px"><span class="mrp-tag">MRP ${fmt(item.mrp)}</span><span class="lp-tag">${Math.round((1-item.price/item.mrp)*100)}% off</span></div>`:''}
+              ${item.updated?`<div>${updBadge(item)}</div>`:''}
+            </div>
+            <span class="cgst">${gn}</span>
+            <button class="sh-add" onclick="shAdd(${JSON.stringify(item.code).replace(/"/g,'&quot;')},event)">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function buildGrid(f){
+  // Group by category for organised display
+  const groups={};
+  f.forEach((item,i)=>{
+    if(!groups[item.category])groups[item.category]=[];
+    groups[item.category].push({item,i});
+  });
+  // Sort categories alphabetically
+  const sortedCats=Object.keys(groups).sort((a,b)=>a.localeCompare(b));
+  let rows='<table class="grid-table"><thead><tr><th style="width:28px">#</th><th>Name</th><th>Code</th><th>Category</th><th class="right">List Price</th><th class="right" style="width:70px">MRP</th><th class="right" style="width:55px">Off%</th><th style="width:60px">GST</th><th style="width:62px"></th></tr></thead><tbody>';
+  let globalIdx=0;
+  sortedCats.forEach(cat=>{
+    const catItems=groups[cat];
+    // Category group header
+    rows+=`<tr class="grid-grp-hdr"><td colspan="8">${esc(cat)} <span style="color:#4a4a5a;font-weight:400">(${catItems.length})</span></td></tr>`;
+    catItems.forEach(({item,i})=>{
+      globalIdx++;
+      const sel=S.sel&&S.sel.code===item.code&&S.sel.name===item.name;
+      const hasMRP=item.mrp&&item.mrp>item.price;
+      const disc=hasMRP?Math.round((1-item.price/item.mrp)*100):0;
+      const gn=item.unit&&item.unit.includes('excl')?'excl':'incl';
+      rows+=`<tr class="${sel?'sel-row':''}" onclick="pick(${i})">
+        <td style="color:#4a4a5a;font-size:10px;text-align:center">${globalIdx}</td>
+        <td class="td-name">${esc(item.name)}</td>
+        <td class="td-code">${esc(item.code)}</td>
+        <td class="td-cat">${bdg(item.source)}</td>
+        <td class="td-price">${fmt(item.price)}${item.unit?`<div style="font-size:9px;color:#4a4a5a;font-weight:400">${esc(item.unit)}</div>`:''}${item.updated?`<div style="margin-top:3px">${updBadge(item)}</div>`:''}</td>
+        <td class="td-mrp">${hasMRP?fmt(item.mrp):''}</td>
+        <td class="td-off">${hasMRP?`<span style="background:rgba(16,185,129,0.15);color:#10b981;border-radius:10px;padding:1px 5px;font-size:10px">${disc}%</span>`:''}</td>
+        <td style="font-size:10px;color:#4a4a5a;text-align:center">${gn}</td>
+        <td style="text-align:center"><button class="sh-add" onclick="shAdd(${JSON.stringify(item.code).replace(/"/g,'&quot;')},event)">Add</button></td>
+      </tr>`;
+    });
+  });
+  rows+='</tbody></table>';
+  document.getElementById('list').innerHTML=rows;
+}
+function pick(i){const item=window._f[i];if(!item)return;if(S.sel&&S.sel.code===item.code&&S.sel.name===item.name){closeDP();return;}S.sel=item;showDP(item);render();}
+function showDP(item){
+  document.getElementById('dp').classList.add('open');
+  document.getElementById('dp-badge').innerHTML=bdg(item.source);
+  document.getElementById('dp-title').textContent=item.name;
+  document.getElementById('dp-name').textContent=item.name;
+  document.getElementById('dp-code').textContent=item.code;
+  document.getElementById('dp-cat').textContent=item.category;
+  document.getElementById('dp-type').textContent=(SRC[item.source]||{l:item.source}).l;
+  document.getElementById('dp-unit').textContent=item.unit||'';
+  document.getElementById('dp-lp').textContent=fmt(item.price);
+  // MRP row
+  const hasMRP=item.mrp&&item.mrp>item.price;
+  const disc=hasMRP?Math.round((1-item.price/item.mrp)*100):0;
+  document.getElementById('dp-mrp-row').innerHTML=hasMRP
+    ?`<div class="pbox-row"><span class="pbox-lbl">MRP</span><span class="pbox-mrp">${fmt(item.mrp)}</span></div>`:'';
+  document.getElementById('dp-disc').innerHTML=hasMRP
+    ?`<span style="background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);padding:3px 10px;border-radius:20px;font-size:11px">&#127381; ${disc}% below MRP</span>`:'';
+  document.getElementById('dp-upd').innerHTML=item.updated?`<div style="margin-top:6px">${updBadge(item)}</div>`:'';
+  // Breakdown
+  const excl=item.unit&&item.unit.includes('excl');
+  document.getElementById('dp-brk').style.display=excl?'none':'block';
+  if(!excl){const b=item.price/1.18,g=item.price-b;document.getElementById('dp-base').textContent=fmt(b);document.getElementById('dp-gst-amt').textContent=fmt(g);document.getElementById('dp-tot').textContent=fmt(item.price);}
+  const rel=ALL_ITEMS.filter(i=>i.source===item.source&&i.category===item.category&&i.code!==item.code).slice(0,6);
+  window._rel=rel;
+  document.getElementById('dp-rel').innerHTML=rel.length?'<div class="rl-t">More in category</div>'+rel.map((r,ri)=>`<div class="rl" onclick="showDP(window._rel[${ri}]);S.sel=window._rel[${ri}];render()"><div class="rl-n">${esc(r.name)}</div><div class="rl-b"><span class="rl-c">${esc(r.code)}</span><div style="text-align:right"><span class="rl-p">${fmt(r.price)}</span>${r.mrp&&r.mrp>r.price?`<div style="font-size:10px;color:#9ca3af;text-decoration:line-through">${fmt(r.mrp)}</div>`:''}</div></div></div>`).join(''):'';
+}
+function closeDP(){S.sel=null;document.getElementById('dp').classList.remove('open');render();}
+function setSrc(v){S.src=v;S.cat='All';S.sel=null;document.getElementById('dp').classList.remove('open');render();}
+function setCat(c){S.cat=c;S.sel=null;render();}
+function setView(v){
+  S.view=v;
+  document.getElementById('vcard').className='vtbtn'+(v==='card'?' on':'');
+  document.getElementById('vgrid').className='vtbtn'+(v==='grid'?' on':'');
+  buildList();
+}
+function srt(col){if(S.sc===col)S.sd=S.sd==='asc'?'desc':'asc';else{S.sc=col;S.sd='asc';}render();}
+function toggleUpd(){S.updOnly=!S.updOnly;S.sel=null;document.getElementById('dp').classList.remove('open');render();}
+document.getElementById('srch').addEventListener('input',function(){S.q=this.value;S.cat='All';S.sel=null;document.getElementById('dp').classList.remove('open');render();});
+document.getElementById('sku-inp').addEventListener('input',function(){
+  const v=this.value.trim().toLowerCase();if(!v){closeDP();return;}
+  const e=ALL_ITEMS.find(i=>i.code.toLowerCase()===v);
+  if(e){S.sel=e;S.src='all';S.q='';S.cat='All';render();showDP(e);}
+});
+render();
+// Init toggle button states
+document.getElementById('vcard').className='vtbtn on';
+document.getElementById('vgrid').className='vtbtn';
+
+/* ===== Send an item to the quotation builder ===== */
+function shQueue(code,name,price,qty){
+  const item={code:code,name:name,price:price,qty:Math.max(1,parseInt(qty)||1)};
+  let pend=[];try{pend=JSON.parse(localStorage.getItem('sh_pending_adds')||'[]');}catch(e){}
+  pend.push(item);
+  try{localStorage.setItem('sh_pending_adds',JSON.stringify(pend));}catch(e){}
+  try{if(window.parent&&window.parent!==window)window.parent.postMessage({t:'sh-queued'},'*');}catch(e){}
+  shToast(item.qty+' \u00d7 '+name.slice(0,30)+(name.length>30?'\u2026':'')+' \u2192 quotation');
+}
+function shAdd(code,ev){
+  if(ev){ev.stopPropagation();}
+  const it=ALL_ITEMS.find(x=>x.code===code);
+  if(!it)return;
+  shQueue(it.code,it.name,it.price,1);
+}
+let shTT;
+function shToast(msg){
+  let t=document.getElementById('shToast');
+  if(!t){t=document.createElement('div');t.id='shToast';
+    t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111;color:#fff;'+
+    'padding:10px 16px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .18s;pointer-events:none';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(shTT);shTT=setTimeout(()=>{t.style.opacity='0';},2200);
+}
+</script>
+</body>
+</html>
