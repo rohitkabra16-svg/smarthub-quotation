@@ -1,0 +1,21 @@
+{
+  "name": "Smart Hub — Prices & Quotation",
+  "short_name": "Smart Hub",
+  "description": "Havells price search and quotation builder for Smart Hub, Guwahati.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f3ef",
+  "theme_color": "#0a2f6b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Search prices", "url": "./index.html" },
+    { "name": "Quotation", "url": "./index.html#quote" },
+    { "name": "Full price list", "url": "./index.html#list" }
+  ]
+}
