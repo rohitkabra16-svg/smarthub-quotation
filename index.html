@@ -122,9 +122,10 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 .slrow{display:flex;align-items:center;gap:12px}
 .pct input::-webkit-outer-spin-button,.pct input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .slrow input[type=range]{flex:1;accent-color:var(--navy);height:22px}
-.pct{font-size:19px;font-weight:700;min-width:88px;text-align:right;white-space:nowrap}
-.pct input{width:78px;font:inherit;font-weight:700;text-align:right;border:1px solid var(--rule);
-  border-radius:6px;padding:3px 5px;background:var(--card)}
+.pct{display:flex;align-items:center;gap:4px;font-size:19px;font-weight:700;white-space:nowrap}
+.pct input{width:72px;font:inherit;font-weight:700;text-align:center;border:1.5px solid var(--rule);
+  border-radius:7px;padding:5px 6px;background:var(--card)}
+.pct input:focus{border-color:var(--navy);outline:0}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
 .chips button{border:1px solid var(--rule);background:var(--card);color:var(--ink2);
   padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer}
@@ -420,46 +421,62 @@ let DISC=+(localStorage.getItem('sh_disc')||40);
 const inr2=n=>'\u20b9'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 function toggleCalc(code){OPEN=OPEN===code?null:code;draw();}
-function setDisc(v,code){
+
+/* Typing in the percent box must update the figures on every keystroke. Repainting the
+   whole panel would steal focus mid-type, so only the parts that changed are redrawn:
+   the bill, the chips, and whichever control the change did not come from. */
+function setDisc(v,code,from){
   DISC=Math.min(60,Math.max(0,+v||0));
   try{localStorage.setItem('sh_disc',DISC);}catch(e){}
-  paintCalc(code);
+  const sl=document.getElementById('sl_'+code), nb=document.getElementById('nb_'+code);
+  if(sl&&from!=='slider')sl.value=DISC;
+  if(nb&&from!=='box')nb.value=DISC;
+  const ch=document.getElementById('chips_'+code); if(ch)ch.innerHTML=chipsHTML(code);
+  const bl=document.getElementById('bill_'+code);
+  const x=ITEMS.find(i=>i.code===code);
+  if(bl&&x)bl.innerHTML=billHTML(x);
 }
 function paintCalc(code){
-  const el=document.getElementById('calc_'+code);
   const x=ITEMS.find(i=>i.code===code);
-  if(el&&x&&OPEN===code)el.innerHTML=panel(x);
+  const bl=document.getElementById('bill_'+code);
+  if(bl&&x)bl.innerHTML=billHTML(x);
 }
-function panel(x){
+function chipsHTML(code){
+  return [35,37,38,40,41,43].map(p=>
+    '<button class="'+(DISC===p?'on':'')+'" onclick="setDisc('+p+','+J(code)+')">'+p+'%</button>'
+  ).join('');
+}
+function billHTML(x){
   const qty=Math.max(1,parseInt(QTY[x.code])||1);
   const lp=x.price*qty;
-  const lpBasic = lp;
-  const basic   = lpBasic*(1-DISC/100);
-  const gst     = basic*0.18;
-  const net     = basic+gst;
-  const per     = (x.unit&&/\d+m/.test(x.unit)) ? 'coil' : 'piece';
-  const C=J(x.code);
+  const basic=lp*(1-DISC/100);
+  const gst=basic*0.18;
+  const net=basic+gst;
+  const per=(x.unit&&/\d+m/.test(x.unit))?'coil':'piece';
+  return '<div class="bl"><span>List price'+(qty>1?' \u00d7 '+qty:'')+'</span><b>'+inr(lp)+'</b></div>'+
+    '<div class="bl"><span>Less '+DISC+'% discount</span><span>\u2212 '+inr(lp-basic)+'</span></div>'+
+    '<div class="bl sub"><span>Taxable value</span><b>'+inr(basic)+'</b></div>'+
+    '<div class="bl"><span>GST @ 18%</span><span>+ '+inr(gst)+'</span></div>'+
+    '<div class="bl tot"><span>Net payable</span><span>'+inr(net)+'</span></div>'+
+    '<div class="each">'+inr2(net/qty)+' per '+per+(qty>1?' \u00b7 '+qty+' nos':'')+'</div>';
+}
+function panel(x){
+  const C=J(x.code), id=x.code;
   return '<div class="calcin"><div class="ctrl">'+
     '<label class="lbl">Discount on list</label>'+
-    '<div class="slrow"><input type="range" min="0" max="60" step="0.5" value="'+DISC+'" '+
-      'oninput="setDisc(this.value,'+C+')">'+
-      '<div class="pct"><input type="number" min="0" max="60" step="0.5" value="'+DISC+'" '+
-      'onchange="setDisc(this.value,'+C+')">%</div></div>'+
-    '<div class="chips">'+[35,37,38,40,41,43].map(p=>
-      '<button class="'+(DISC===p?'on':'')+'" onclick="setDisc('+p+','+C+')">'+p+'%</button>').join('')+'</div>'+
+    '<div class="slrow">'+
+      '<div class="pct"><input type="number" id="nb_'+id+'" min="0" max="60" step="0.5" '+
+        'inputmode="decimal" value="'+DISC+'" oninput="setDisc(this.value,'+C+',\'box\')">'+
+        '<span>%</span></div>'+
+      '<input type="range" id="sl_'+id+'" min="0" max="60" step="0.5" value="'+DISC+'" '+
+        'oninput="setDisc(this.value,'+C+',\'slider\')">'+
+    '</div>'+
+    '<div class="chips" id="chips_'+id+'">'+chipsHTML(x.code)+'</div>'+
     (x.source==='welkm'
-      ? '<div class="pvcnote">PVC lines are your purchase cost, not a Havells list price. '+
-        'Not a Havells list price.</div>'
+      ? '<div class="pvcnote">PVC lines are your purchase cost, not a Havells list price.</div>'
       : '')+
     '</div>'+
-    '<div class="bill">'+
-      '<div class="bl"><span>List price'+(qty>1?' \u00d7 '+qty:'')+'</span><b>'+inr(lp)+'</b></div>'+
-      '<div class="bl"><span>Less '+DISC+'% discount</span><span>\u2212 '+inr(lpBasic-basic)+'</span></div>'+
-      '<div class="bl sub"><span>Taxable value</span><b>'+inr(basic)+'</b></div>'+
-      '<div class="bl"><span>GST @ 18%</span><span>+ '+inr(gst)+'</span></div>'+
-      '<div class="bl tot"><span>Net payable</span><span>'+inr(net)+'</span></div>'+
-      '<div class="each">'+inr2(net/qty)+' per '+per+(qty>1?' \u00b7 '+qty+' nos':'')+'</div>'+
-    '</div></div>';
+    '<div class="bill" id="bill_'+id+'">'+billHTML(x)+'</div></div>';
 }
 
 function drawFilters(raw){
