@@ -99,6 +99,11 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 .code{font-size:11px;letter-spacing:.02em;color:#8a6d1f}
 .tag{font-size:10.5px;padding:1px 6px;border-radius:4px;background:#eef1f6;color:var(--navy)}
 .tag.upd{background:#fdf0d8;color:#8a6d1f}
+.pole{font-size:10.5px;font-weight:800;letter-spacing:.04em;padding:1px 7px;border-radius:4px}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:9px 14px;background:#eceae4;border-bottom:1px solid var(--rule);
+  font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--navy)}
+.ghead span{font-weight:600;color:var(--ink2);font-size:11px;letter-spacing:0;text-transform:none}
 .rprice{font-size:16px;font-weight:700;white-space:nowrap}
 .radd{display:flex;gap:6px;align-items:center}
 .radd input{width:54px;padding:7px 6px;border:1px solid var(--rule);border-radius:6px;text-align:center;font-size:13px;background:var(--card)}
@@ -184,6 +189,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   :root:not([data-theme="light"]) .hint code{background:#2a2f39}
   :root:not([data-theme="light"]) .row:hover{background:#21242c}
   :root:not([data-theme="light"]) .calc{background:#191c22}
+  :root:not([data-theme="light"]) .ghead{background:#242831;color:#b9cbe8}
   :root:not([data-theme="light"])   :root:not([data-theme="light"]) .pvcnote{background:#2a2416;border-color:#4a3f20;color:#e4d4a4}
 }
 </style>
@@ -335,7 +341,22 @@ function draw(){
   const show=res.slice(0,SHOWN);
   meta.innerHTML='<b>'+res.length+'</b> '+(res.length===1?'item':'items')+
     (SRCFILTER?' in '+esc(SRC[SRCFILTER]||SRCFILTER):'');
-  box.innerHTML='<div class="rows">'+show.map(row).join('')+
+
+  let inner;
+  if(show.length>1&&show.every(x=>BRK[x.source])){
+    /* Breakers: keep each series together so every kA variant of ATRON, QTRON or
+       Loadline sits in one block, ordered by current rating then breaking capacity. */
+    const order=[],g={};
+    show.forEach(x=>{const k=seriesOf(x);if(!g[k]){g[k]=[];order.push(k);}g[k].push(x);});
+    inner=order.map(k=>{
+      const list=g[k].slice().sort((a,b)=>
+        ampOf(a.name)-ampOf(b.name)||kaOf(a.name)-kaOf(b.name)||a.price-b.price);
+      return '<div class="ghead">'+esc(k)+'<span>'+list.length+'</span></div>'+list.map(row).join('');
+    }).join('');
+  }else{
+    inner=show.map(row).join('');
+  }
+  box.innerHTML='<div class="rows">'+inner+
     (res.length>show.length
       ? '<div class="more"><button onclick="SHOWN+=60;draw()">Show '+
         Math.min(60,res.length-show.length)+' more</button></div>'
@@ -347,6 +368,8 @@ function row(x,i){
   return '<div class="row" onclick="toggleCalc('+J(x.code)+')">'+
     '<div><div class="rname">'+esc(x.name)+'</div><div class="rsub">'+
       '<span class="code">'+esc(x.code)+'</span>'+
+      (function(){const p=poleOf(x);return p
+        ? '<span class="pole" style="color:'+p[2]+';background:'+p[3]+'">'+p[0]+'</span>' : '';})()+
       '<span class="tag">'+esc(SRC[x.source]||x.source)+'</span>'+
       (x.category?'<span>'+esc(x.category)+'</span>':'')+
       (x.updated?'<span class="tag upd">new price</span>':'')+
@@ -361,6 +384,34 @@ function row(x,i){
     '</div></div>'+
     '<div class="calc'+(open?' open':'')+'" id="calc_'+esc(x.code)+'">'+(open?panel(x):'')+'</div>';
 }
+
+
+/* ---- breaker helpers: pole configuration and series ---- */
+const POLE=[
+  ['TPN', /\bTPN\b|triple pole with neutral|3 ?pole ?\+ ?n/i,          '#7c3aed','#efe7fd'],
+  ['SPN', /\bSPN\b|single pole with neutral|1 ?pole ?\+ ?n/i,          '#0f766e','#dcf4f1'],
+  ['FP',  /\bFP\b|four pole|\b4 ?pole/i,                                '#15803d','#e0f3e4'],
+  ['TP',  /\bTP\b|triple pole|\b3 ?pole/i,                              '#b45309','#fdeedb'],
+  ['DP',  /\bDP\b|double pole|\b2 ?pole/i,                              '#be123c','#fde8ec'],
+  ['SP',  /\bSP\b|single pole|\b1 ?pole/i,                              '#1d4ed8','#e3ebfd']
+];
+function poleOf(x){
+  if(!BRK[x.source])return null;
+  const t=x.name+' '+(x.category||'');
+  for(const p of POLE)if(p[1].test(t))return p;
+  return null;
+}
+const BRK={mcb:1,mcb_x7:1,ip:1};
+/* The series a breaker belongs to, so every kA variant lands in one block. */
+function seriesOf(x){
+  const c=x.category||'';
+  if(x.source==='ip')      return c.split('\u2014').pop().trim();
+  if(x.source==='mcb')     return 'Euro II '+c.split(' - ')[0].trim();
+  if(x.source==='mcb_x7')  return c.split(' - ')[0].trim();
+  return c;
+}
+const ampOf=n=>{const m=String(n).match(/(\d+(?:\.\d+)?)\s*A\b/);return m?+m[1]:1e9;};
+const kaOf =n=>{const m=String(n).match(/(\d+(?:\.\d+)?)\s*kA\b/i);return m?+m[1]:0;};
 
 /* ---- the rate calculator that opens under a tapped row ---- */
 let OPEN=null, QTY={};
