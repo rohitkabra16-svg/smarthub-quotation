@@ -198,8 +198,13 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 
 <script src="catalog.js"></script>
 <script>
+const flat=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
+/* Two haystacks per item: the normal one for ranking, and a flattened one with every
+   space, dot and dash stripped out. The flattened one is what matching runs against,
+   so "life line 90m", "lifeline 90m" and "lifeline90m" all land on the same item. */
 const ITEMS = (window.SH_CATALOG||[]).map(x=>Object.assign({},x,{
-  hay:(x.name+' '+x.code+' '+(x.category||'')).toLowerCase()
+  hay:(x.name+' '+x.code+' '+(x.category||'')).toLowerCase(),
+  flat:flat(x.name+x.code+(x.category||''))
 }));
 
 const SRC={
@@ -235,7 +240,17 @@ function variants(w){
   if(m)v.push(m[1]+' '+m[2]);
   return v;
 }
-function hit(x,w){return variants(w).some(v=>x.hay.includes(v));}
+function hit(x,w){
+  return variants(w).some(v=>{
+    const f=flat(v);
+    if(f&&x.flat.includes(f))return true;
+    /* a run typed without spaces: "lifeline90m" -> lifeline / 90 / m */
+    const parts=w.match(/[a-z]+|\d+(?:\.\d+)?/g);
+    if(parts&&parts.length>1)
+      return parts.every(p=>[p].concat(SYN[p]||[]).some(v=>x.flat.includes(flat(v))));
+    return false;
+  });
+}
 
 /* ---- search: exact code first, then every word must appear ---- */
 function search(raw){
