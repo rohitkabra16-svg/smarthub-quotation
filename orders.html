@@ -204,14 +204,34 @@ function pull(show){
         return;
       }
       // Newest edit wins, per record.
+      const cloud={};(d.records||[]).forEach(r=>cloud[r.id]=r);
       const mine={};RECS.forEach(r=>mine[r.id]=r);
-      d.records.forEach(r=>{
-        const cur=mine[r.id];
-        if(!cur||(+r.updatedAt||0)>=(+cur.updatedAt||0))mine[r.id]=r;
+
+      // Anything held here that the sheet has never seen, or that is newer here,
+      // gets pushed up. Without this, records made before sync was switched on
+      // would sit on one machine for ever.
+      const toPush=RECS.filter(r=>{
+        const c=cloud[r.id];
+        return !c||(+r.updatedAt||0)>(+c.updatedAt||0);
+      });
+
+      Object.keys(cloud).forEach(id=>{
+        const c=cloud[id],cur=mine[id];
+        if(!cur||(+c.updatedAt||0)>=(+cur.updatedAt||0))mine[id]=c;
       });
       RECS=Object.values(mine).filter(r=>!r.deleted);
-      save();render();syncLbl('ok');
-      if(show)toast('Up to date');
+      save();render();
+
+      if(toPush.length){
+        syncLbl('up');
+        Promise.all(toPush.map(r=>push(r))).then(()=>{
+          syncLbl('ok');
+          if(show)toast(toPush.length+' sent up to the sheet');
+        });
+      }else{
+        syncLbl('ok');
+        if(show)toast('Up to date');
+      }
     }).catch(()=>{syncLbl('err');if(show)toast('Could not reach the sheet');});
 }
 function syncLbl(state){
@@ -219,6 +239,7 @@ function syncLbl(state){
   if(!syncOn()){el.className='sync off';el.innerHTML='Cloud sync <b>off</b>';return;}
   if(state==='err'){el.className='sync off';el.innerHTML='Sync <b>unreachable</b>';return;}
   if(state==='norec'){el.className='sync off';el.innerHTML='Sheet <b>not ready</b>';return;}
+  if(state==='up'){el.className='sync';el.innerHTML='Sending <b>\u2026</b>';return;}
   el.className='sync';el.innerHTML='Synced <b>✓</b>';
 }
 function commit(rec){
