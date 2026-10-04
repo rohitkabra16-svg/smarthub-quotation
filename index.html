@@ -203,6 +203,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
     <button id="nav-home" class="on" onclick="go('home')"><span class="ic">⌕</span>Search prices</button>
     <button id="nav-quote" onclick="go('quote')"><span class="ic">▤</span>Quotation<span class="badge" id="pendBadge"></span></button>
     <button id="nav-list" onclick="go('list')"><span class="ic">☰</span>Full price list</button>
+    <button id="nav-orders" onclick="go('orders')"><span class="ic">◳</span>Orders</button>
   </div>
   <button id="installBtn" class="install" onclick="installApp()" style="display:none">⤓ Install as app</button>
   <div class="railfoot" id="railfoot">&nbsp;</div>
@@ -234,6 +235,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   </section>
   <section class="pane" id="pane-quote"></section>
   <section class="pane" id="pane-list"></section>
+  <section class="pane" id="pane-orders"></section>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -537,16 +539,16 @@ function toast(msg){
 
 /* ---- panes: each app loads once, then keeps its state ---- */
 const APPS={};
-const PAGES={quote:'quotation.html',list:'prices.html'};
+const PAGES={quote:'quotation.html',list:'prices.html',orders:'orders.html'};
 function go(which){
-  ['home','quote','list'].forEach(k=>{
+  ['home','quote','list','orders'].forEach(k=>{
     document.getElementById('pane-'+k).classList.toggle('on',k===which);
     document.getElementById('nav-'+k).classList.toggle('on',k===which);
   });
   if(PAGES[which]&&!APPS[which]){
     const f=document.createElement('iframe');
     f.src=PAGES[which];
-    f.title=which==='quote'?'Quotation builder':'Full price list';
+    f.title={quote:'Quotation builder',list:'Full price list',orders:'Orders'}[which]||which;
     document.getElementById('pane-'+which).appendChild(f);
     APPS[which]=f;
   }

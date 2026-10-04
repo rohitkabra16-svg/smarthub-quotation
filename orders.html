@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smart Hub — Orders</title>
+<style>
+:root{
+  --paper:#f4f3ef;--card:#fff;--ink:#1b1d22;--ink2:#6a6f7a;--rule:#dedbd3;
+  --navy:#0a2f6b;--red:#be123c;--amber:#b45309;--ok:#15803d;--teal:#0f766e;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);
+  font:400 15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:18px 16px 60px}
+
+/* top */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tabs{display:flex;gap:4px;background:#e7e5df;padding:3px;border-radius:9px}
+.tabs button{border:0;background:none;padding:7px 14px;border-radius:7px;font-size:13.5px;
+  font-weight:600;color:var(--ink2);cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.spacer{margin-left:auto}
+.primary{border:0;background:var(--navy);color:#fff;padding:9px 15px;border-radius:8px;
+  font-size:13.5px;font-weight:600;cursor:pointer}
+.ghost{border:1px solid var(--rule);background:var(--card);padding:8px 13px;border-radius:8px;
+  font-size:13px;cursor:pointer}
+.sync{font-size:11.5px;color:var(--ink2)}
+.sync b{color:var(--ok)}
+.sync.off b{color:var(--amber)}
+
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters button{border:1px solid var(--rule);background:var(--card);color:var(--ink2);
+  padding:5px 12px;border-radius:999px;font-size:12.5px;cursor:pointer}
+.filters button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.filters input{flex:1;min-width:150px;padding:8px 11px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--card);font-size:13.5px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.chead{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;cursor:pointer}
+.chead:hover{background:#faf9f6}
+.cust{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.sub{font-size:11.5px;color:var(--ink2);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:10.5px;font-weight:800;letter-spacing:.03em;padding:2px 8px;border-radius:5px;text-transform:uppercase}
+.p-open{background:#e3ebfd;color:#1d4ed8}
+.p-part{background:#fdeedb;color:var(--amber)}
+.p-done{background:#e0f3e4;color:var(--ok)}
+.p-out{background:#efe7fd;color:#7c3aed}
+.p-ret{background:#e0f3e4;color:var(--ok)}
+.p-conv{background:#dcf4f1;color:var(--teal)}
+.p-off{background:#fde8ec;color:var(--red)}
+.prog{min-width:132px;text-align:right}
+.bar{height:6px;background:#eceae4;border-radius:4px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.bar.part i{background:var(--amber)}
+.pnum{font-size:12px;color:var(--ink2)}
+.pnum b{color:var(--ink);font-size:13.5px}
+
+.body{display:none;border-top:1px solid var(--rule);padding:12px 14px 14px;background:#faf9f6}
+.body.open{display:block}
+.meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin-bottom:11px}
+.meta b{color:var(--ink);font-weight:600}
+
+table.lines{width:100%;border-collapse:collapse;background:var(--card);
+  border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.lines th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);
+  text-align:left;padding:8px 10px;background:#f0eee9;font-weight:700}
+.lines td{padding:9px 10px;border-top:1px solid var(--rule);font-size:13px;vertical-align:top}
+.lines .n{text-align:right;white-space:nowrap}
+.lines .done td{color:var(--ink2)}
+.code{font-size:10.5px;color:var(--amber)}
+.log{font-size:11px;color:var(--ink2);margin-top:4px;line-height:1.5}
+.supply{display:flex;gap:5px;align-items:center;justify-content:flex-end}
+.supply input{width:58px;padding:5px;border:1px solid var(--rule);border-radius:6px;
+  text-align:center;font-size:12.5px}
+.supply button{border:0;background:var(--navy);color:#fff;padding:6px 10px;border-radius:6px;
+  font-size:11.5px;font-weight:600;cursor:pointer}
+.supply button[disabled]{background:#d6d3cc;cursor:default}
+.rowacts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.danger{border:1px solid #f0c8cf;background:#fdf1f3;color:var(--red);padding:7px 12px;
+  border-radius:7px;font-size:12.5px;cursor:pointer}
+.note{font-size:12.5px;color:var(--ink2);margin-top:10px;line-height:1.55}
+
+/* form */
+.ovl{display:none;position:fixed;inset:0;background:rgba(20,22,27,.5);z-index:40;
+  padding:20px;overflow-y:auto}
+.ovl.open{display:block}
+.sheet{background:var(--card);border-radius:12px;max-width:660px;margin:0 auto;padding:18px}
+.sheet h2{margin:0 0 14px;font-size:18px;letter-spacing:-.02em}
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--ink2);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:9px 11px;border:1px solid var(--rule);
+  border-radius:8px;background:var(--card);font-size:14px}
+.fld textarea{min-height:58px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.picked{border:1px solid var(--rule);border-radius:8px;margin-top:8px;max-height:210px;overflow-y:auto}
+.picked div.r{display:grid;grid-template-columns:1fr 62px 30px;gap:8px;align-items:center;
+  padding:7px 10px;border-bottom:1px solid var(--rule);font-size:13px}
+.picked div.r:last-child{border-bottom:0}
+.picked input{width:100%;padding:5px;border:1px solid var(--rule);border-radius:6px;text-align:center;font-size:12.5px}
+.picked .x{border:0;background:none;color:var(--red);font-size:17px;cursor:pointer;padding:0}
+.res{border:1px solid var(--rule);border-radius:8px;max-height:190px;overflow-y:auto;margin-top:6px}
+.res div{padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13px;cursor:pointer}
+.res div:last-child{border-bottom:0}
+.res div:hover{background:#f3f1ec}
+.acts{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
+.empty{padding:40px 16px;text-align:center;color:var(--ink2);font-size:14px;
+  background:var(--card);border:1px solid var(--rule);border-radius:10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);
+  color:#fff;padding:11px 18px;border-radius:8px;font-size:13.5px;z-index:60;opacity:0;
+  pointer-events:none;transition:opacity .18s}
+.toast.show{opacity:1}
+@media(max-width:700px){
+  .chead{grid-template-columns:1fr}
+  .prog{text-align:left}
+  .two{grid-template-columns:1fr}
+  .lines th:nth-child(2),.lines td:nth-child(2){display:none}
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#15171c;--card:#1d2027;--ink:#e9eaec;--ink2:#9aa1ad;--rule:#2d323c}
+  :root:not([data-theme="light"]) .body{background:#191c22}
+  :root:not([data-theme="light"]) .chead:hover{background:#21242c}
+  :root:not([data-theme="light"]) .lines th{background:#242831}
+  :root:not([data-theme="light"]) .tabs{background:#242831}
+  :root:not([data-theme="light"]) .bar{background:#2d323c}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="tabs">
+      <button id="t-orders" class="on" onclick="setTab('orders')">Orders</button>
+      <button id="t-samples" onclick="setTab('samples')">Samples</button>
+      <button id="t-damage" onclick="setTab('damage')">Damage &amp; returns</button>
+    </div>
+    <div class="spacer"></div>
+    <span class="sync" id="syncLbl"></span>
+    <button class="ghost" onclick="pull(true)">Refresh</button>
+    <button class="primary" id="newBtn" onclick="openForm()">+ New order</button>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</div>
+
+<div class="ovl" id="ovl"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="catalog.js"></script>
+<script>
+/* ============================================================
+   Records: orders, samples and damage returns live in one list,
+   separated by `type`. One shape to sync, one sheet to hold them.
+   ============================================================ */
+const KEY='sh_records_v1';
+let RECS=[], TAB='orders', FILTER='', Q='', OPENID=null, PICK=[];
+
+const uid=()=>'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const J=s=>JSON.stringify(s).replace(/"/g,'&quot;');
+const inr=n=>'₹'+Math.round(+n||0).toLocaleString('en-IN');
+const today=()=>new Date().toISOString().slice(0,10);
+const fmt=d=>{if(!d)return '';const x=new Date(d+'T00:00:00');
+  return isNaN(x)?d:x.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});};
+const daysSince=d=>{if(!d)return 0;return Math.max(0,Math.round((Date.now()-new Date(d+'T00:00:00'))/86400000));};
+
+function load(){try{RECS=JSON.parse(localStorage.getItem(KEY)||'[]')||[];}catch(e){RECS=[];}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(RECS));}catch(e){}}
+function byId(id){return RECS.find(r=>r.id===id);}
+
+/* ---------- sync: same web app and secret the quotation uses ---------- */
+function sUrl(){try{return localStorage.getItem('sh_sync_url')||'';}catch(e){return '';}}
+function sSec(){try{return localStorage.getItem('sh_sync_secret')||'';}catch(e){return '';}}
+function syncOn(){return !!(sUrl()&&sSec());}
+function push(rec){
+  if(!syncOn())return Promise.resolve(null);
+  return fetch(sUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({secret:sSec(),action:'rec',rec:rec})})
+    .then(r=>r.json()).catch(()=>null);
+}
+function pushDelete(id){
+  if(!syncOn())return Promise.resolve(null);
+  return fetch(sUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({secret:sSec(),action:'recDelete',id:id})})
+    .then(r=>r.json()).catch(()=>null);
+}
+function pull(show){
+  if(!syncOn()){syncLbl();if(show)toast('Cloud sync is off — set it up in the quotation tab');return;}
+  fetch(sUrl()+'?secret='+encodeURIComponent(sSec()))
+    .then(r=>r.json())
+    .then(d=>{
+      if(!d||!d.ok){if(show)toast('Could not reach the sheet');syncLbl('err');return;}
+      if(!Array.isArray(d.records)){
+        syncLbl('norec');
+        if(show)toast('The sheet has no orders area yet — Apps Script needs updating');
+        return;
+      }
+      // Newest edit wins, per record.
+      const mine={};RECS.forEach(r=>mine[r.id]=r);
+      d.records.forEach(r=>{
+        const cur=mine[r.id];
+        if(!cur||(+r.updatedAt||0)>=(+cur.updatedAt||0))mine[r.id]=r;
+      });
+      RECS=Object.values(mine).filter(r=>!r.deleted);
+      save();render();syncLbl('ok');
+      if(show)toast('Up to date');
+    }).catch(()=>{syncLbl('err');if(show)toast('Could not reach the sheet');});
+}
+function syncLbl(state){
+  const el=document.getElementById('syncLbl');
+  if(!syncOn()){el.className='sync off';el.innerHTML='Cloud sync <b>off</b>';return;}
+  if(state==='err'){el.className='sync off';el.innerHTML='Sync <b>unreachable</b>';return;}
+  if(state==='norec'){el.className='sync off';el.innerHTML='Sheet <b>not ready</b>';return;}
+  el.className='sync';el.innerHTML='Synced <b>✓</b>';
+}
+function commit(rec){
+  rec.updatedAt=Date.now();
+  const i=RECS.findIndex(r=>r.id===rec.id);
+  if(i<0)RECS.push(rec);else RECS[i]=rec;
+  save();push(rec);render();
+}
+
+/* ---------- an order's state comes from its lines, never set by hand ---------- */
+function totals(o){
+  let ord=0,sup=0;
+  (o.lines||[]).forEach(l=>{ord+=+l.qty||0;sup+=supplied(l);});
+  return {ord:ord,sup:sup,pend:Math.max(0,ord-sup)};
+}
+function supplied(l){return (l.log||[]).reduce((a,e)=>a+(+e.q||0),0);}
+function orderState(o){
+  const t=totals(o);
+  if(t.ord>0&&t.sup>=t.ord)return 'done';
+  if(t.sup>0)return 'part';
+  return 'open';
+}
+const STATE_LABEL={open:'Open',part:'Partly supplied',done:'Completed'};
+const SAMPLE_LABEL={out:'With customer',returned:'Returned',converted:'Converted to sale',writtenoff:'Written off'};
+const SAMPLE_CLS={out:'p-out',returned:'p-ret',converted:'p-conv',writtenoff:'p-off'};
+const DMG_LABEL={open:'To be claimed',claimed:'Claim raised',credited:'Credit note received',replaced:'Replaced'};
+const DMG_CLS={open:'p-open',claimed:'p-part',credited:'p-done',replaced:'p-done'};
+
+/* ---------- rendering ---------- */
+function setTab(t){TAB=t;FILTER='';OPENID=null;
+  ['orders','samples','damage'].forEach(k=>document.getElementById('t-'+k).classList.toggle('on',k===t));
+  document.getElementById('newBtn').textContent=
+    t==='orders'?'+ New order':(t==='samples'?'+ Issue sample':'+ Log damage');
+  render();}
+
+function render(){
+  const f=document.getElementById('filters'), box=document.getElementById('list');
+  const mine=RECS.filter(r=>r.type===TAB);
+  let sets;
+  if(TAB==='orders')sets=[['','All'],['open','Open'],['part','Partly supplied'],['done','Completed']];
+  else if(TAB==='samples')sets=[['','All'],['out','With customer'],['returned','Returned'],['converted','Converted'],['writtenoff','Written off']];
+  else sets=[['','All'],['open','To be claimed'],['claimed','Claim raised'],['credited','Credited'],['replaced','Replaced']];
+
+  const stateOf=r=>TAB==='orders'?orderState(r):(r.status||'');
+  const counts={};mine.forEach(r=>{const s=stateOf(r);counts[s]=(counts[s]||0)+1;});
+  f.innerHTML=sets.map(([k,l])=>'<button class="'+(FILTER===k?'on':'')+'" onclick="setFilter('+J(k)+')">'+
+      l+(k?' '+(counts[k]||0):' '+mine.length)+'</button>').join('')+
+    '<input placeholder="Search customer or item" value="'+esc(Q)+'" oninput="Q=this.value;render()">';
+
+  const q=Q.trim().toLowerCase();
+  let list=mine.filter(r=>!FILTER||stateOf(r)===FILTER);
+  if(q)list=list.filter(r=>{
+    const hay=(r.customer||'')+' '+(r.note||'')+' '+(r.item||'')+' '+
+      ((r.lines||[]).map(l=>l.name+' '+l.code).join(' '));
+    return hay.toLowerCase().includes(q);
+  });
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.updatedAt||0)-(a.updatedAt||0));
+
+  if(!list.length){
+    box.innerHTML='<div class="empty">'+(mine.length?'Nothing matches that.':
+      TAB==='orders'?'No orders yet. Tap <b>+ New order</b> to add one.':
+      TAB==='samples'?'No samples issued yet.':'Nothing logged yet.')+'</div>';
+    return;
+  }
+  box.innerHTML=list.map(TAB==='orders'?orderCard:simpleCard).join('');
+}
+function setFilter(k){FILTER=FILTER===k?'':k;render();}
+
+function orderCard(o){
+  const t=totals(o), st=orderState(o), open=OPENID===o.id;
+  const pct=t.ord?Math.round(t.sup/t.ord*100):0;
+  return '<div class="card"><div class="chead" onclick="toggle('+J(o.id)+')">'+
+    '<div><div class="cust">'+esc(o.customer||'Unnamed')+'</div><div class="sub">'+
+      '<span class="pill p-'+st+'">'+STATE_LABEL[st]+'</span>'+
+      (o.date?'<span>'+fmt(o.date)+'</span>':'')+
+      (o.staff?'<span>'+esc(o.staff)+'</span>':'')+
+      '<span>'+(o.lines||[]).length+' lines</span>'+
+      (t.pend?'<span><b>'+t.pend+'</b> pending</span>':'')+
+    '</div></div>'+
+    '<div class="prog"><div class="pnum"><b>'+t.sup+'</b> of '+t.ord+' supplied</div>'+
+      '<div class="bar'+(st==='part'?' part':'')+'"><i style="width:'+pct+'%"></i></div></div>'+
+    '</div>'+
+    '<div class="body'+(open?' open':'')+'">'+(open?orderBody(o):'')+'</div></div>';
+}
+function orderBody(o){
+  const rows=(o.lines||[]).map((l,i)=>{
+    const s=supplied(l), p=Math.max(0,(+l.qty||0)-s), done=p<=0;
+    return '<tr class="'+(done?'done':'')+'">'+
+      '<td>'+esc(l.name)+(l.code?'<div class="code">'+esc(l.code)+'</div>':'')+
+        ((l.log||[]).length?'<div class="log">'+l.log.map(e=>fmt(e.d)+': '+e.q+(e.n?' ('+esc(e.n)+')':'')).join(' · ')+'</div>':'')+
+      '</td>'+
+      '<td class="n">'+(l.rate?inr(l.rate):'—')+'</td>'+
+      '<td class="n">'+(+l.qty||0)+'</td>'+
+      '<td class="n">'+s+'</td>'+
+      '<td class="n"><b>'+(done?'—':p)+'</b></td>'+
+      '<td class="n"><div class="supply">'+
+        '<input type="number" min="1" placeholder="'+(done?'0':p)+'" id="sup_'+o.id+'_'+i+'" '+(done?'disabled':'')+'>'+
+        '<button onclick="addSupply('+J(o.id)+','+i+')" '+(done?'disabled':'')+'>Supply</button>'+
+      '</div></td></tr>';
+  }).join('');
+  return '<div class="meta">'+
+      (o.phone?'<span>Phone <b>'+esc(o.phone)+'</b></span>':'')+
+      (o.ref?'<span>Ref <b>'+esc(o.ref)+'</b></span>':'')+
+      (o.address?'<span>'+esc(o.address)+'</span>':'')+
+    '</div>'+
+    '<table class="lines"><thead><tr><th>Item</th><th class="n">Rate</th><th class="n">Ordered</th>'+
+    '<th class="n">Supplied</th><th class="n">Pending</th><th class="n">Record supply</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table>'+
+    (o.note?'<div class="note">'+esc(o.note)+'</div>':'')+
+    '<div class="rowacts"><button class="ghost" onclick="openForm('+J(o.id)+')">Edit order</button>'+
+    '<button class="danger" onclick="del('+J(o.id)+')">Delete</button></div>';
+}
+function simpleCard(r){
+  const open=OPENID===r.id;
+  const L=TAB==='samples'?SAMPLE_LABEL:DMG_LABEL, C=TAB==='samples'?SAMPLE_CLS:DMG_CLS;
+  const age=(TAB==='samples'&&r.status==='out')?daysSince(r.date):0;
+  return '<div class="card"><div class="chead" onclick="toggle('+J(r.id)+')">'+
+    '<div><div class="cust">'+esc(r.item||'Item')+'</div><div class="sub">'+
+      '<span class="pill '+(C[r.status]||'p-open')+'">'+(L[r.status]||r.status||'')+'</span>'+
+      (r.customer?'<span>'+esc(r.customer)+'</span>':'')+
+      (r.date?'<span>'+fmt(r.date)+'</span>':'')+
+      (r.source?'<span>'+(r.source==='supplier'?'Supplier damage':'Customer return')+'</span>':'')+
+      (r.invoice?'<span>Inv '+esc(r.invoice)+'</span>':'')+
+      (age>14?'<span style="color:var(--red)"><b>'+age+' days out</b></span>':'')+
+    '</div></div>'+
+    '<div class="prog"><div class="pnum"><b>'+(+r.qty||0)+'</b> nos</div></div>'+
+    '</div><div class="body'+(open?' open':'')+'">'+(open?simpleBody(r):'')+'</div></div>';
+}
+function simpleBody(r){
+  const L=TAB==='samples'?SAMPLE_LABEL:DMG_LABEL;
+  const opts=Object.keys(L).map(k=>'<option value="'+k+'"'+(r.status===k?' selected':'')+'>'+L[k]+'</option>').join('');
+  return '<div class="fld" style="max-width:300px"><label>Status</label>'+
+      '<select onchange="setStatus('+J(r.id)+',this.value)">'+opts+'</select></div>'+
+    (r.code?'<div class="note">Code '+esc(r.code)+'</div>':'')+
+    (r.note?'<div class="note">'+esc(r.note)+'</div>':'')+
+    '<div class="rowacts"><button class="ghost" onclick="openForm('+J(r.id)+')">Edit</button>'+
+    '<button class="danger" onclick="del('+J(r.id)+')">Delete</button></div>';
+}
+function toggle(id){OPENID=OPENID===id?null:id;render();}
+function setStatus(id,v){const r=byId(id);if(!r)return;r.status=v;commit(r);toast('Updated');}
+
+/* ---------- recording a supply against a line ---------- */
+function addSupply(id,i){
+  const o=byId(id);if(!o)return;
+  const l=o.lines[i];if(!l)return;
+  const el=document.getElementById('sup_'+id+'_'+i);
+  const pend=Math.max(0,(+l.qty||0)-supplied(l));
+  let q=parseInt(el&&el.value);
+  if(!q||q<1)q=pend;                      // blank means "send the balance"
+  if(q>pend&&!confirm('That is more than the '+pend+' still pending. Record anyway?'))return;
+  l.log=l.log||[];
+  l.log.push({d:today(),q:q});
+  commit(o);
+  toast(q+' supplied — '+Math.max(0,(+l.qty||0)-supplied(l))+' still pending');
+}
+function del(id){
+  const r=byId(id);if(!r)return;
+  if(!confirm('Delete this permanently?'))return;
+  RECS=RECS.filter(x=>x.id!==id);save();pushDelete(id);OPENID=null;render();toast('Deleted');
+}
+
+/* ---------- forms ---------- */
+function openForm(id){
+  const r=id?byId(id):null;
+  PICK=r&&r.lines?JSON.parse(JSON.stringify(r.lines)):[];
+  const s=document.getElementById('sheet');
+  s.innerHTML=TAB==='orders'?orderForm(r):simpleForm(r);
+  document.getElementById('ovl').classList.add('open');
+  if(TAB==='orders')drawPick();
+  const first=s.querySelector('input,select');if(first)first.focus();
+}
+function closeForm(){document.getElementById('ovl').classList.remove('open');PICK=[];}
+function orderForm(r){
+  return '<h2>'+(r?'Edit order':'New order')+'</h2>'+
+    '<input type="hidden" id="fId" value="'+(r?esc(r.id):'')+'">'+
+    '<div class="two"><div class="fld"><label>Customer</label>'+
+      '<input id="fCust" value="'+(r?esc(r.customer):'')+'" placeholder="Name"></div>'+
+      '<div class="fld"><label>Phone</label><input id="fPhone" value="'+(r?esc(r.phone||''):'')+'"></div></div>'+
+    '<div class="two"><div class="fld"><label>Date</label>'+
+      '<input type="date" id="fDate" value="'+(r&&r.date?r.date:today())+'"></div>'+
+      '<div class="fld"><label>Staff</label><input id="fStaff" value="'+(r?esc(r.staff||''):'')+'" placeholder="Who took the order"></div></div>'+
+    '<div class="two"><div class="fld"><label>Site / reference</label>'+
+      '<input id="fRef" value="'+(r?esc(r.ref||''):'')+'" placeholder="Quotation no, site name"></div>'+
+      '<div class="fld"><label>Delivery address</label><input id="fAddr" value="'+(r?esc(r.address||''):'')+'"></div></div>'+
+    '<div class="fld"><label>Items</label>'+
+      '<input id="fSearch" placeholder="Search the catalogue, or type a name and press Enter" '+
+        'oninput="searchCat(this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addFree(this.value);this.value=\'\';searchCat(\'\');}">'+
+      '<div class="res" id="fRes" style="display:none"></div>'+
+      '<div class="picked" id="fPick"></div></div>'+
+    '<div class="fld"><label>Note</label><textarea id="fNote">'+(r?esc(r.note||''):'')+'</textarea></div>'+
+    '<div class="acts"><button class="ghost" onclick="closeForm()">Cancel</button>'+
+    '<button class="primary" onclick="saveOrder()">Save order</button></div>';
+}
+function simpleForm(r){
+  const isS=TAB==='samples';
+  const L=isS?SAMPLE_LABEL:DMG_LABEL;
+  const opts=Object.keys(L).map(k=>'<option value="'+k+'"'+(r&&r.status===k?' selected':'')+'>'+L[k]+'</option>').join('');
+  return '<h2>'+(r?'Edit':(isS?'Issue sample':'Log damage / return'))+'</h2>'+
+    '<input type="hidden" id="fId" value="'+(r?esc(r.id):'')+'">'+
+    '<div class="fld"><label>Item</label>'+
+      '<input id="fSearch" value="'+(r?esc(r.item||''):'')+'" placeholder="Search the catalogue or type the item" '+
+      'oninput="searchCat(this.value,true)">'+
+      '<div class="res" id="fRes" style="display:none"></div>'+
+      '<input type="hidden" id="fCode" value="'+(r?esc(r.code||''):'')+'"></div>'+
+    '<div class="two"><div class="fld"><label>Quantity</label>'+
+      '<input type="number" min="1" id="fQty" value="'+(r?(+r.qty||1):1)+'"></div>'+
+      '<div class="fld"><label>Date</label><input type="date" id="fDate" value="'+(r&&r.date?r.date:today())+'"></div></div>'+
+    '<div class="two"><div class="fld"><label>'+(isS?'Customer':'Customer / supplier')+'</label>'+
+      '<input id="fCust" value="'+(r?esc(r.customer||''):'')+'"></div>'+
+      (isS?'<div class="fld"><label>Status</label><select id="fStatus">'+opts+'</select></div>'
+          :'<div class="fld"><label>Type</label><select id="fSource">'+
+             '<option value="supplier"'+(r&&r.source==='supplier'?' selected':'')+'>Supplier damage</option>'+
+             '<option value="customer"'+(r&&r.source==='customer'?' selected':'')+'>Customer warranty return</option></select></div>')+
+    '</div>'+
+    (isS?'':'<div class="two"><div class="fld"><label>Invoice</label>'+
+      '<input id="fInv" value="'+(r?esc(r.invoice||''):'')+'" placeholder="Havells invoice or your bill"></div>'+
+      '<div class="fld"><label>Status</label><select id="fStatus">'+opts+'</select></div></div>')+
+    '<div class="fld"><label>Note</label><textarea id="fNote">'+(r?esc(r.note||''):'')+'</textarea></div>'+
+    '<div class="acts"><button class="ghost" onclick="closeForm()">Cancel</button>'+
+    '<button class="primary" onclick="saveSimple()">Save</button></div>';
+}
+
+/* ---------- catalogue picker ---------- */
+const CAT=(window.SH_CATALOG||[]).map(x=>Object.assign({},x,{
+  flat:(x.name+x.code+(x.category||'')).toLowerCase().replace(/[^a-z0-9]/g,'')}));
+let PICKMODE=false;
+function searchCat(v,single){
+  PICKMODE=!!single;
+  const box=document.getElementById('fRes');
+  const s=String(v||'').trim().toLowerCase();
+  if(s.length<2){box.style.display='none';return;}
+  const words=s.split(/\s+/).map(w=>w.replace(/[^a-z0-9]/g,'')).filter(Boolean);
+  const hits=CAT.filter(x=>words.every(w=>x.flat.includes(w))).slice(0,25);
+  if(!hits.length){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=hits.map(h=>'<div onclick="pick('+J(h.code)+')">'+esc(h.name)+
+    ' <span class="code">'+esc(h.code)+'</span> — '+inr(h.price)+'</div>').join('');
+}
+function pick(code){
+  const x=CAT.find(c=>c.code===code);if(!x)return;
+  if(PICKMODE){
+    document.getElementById('fSearch').value=x.name;
+    document.getElementById('fCode').value=x.code;
+    document.getElementById('fRes').style.display='none';
+    return;
+  }
+  if(!PICK.some(l=>l.code===x.code))PICK.push({code:x.code,name:x.name,rate:x.price,qty:1,log:[]});
+  document.getElementById('fSearch').value='';
+  document.getElementById('fRes').style.display='none';
+  drawPick();
+}
+function addFree(v){
+  const n=String(v||'').trim();if(n.length<2)return;
+  PICK.push({code:'',name:n,rate:0,qty:1,log:[]});drawPick();
+}
+function drawPick(){
+  const box=document.getElementById('fPick');if(!box)return;
+  if(!PICK.length){box.innerHTML='<div class="r" style="color:var(--ink2);grid-template-columns:1fr">No items yet</div>';return;}
+  box.innerHTML=PICK.map((l,i)=>'<div class="r"><div>'+esc(l.name)+
+    (l.code?'<div class="code">'+esc(l.code)+'</div>':'')+
+    ((l.log||[]).length?'<div class="log">'+supplied(l)+' already supplied</div>':'')+'</div>'+
+    '<input type="number" min="1" value="'+(+l.qty||1)+'" onchange="PICK['+i+'].qty=+this.value||1">'+
+    '<button class="x" onclick="PICK.splice('+i+',1);drawPick()">×</button></div>').join('');
+}
+
+/* ---------- saving ---------- */
+function val(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function saveOrder(){
+  const cust=val('fCust');
+  if(!cust){toast('Customer name is needed');return;}
+  if(!PICK.length){toast('Add at least one item');return;}
+  const id=val('fId')||uid();
+  const prev=byId(id);
+  const rec=Object.assign(prev||{},{
+    id:id,type:'orders',customer:cust,phone:val('fPhone'),date:val('fDate')||today(),
+    staff:val('fStaff'),ref:val('fRef'),address:val('fAddr'),note:val('fNote'),
+    lines:PICK.map(l=>({code:l.code||'',name:l.name,rate:+l.rate||0,qty:+l.qty||1,log:l.log||[]}))
+  });
+  commit(rec);closeForm();toast(prev?'Order updated':'Order added');
+}
+function saveSimple(){
+  const item=val('fSearch');
+  if(!item){toast('Item is needed');return;}
+  const id=val('fId')||uid();
+  const prev=byId(id);
+  const rec=Object.assign(prev||{},{
+    id:id,type:TAB,item:item,code:val('fCode'),qty:+val('fQty')||1,
+    date:val('fDate')||today(),customer:val('fCust'),note:val('fNote'),
+    status:val('fStatus')||(TAB==='samples'?'out':'open')
+  });
+  if(TAB==='damage'){rec.source=val('fSource')||'supplier';rec.invoice=val('fInv');}
+  commit(rec);closeForm();toast(prev?'Updated':'Saved');
+}
+
+let TT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(TT);TT=setTimeout(()=>t.classList.remove('show'),2400);}
+
+document.getElementById('ovl').addEventListener('click',e=>{
+  if(e.target.id==='ovl')closeForm();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeForm();});
+
+load();syncLbl();render();pull(false);
+</script>
+</body>
+</html>
