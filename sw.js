@@ -3,13 +3,14 @@
    upload must show immediately, so we always try the server before the cache.
    The cache only steps in when the shop connection is down or slow. */
 
-const CACHE = 'smarthub-v1';
+const CACHE = 'smarthub-v2';
 const FILES = [
   './',
   './index.html',
   './quotation.html',
   './prices.html',
   './catalog.js',
+  './html2pdf.bundle.min.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
