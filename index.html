@@ -288,17 +288,29 @@ function hit(x,w){
   return variants(w).some(v=>{
     const f=flat(v);
     if(f&&x.flat.includes(f))return true;
-    /* a run typed without spaces: "lifeline90m" -> lifeline / 90 / m */
-    const parts=w.match(/[a-z]+|\d+(?:\.\d+)?/g);
-    if(parts&&parts.length>1)
-      return parts.every(p=>[p].concat(SYN[p]||[]).some(v=>x.flat.includes(flat(v))));
+    /* A run typed without spaces: "lifeline90m" -> lifeline / 90 / m.
+       Only for genuinely long runs, and single letters are dropped: splitting
+       "32a" into "32"+"a" would match the "032" inside a range code. */
+    if(w.length<6)return false;
+    const parts=(w.match(/[a-z]+|\d+(?:\.\d+)?/g)||[]).filter(p=>/\d/.test(p)||p.length>1);
+    if(parts.length<2)return false;
+    return parts.every(p=>[p].concat(SYN[p]||[]).some(v=>x.flat.includes(flat(v))));
     return false;
   });
 }
 
+/* Havells writes series numbers in roman: "Euro II", "X7". People type "euro 2",
+   "euro2", "euroii". Normalise the query so every spelling lands on the same items. */
+function normQuery(t){
+  return String(t||'')
+    .replace(/\beuro\s*(?:ii|2|two)\b/gi,'euro ii')
+    .replace(/\beuroii\b/gi,'euro ii')
+    .replace(/\bx\s*7\b/gi,'x7');
+}
+
 /* ---- search: exact code first, then every word must appear ---- */
 function search(raw){
-  const s=raw.trim().toLowerCase();
+  const s=normQuery(raw).trim().toLowerCase();
   if(s.length<2)return [];
   const words=s.split(/\s+/).filter(Boolean);
   const pool=SRCFILTER?ITEMS.filter(x=>x.source===SRCFILTER):ITEMS;
@@ -346,7 +358,30 @@ function draw(){
     (SRCFILTER?' in '+esc(SRC[SRCFILTER]||SRCFILTER):'');
 
   let inner;
-  if(show.length>1&&show.every(x=>BRK[x.source])){
+  if(show.length>1&&show.every(x=>FAN[x.source])){
+    /* 1200mm first, then 900, then 600 - customers ask by size before model. */
+    const g={};
+    show.forEach(x=>{const k=sweepOf(x.name);(g[k]=g[k]||[]).push(x);});
+    inner=Object.keys(g).map(Number).sort((a,b)=>b-a).map(k=>{
+      const list=g[k].slice().sort((a,b)=>a.name.localeCompare(b.name)||a.price-b.price);
+      const head=k?k+' mm sweep':'Other fans';
+      return '<div class="ghead">'+head+'<span>'+list.length+'</span></div>'+list.map(row).join('');
+    }).join('');
+  }else if(show.length>1&&show.every(x=>LIT[x.source])){
+    /* Lighting: one block per colour, wattage ascending inside it, so a customer
+       choosing Cool White sees 3W, 6W, 9W, 12W together instead of hunting. */
+    const order=[],g={};
+    show.forEach(x=>{const k=ctOf(x);if(!g[k]){g[k]=[];order.push(k);}g[k].push(x);});
+    order.sort((a,b)=>{
+      const ia=CTORDER.indexOf(a),ib=CTORDER.indexOf(b);
+      return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);
+    });
+    inner=order.map(k=>{
+      const list=g[k].slice().sort((a,b)=>
+        wattOf(a.name)-wattOf(b.name)||a.name.localeCompare(b.name)||a.price-b.price);
+      return '<div class="ghead">'+esc(k)+'<span>'+list.length+'</span></div>'+list.map(row).join('');
+    }).join('');
+  }else if(show.length>1&&show.every(x=>BRK[x.source])){
     /* Breakers: keep each series together so every kA variant of ATRON, QTRON or
        Loadline sits in one block, ordered by current rating then breaking capacity. */
     const order=[],g={};
@@ -388,6 +423,22 @@ function row(x,i){
     '<div class="calc'+(open?' open':'')+'" id="calc_'+esc(x.code)+'">'+(open?panel(x):'')+'</div>';
 }
 
+
+
+/* ---- fans: biggest sweep first, since that is how they are asked for ---- */
+const FAN={fan:1};
+const sweepOf=n=>{const m=String(n).match(/(\d{3,4})\s*mm/i);return m?+m[1]:0;};
+
+/* ---- lighting: colour temperature groups, wattage order inside ---- */
+const LIT={light:1,pro:1};
+const CTORDER=['Warm White','Neutral White','Cool White','3-in-1 (Warm / Neutral / Cool)','RGBW'];
+function ctOf(x){
+  const t=x.name+' '+(x.category||'');
+  for(const c of CTORDER)if(t.includes(c))return c;
+  if(/\bRGB\b/i.test(t))return 'RGBW';
+  return 'No colour temperature';
+}
+const wattOf=n=>{const m=String(n).match(/(\d+(?:\.\d+)?)\s*W\b/);return m?+m[1]:1e9;};
 
 /* ---- breaker helpers: pole configuration and series ---- */
 const POLE=[
@@ -484,7 +535,7 @@ function panel(x){
 function drawFilters(raw){
   const counts={};
   for(const x of search(raw.length?raw:'')){}
-  const all=(function(){const s=document.getElementById('q').value.trim().toLowerCase();
+  const all=(function(){const s=normQuery(document.getElementById('q').value).trim().toLowerCase();
     const words=s.split(/\s+/).filter(Boolean);
     return ITEMS.filter(x=>words.every(w=>hit(x,w)));})();
   all.forEach(x=>counts[x.source]=(counts[x.source]||0)+1);
