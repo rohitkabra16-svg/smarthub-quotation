@@ -92,6 +92,8 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 
 .rows{margin-top:14px;border:1px solid var(--rule);border-radius:10px;background:var(--card);overflow:hidden}
 .row{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--rule)}
+.row.hasim{grid-template-columns:46px 1fr auto auto}
+.thumb{width:46px;height:46px;object-fit:contain;border-radius:6px;background:#efedE8}
 .row:last-child{border-bottom:0}
 .row:nth-child(even){background:#fbfaf8}
 .rname{font-size:14px;line-height:1.3}
@@ -179,6 +181,8 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   .hhead{padding:26px 0 0}
   .hhead h1{font-size:22px}
   .row{grid-template-columns:1fr auto;row-gap:9px}
+  .row.hasim{grid-template-columns:40px 1fr auto}
+  .thumb{width:40px;height:40px}
   .radd{grid-column:1/-1;justify-content:flex-end}
 }
 @media(prefers-color-scheme:dark){
@@ -191,6 +195,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   :root:not([data-theme="light"]) .row:hover{background:#21242c}
   :root:not([data-theme="light"]) .calc{background:#191c22}
   :root:not([data-theme="light"]) .ghead{background:#242831;color:#b9cbe8}
+  :root:not([data-theme="light"]) .thumb{background:#262a33}
   :root:not([data-theme="light"])   :root:not([data-theme="light"]) .pvcnote{background:#2a2416;border-color:#4a3f20;color:#e4d4a4}
 }
 </style>
@@ -241,6 +246,8 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 <div class="toast" id="toast"></div>
 
 <script src="catalog.js"></script>
+<script src="img-map.js"></script>
+<script src="lit-map.js"></script>
 <script>
 const flat=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
 /* Two haystacks per item: the normal one for ranking, and a flattened one with every
@@ -403,7 +410,9 @@ function draw(){
 
 function row(x,i){
   const open=OPEN===x.code;
-  return '<div class="row" onclick="toggleCalc('+J(x.code)+')">'+
+  const im=imgFor(x);
+  return '<div class="row'+(im?' hasim':'')+'" onclick="toggleCalc('+J(x.code)+')">'+
+    (im?'<img class="thumb" src="'+im+'" alt="" loading="lazy">':'')+
     '<div><div class="rname">'+esc(x.name)+'</div><div class="rsub">'+
       '<span class="code">'+esc(x.code)+'</span>'+
       (function(){const p=poleOf(x);return p
@@ -424,6 +433,59 @@ function row(x,i){
 }
 
 
+
+/* ---- switch plate photographs, by range and finish ----
+   Categories come in variants (MAGNUS, Magnus Color, Signia Decorative), so the
+   range is normalised first and the finish is then read out of the item's name. */
+function baseRange(c){
+  const t=String(c||'').toLowerCase();
+  if(t.indexOf('adiva')>=0)  return 'Adiva';
+  if(t.indexOf('signia')>=0) return 'Signia';
+  if(t.indexOf('magnus')>=0) return 'Magnus';
+  if(t.indexOf('athena')>=0) return 'Athena';
+  if(t.indexOf('verona')>=0) return 'Verona';
+  if(t.indexOf('murano')>=0) return 'Murano';
+  if(t==='yu'||t.indexOf('yu ')===0) return 'YU';
+  return '';
+}
+/* Lighting photographs: the share kit's own item codes win, because a code tells
+   you the finish even when the item name has lost it. Family name is the fallback. */
+function litImg(x){
+  const M=window.SH_LITIMG;
+  if(!M)return '';
+  if(M.byCode[x.code])return 'img/'+M.byCode[x.code];
+  const t=(x.name+' '+(x.category||'')).toLowerCase();
+  for(let i=0;i<M.byFamily.length;i++){
+    const fam=M.byFamily[i][0], rules=M.byFamily[i][1];
+    if(t.indexOf(fam)<0)continue;
+    for(let j=0;j<rules.length;j++){
+      const k=rules[j][0];
+      if(!k||t.indexOf(k)>=0)return 'img/'+rules[j][1];
+    }
+  }
+  return '';
+}
+function imgFor(x){
+  if(x.source==='light'||x.source==='pro')return litImg(x);
+  if(x.source!=='ewa')return '';
+  const t0=(x.name+' '+(x.category||'')).toLowerCase();
+  /* Flat modules look nothing like the rocker on a plate photo, and the difference
+     is visible even at thumbnail size, so they get their own picture. */
+  if(/\bflat\b/.test(t0)&&t0.indexOf('plate')<0){
+    if(/\bblack\b/.test(t0))return 'img/adiva-flat-black.png';
+    if(/\bgrey\b/.test(t0)) return 'img/adiva-flat-grey.png';
+    return 'img/adiva-flat-white.png';
+  }
+  const r=baseRange(x.category);
+  const rules=r&&(window.SH_IMG||{})[r];
+  if(!rules)return '';
+  const t=(x.name+' '+(x.category||'')).toLowerCase();
+  for(let i=0;i<rules.length;i++){
+    const k=rules[i][0];
+    if(!k||t.indexOf(k)>=0)return 'img/'+rules[i][1];
+  }
+  return '';
+}
 
 /* ---- fans: biggest sweep first, since that is how they are asked for ---- */
 const FAN={fan:1};
