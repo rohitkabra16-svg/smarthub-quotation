@@ -685,7 +685,19 @@ table.plt{min-width:0}
  table.plt td.plc{min-width:118px;padding:6px}
  .plq input.qty{width:44px}
 }
-</style><script src="html2pdf.bundle.min.js"></script>
+
+.swprev{display:flex;align-items:center;gap:12px;margin-top:10px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:9px;background:#fbfaf8}
+.swprev img{width:54px;height:54px;object-fit:contain;border-radius:6px;background:#f0eee9;flex:0 0 auto}
+.swprev b{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.01em}
+.swprev span{display:block;font-size:11.5px;color:var(--ink2);margin-top:2px}
+@media print{.swprev{display:none!important}}
+
+.phsec.phsel{box-shadow:0 0 0 2px var(--nb) inset;border-radius:10px}
+.phtag.phpick{background:var(--nb);color:#fff;border-color:var(--nb)}
+@media print{.phsec.phsel{box-shadow:none}}
+</style><script src="img-map.js"></script>
+<script src="html2pdf.bundle.min.js"></script>
 </head><body>
 <div class="wrap">
 <header class="shHeader">
@@ -767,6 +779,7 @@ table.plt{min-width:0}
   <select class="ddselect" id="dd2" onchange="pick2(this.value)" disabled><option value="">Step 2</option></select>
   <select class="ddselect" id="dd3" onchange="pick3(this.value)" disabled style="display:none"><option value="">Step 3</option></select>
  </div>
+ <div class="swprev" id="swPrev" style="display:none"></div>
 </div>
 </div>
 <div class="panel" id="pastePanel" style="display:none">
@@ -2517,6 +2530,7 @@ function meta(){return CATS.find(c=>c.k===CAT);}
 function ddOptHTML(x,sel,sub,dot){
  return `<option value="${esc(x)}"${sel?' selected':''}>${esc(x)}${sub?' \u2014 '+sub:''}</option>`;}
 function pickCat(k){CAT=k;A=B=C=null;T='P';
+ if(typeof drawSwPrev==='function')setTimeout(drawSwPrev,0);
  if(k==='CUSTOM'){
   document.getElementById('stepsPanel').style.display='none';
   document.getElementById('mainp').style.display='block';
@@ -2590,11 +2604,44 @@ function accColFor(series,finish){
  if(/white|igloo|pearl/.test(f))    return white;
  return white;             // bezel / glass / metal / wood finishes use the standard body
 }
+/* The plate photograph for the range and finish currently chosen. */
+function swBaseRange(c){
+ const t=String(c||'').toLowerCase();
+ if(t.indexOf('adiva')>=0)  return 'Adiva';
+ if(t.indexOf('signia')>=0) return 'Signia';
+ if(t.indexOf('magnus')>=0) return 'Magnus';
+ if(t.indexOf('athena')>=0) return 'Athena';
+ if(t.indexOf('verona')>=0) return 'Verona';
+ if(t.indexOf('murano')>=0) return 'Murano';
+ if(t==='yu'||t.indexOf('yu ')===0) return 'YU';
+ return '';
+}
+function swImg(series,finish){
+ const r=swBaseRange(series), rules=r&&(window.SH_IMG||{})[r];
+ if(!rules)return '';
+ const t=((finish||'')+' '+(series||'')).toLowerCase();
+ for(let i=0;i<rules.length;i++){
+  const k=rules[i][0];
+  if(!k||t.indexOf(k)>=0)return 'img/'+rules[i][1];
+ }
+ return '';
+}
+function drawSwPrev(){
+ const box=document.getElementById('swPrev');
+ if(!box)return;
+ if(CAT!=='SW'||!A){box.style.display='none';box.innerHTML='';return;}
+ const src=swImg(A,B);
+ if(!src){box.style.display='none';box.innerHTML='';return;}
+ box.style.display='flex';
+ box.innerHTML='<img src="'+src+'" alt="">'+
+   '<div><b>'+esc(A)+'</b>'+(B?'<span>'+esc(B)+'</span>':'<span>pick a finish</span>')+'</div>';
+}
+
 function accAuto(){return (CAT==='SW'&&A)?accColFor(A,B):null;}
 function pick1(x){A=x;B=C=null;T='P';FS={};LS={};PLS={};
  document.getElementById('mainp').style.display='none';
  if(CAT==='SW')col=accColFor(A,null);
- fillDD1();fillDD2();}
+ fillDD1();fillDD2();drawSwPrev();}
 function fillDD2(){
  const opts=L2().map(x=>{
   let sub='';
@@ -2616,6 +2663,7 @@ function pick2(x){B=x;C=null;FS={};LS={};PLS={};
   setTimeout(function(){fillDD2();fillDD3();},0);return;}
  if(CAT==='SW')col=accColFor(A,B);   // modules follow the plate finish you just chose
  document.getElementById('mainp').style.display='block';
+ drawSwPrev();
  subtabs();render();
  // defer dropdown rebuild: rewriting dd2.innerHTML during the native change event
  // makes iOS Safari's picker snap back visually to the old choice.
@@ -2951,7 +2999,15 @@ function addSW(btn){
    delete Q[d.c];if(d.ic)delete Q[d.ic];
    inp.value='';calc();render();toast('Removed \u2014 '+d.n);return;}
   alert('Enter a quantity first.');return;}
- const g=grpKey();
+ // A cell in the price-list table knows its own finish. Using grpKey() here would
+ // label it with whatever the dropdown happens to say, which is how grey modules
+ // ended up filed under "White / Standard accessories".
+ var g;
+ if(CAT==='SW'&&d.fin){
+  g='Switches \u2014 '+A+' \u00b7 '+(T==='P'?d.fin:d.fin+' accessories');
+ }else{
+  g=grpKey();
+ }
  Q[d.c]={q,p:+d.p,n:d.n,g};
  if(d.ic){Q[d.ic]={q,p:+d.ip,n:d.in,g};}
  trackRecent(d.c);if(d.ic)trackRecent(d.ic);
@@ -3010,6 +3066,10 @@ function grpKey(){
 // Lays switches out the way the Havells price list does: one row per item,
 // one column per finish, so a code can be found by eye instead of by scrolling.
 var PLVIEW = (function(){try{var v=localStorage.getItem('sh_plview');return v===null?1:(v==='1'?1:0);}catch(e){return 1;}})();
+// Show only the finish picked in Step 2. The all-finishes view is still one tap away,
+// for when a customer is choosing between them.
+var PLONLY = (function(){try{var v=localStorage.getItem('sh_plonly');return v===null?1:(v==='1'?1:0);}catch(e){return 1;}})();
+function setPLOnly(v){PLONLY=v?1:0;try{localStorage.setItem('sh_plonly',String(PLONLY));}catch(e){}render();}
 function setPLView(v){PLVIEW=v?1:0;try{localStorage.setItem('sh_plview',String(PLVIEW));}catch(e){}subtabs();render();}
 function plViewBar(){
  return '<div class="plvbar">'+
@@ -3132,10 +3192,12 @@ function accMatrix(series){
   cur.rows.push(r);});
  return {finishes:fins,groups:groups};}
 
-function plCellHTML(it,rowLabel){
+function plCellHTML(it,rowLabel,finish){
  if(!it)return '<td class="plc plmt">&mdash;</td>';
  var e=Q[it.c],q=e?e.q:0;
- var dat='data-c="'+esc(it.c)+'" data-p="'+it.p+'" data-n="'+esc(it.n)+'"';
+ // the cell carries its own finish, so the basket heading matches the column tapped
+ var dat='data-c="'+esc(it.c)+'" data-p="'+it.p+'" data-n="'+esc(it.n)+'"'+
+         (finish?' data-fin="'+esc(finish)+'"':'');
  return '<td class="plc'+(q?' has':'')+'"><div class="plcell">'+
    '<div class="plcode">'+esc(it.c)+'</div>'+
    '<div class="plrate">'+inr(it.p)+'</div>'+
@@ -3164,7 +3226,7 @@ function renderAccTable(series){
   if(it.g!==seen){seen=it.g;
    h+='<tr class="plgrp"><td colspan="'+(fins.length+1)+'">'+esc(it.g)+'</td></tr>';}
   h+='<tr><td class="plname">'+esc(it.row.label)+'</td>'+
-    fins.map(function(f){return plCellHTML(it.row.cells[f],it.row.label);}).join('')+'</tr>';});
+    fins.map(function(f){return plCellHTML(it.row.cells[f],it.row.label,f);}).join('')+'</tr>';});
  h+='</tbody></table></div>'+bar;
  return h+addAllBar();}
 
@@ -3175,10 +3237,22 @@ function renderPlateTable(series){
  var fins=Object.keys(plates).filter(function(f){return f!==inner;});
  // the inner plate is a sellable item on its own, so it gets its own block at the end
  if(inner&&plates[inner])fins.push(inner);
+ var allFins=fins.slice();
+ if(B&&fins.indexOf(B)>=0){
+  if(PLONLY){
+   // just the selected finish, plus the inner plate when it is paired with it
+   fins=fins.filter(function(x){return x===B||(inner&&x===inner&&INNER);});
+  }else{
+   fins=[B].concat(fins.filter(function(x){return x!==B;}));
+  }
+ }
  var anyPair=inner&&fins.some(function(f){return f!==inner&&(NOINNER[series]||[]).indexOf(f)<0;});
  var h=plViewBar();
  if(anyPair)h+='<div class="inn"><button class="ib'+(INNER?' on':'')+'" onclick="setInner(1)">Plate + Inner</button>'+
    '<button class="ib'+(!INNER?' on':'')+'" onclick="setInner(0)">Plate only</button></div>';
+ if(B&&allFins.length>1&&allFins.indexOf(B)>=0)
+  h+='<div class="inn"><button class="ib'+(PLONLY?' on':'')+'" onclick="setPLOnly(1)">'+esc(B)+' only</button>'+
+     '<button class="ib'+(!PLONLY?' on':'')+'" onclick="setPLOnly(0)">All '+allFins.length+' finishes</button></div>';
  fins.forEach(function(f){
   var isInner=(f===inner);
   var exempt=isInner||(NOINNER[series]||[]).indexOf(f)>=0;
@@ -3188,7 +3262,8 @@ function renderPlateTable(series){
   var per=plPageWidth(),key=series+'|'+f,cur=PLPG[key]||0;
   var last=Math.max(0,Math.ceil(rows.length/per)-1); if(cur>last){cur=last;PLPG[key]=cur;}
   var shown=rows.slice(cur*per,cur*per+per);
-  h+='<div class="phsec'+(isInner?' phinner':'')+'"><div class="phhdr"><span class="dot" style="background:'+(ACOL[f]||'#ccc')+'"></span>'+esc(f)+
+  h+='<div class="phsec'+(isInner?' phinner':'')+(f===B?' phsel':'')+'"><div class="phhdr"><span class="dot" style="background:'+(ACOL[f]||'#ccc')+'"></span>'+esc(f)+
+     (f===B?'<em class="phtag phpick">your selection</em>':'')+
      (isInner?'<em class="phtag">quote on its own</em>':'')+
      '<small>'+rows.length+' sizes</small></div>'+
      pgBar('pl',key,rows.length,per,cur)+'<div class="phrow">';
@@ -3197,7 +3272,7 @@ function renderPlateTable(series){
    var eff=p.p+(ip?ip.p:0);
    var e=Q[p.c],q=e?e.q:0;
    var nm=esc(p.s+' plate \u00b7 '+f);
-   var dat='data-c="'+esc(p.c)+'" data-p="'+p.p+'" data-n="'+nm+'"'+(ip?' data-ic="'+esc(ip.c)+'" data-ip="'+ip.p+'" data-in="'+esc(p.s+' '+inner)+'"':'');
+   var dat='data-c="'+esc(p.c)+'" data-p="'+p.p+'" data-n="'+nm+'" data-fin="'+esc(f)+'"'+(ip?' data-ic="'+esc(ip.c)+'" data-ip="'+ip.p+'" data-in="'+esc(p.s+' '+inner)+'"':'');
    h+='<div class="phcard'+(q?' has':'')+'"><div class="plcell">'+
      '<div class="phsz">'+esc(p.s)+'</div>'+
      '<div class="plcode">'+esc(p.c)+'</div>'+
