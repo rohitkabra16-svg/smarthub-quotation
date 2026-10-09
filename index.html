@@ -247,6 +247,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
 
 <script src="catalog.js"></script>
 <script src="img-map.js"></script>
+<script src="img-codes.js"></script>
 <script src="lit-map.js"></script>
 <script>
 const flat=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,'');
@@ -466,6 +467,7 @@ function litImg(x){
   return '';
 }
 function imgFor(x){
+  const D=window.SH_IMG_DATA; if(D&&D[x.code])return D[x.code];
   if(x.source==='light'||x.source==='pro')return litImg(x);
   if(x.source!=='ewa')return '';
   const t0=(x.name+' '+(x.category||'')).toLowerCase();
