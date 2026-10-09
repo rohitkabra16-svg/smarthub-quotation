@@ -1131,8 +1131,9 @@ function setPimg(on){
 /* the photograph for a basket line, or '' when none is on file */
 function pimgFor(k,v){
  const M=window.SH_IMG_DATA; if(!M)return '';
- const c=String((v&&v.code)||k||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
- return M[c]||'';
+ const raw=String((v&&v.code)||k||'');
+ /* many codes carry a hyphen (WSFFDN-A1X507), so try the code as written first */
+ return M[raw]||M[raw.toUpperCase()]||M[raw.toUpperCase().replace(/[^A-Z0-9]/g,'')]||'';
 }
 function setFmt(f){PFMT=f;
  document.getElementById('fmt1').className='fmtb'+(f==='net'?' on':'');
@@ -3873,6 +3874,32 @@ function quoteStandaloneHTML(){
   esc(F.no?('Quotation '+F.no):'Smart Hub Quotation')+'</title>'+styles+
   '<style>#quote{display:block!important}body{background:#fff;margin:0}.wrap{padding:0}</style></head><body><div class="wrap"><div id="quote">'+quote+'</div></div></body></html>';
 }
+/* One filename convention for every PDF this app produces, so a folder of
+   quotations sorts by number and reads as "who, when" at a glance:
+       SH-26-27-603_SS-Construction-Co_09Oct2026
+   Windows and Chrome both reject / \ : * ? " < > | in filenames, so the
+   quotation number's slashes become hyphens. */
+function pdfBaseName(){
+ const no=String(F.no||'').trim();
+ const num=no ? no.replace(/^SH\//i,'SH-').replace(/\//g,'-') : 'Quotation';
+ let cust=String(F.cust||'').trim()
+   .replace(/&/g,' and ')
+   .replace(/[^A-Za-z0-9 .-]+/g,'')
+   .replace(/\s+/g,'-')
+   .replace(/-+/g,'-')
+   .replace(/^-|-$/g,'');
+ if(cust.length>40){                      // trim on a word break, not mid-word
+   cust=cust.slice(0,40);
+   const cut=cust.lastIndexOf('-');
+   if(cut>18)cust=cust.slice(0,cut);
+ }
+ cust=cust.replace(/[-.]+$/,'');
+ const d=new Date();
+ const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+ const date=String(d.getDate()).padStart(2,'0')+mon+d.getFullYear();
+ return [num, cust||null, date].filter(Boolean).join('_');
+}
+
 function doDownload(){
  logQuotation();
  const sheet=document.querySelector('#quote .qsheet');
@@ -3880,8 +3907,7 @@ function doDownload(){
  if(typeof html2pdf!=='function'){
   toast('PDF engine did not load \u2014 reload the page and try again.');return;
  }
- const safe=(F.no||('Quote-'+new Date().toISOString().slice(0,10))).replace(/[^a-zA-Z0-9_-]+/g,'_');
- const filename='SmartHub-'+safe+'.pdf';
+ const filename=pdfBaseName()+'.pdf';
  toast('Building PDF\u2026');
 
  // Render the quotation sheet itself, at 2x so the text stays sharp on screen and in print.
@@ -3917,7 +3943,9 @@ function doDownload(){
 function doPrint(){
  // give the browser print header a clean name (quote no if present)
  window.__savedTitle=document.title;
- document.title=(F.no?('Quotation '+F.no):'Smart Hub Quotation');
+ /* Chrome, Edge and Safari all seed the Save-as-PDF filename from the document
+    title, so setting it here is what makes the saved name automatic. */
+ document.title=pdfBaseName();
  // Works when the file is opened directly. If running inside a sandboxed preview
  // where window.print() is blocked, fall back to a standalone print window.
  try{
@@ -3929,7 +3957,8 @@ function doPrint(){
  const quote=document.getElementById('quote').innerHTML;
  const w=window.open('','_blank');
  if(!w){ setTimeout(()=>{window.print();document.title=window.__savedTitle||document.title;},60); return; } // popup blocked -> last resort
- w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"/>'+styles+
+ w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"/><title>'+
+  pdfBaseName().replace(/[<>&]/g,'')+'</title>'+styles+
   '<style>#quote{display:block!important}body{background:#fff;margin:0}.wrap{padding:0}</style></head><body><div class="wrap"><div id="quote">'+quote+'</div></div></body></html>');
  w.document.close();
  setTimeout(()=>{ w.focus(); w.print(); },250);}
