@@ -209,6 +209,8 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
     <button id="nav-quote" onclick="go('quote')"><span class="ic">▤</span>Quotation<span class="badge" id="pendBadge"></span></button>
     <button id="nav-list" onclick="go('list')"><span class="ic">☰</span>Full price list</button>
     <button id="nav-orders" onclick="go('orders')"><span class="ic">◳</span>Orders</button>
+    <button id="nav-sticker" onclick="go('sticker')"><span class="ic">⎙</span>Dispatch stickers</button>
+    <button id="nav-transport" onclick="go('transport')"><span class="ic">⛟</span>Transporters</button>
   </div>
   <button id="installBtn" class="install" onclick="installApp()" style="display:none">⤓ Install as app</button>
   <div class="railfoot" id="railfoot">&nbsp;</div>
@@ -241,6 +243,8 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   <section class="pane" id="pane-quote"></section>
   <section class="pane" id="pane-list"></section>
   <section class="pane" id="pane-orders"></section>
+  <section class="pane" id="pane-sticker"></section>
+  <section class="pane" id="pane-transport"></section>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -654,16 +658,16 @@ function toast(msg){
 
 /* ---- panes: each app loads once, then keeps its state ---- */
 const APPS={};
-const PAGES={quote:'quotation.html',list:'prices.html',orders:'orders.html'};
+const PAGES={quote:'quotation.html',list:'prices.html',orders:'orders.html',sticker:'stickers.html',transport:'transporters.html'};
 function go(which){
-  ['home','quote','list','orders'].forEach(k=>{
+  ['home','quote','list','orders','sticker','transport'].forEach(k=>{
     document.getElementById('pane-'+k).classList.toggle('on',k===which);
     document.getElementById('nav-'+k).classList.toggle('on',k===which);
   });
   if(PAGES[which]&&!APPS[which]){
     const f=document.createElement('iframe');
     f.src=PAGES[which];
-    f.title={quote:'Quotation builder',list:'Full price list',orders:'Orders'}[which]||which;
+    f.title={quote:'Quotation builder',list:'Full price list',orders:'Orders',sticker:'Dispatch sticker printer',transport:'Transporter directory'}[which]||which;
     document.getElementById('pane-'+which).appendChild(f);
     APPS[which]=f;
   }

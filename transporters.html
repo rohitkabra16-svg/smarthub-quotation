@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transporter Directory — Guwahati</title>
+<style>
+:root {
+  --ink: #0f1117;
+  --paper: #f5f0e8;
+  --cream: #ede7d9;
+  --rust: #c4451a;
+  --rust-light: #f5ece8;
+  --rust-mid: #e07250;
+  --gold: #c89b3c;
+  --gold-light: #fdf6e3;
+  --teal: #1a6b5a;
+  --teal-light: #e8f5f1;
+  --border: #d4cfc4;
+  --text2: #5a5248;
+  --text3: #9a9490;
+  --shadow: 0 4px 24px rgba(15,17,23,0.10);
+  --shadow-lg: 0 12px 48px rgba(15,17,23,0.16);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--rust);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+.logo-block { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.logo-icon {
+  width: 38px; height: 38px;
+  background: var(--rust);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: white;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 400; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; letter-spacing: 0.3px; }
+.header-count {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  white-space: nowrap;
+}
+
+/* ── HERO SEARCH ── */
+.hero {
+  background: var(--ink);
+  padding: 40px 24px 56px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196,69,26,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-label {
+  font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  font-size: 11px;
+  color: var(--rust-mid);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hero-title {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 800;
+  color: white;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+.hero-title span { color: var(--rust-mid); }
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 32px;
+}
+
+/* ── SEARCH BOX ── */
+.search-wrap {
+  max-width: 620px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+.search-icon-wrap {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+  z-index: 2;
+}
+.search-input {
+  width: 100%;
+  padding: 18px 18px 18px 54px;
+  font-size: 16px;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-weight: 600;
+  border: 2.5px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  color: white;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  backdrop-filter: blur(8px);
+}
+.search-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; }
+.search-input:focus {
+  border-color: var(--rust);
+  background: rgba(255,255,255,0.10);
+}
+.search-clear {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: rgba(255,255,255,0.6);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.search-clear.show { display: flex; }
+.search-clear:hover { background: rgba(255,255,255,0.2); }
+
+/* ── QUICK LOCATION PILLS ── */
+.quick-locations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.ql-pill {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.65);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  white-space: nowrap;
+}
+.ql-pill:hover, .ql-pill.active {
+  background: var(--rust);
+  border-color: var(--rust);
+  color: white;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* ── RESULTS BAR ── */
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.results-count {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.results-count span { color: var(--rust); }
+.results-hint { font-size: 12px; color: var(--text3); }
+.view-toggle { display: flex; gap: 6px; }
+.vt-btn {
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.vt-btn.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+/* ── GRID VIEW ── */
+.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.list-view { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── CARD ── */
+.card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  cursor: default;
+  animation: fadeUp 0.25s ease both;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.card:hover { box-shadow: var(--shadow); border-color: var(--rust-mid); transform: translateY(-2px); }
+
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.card-num {
+  font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  background: var(--cream);
+  border-radius: 5px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.card-name {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  flex: 1;
+}
+.card-name mark {
+  background: #fde68a;
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.card-gst {
+  font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  font-size: 10.5px;
+  color: var(--text2);
+  background: var(--cream);
+  border-radius: 6px;
+  padding: 4px 9px;
+  margin-bottom: 10px;
+  display: inline-block;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.card-gst:hover { background: var(--gold-light); }
+.copy-tooltip {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.card-gst:hover .copy-tooltip { opacity: 1; }
+
+.card-contact {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 11px;
+  flex-wrap: wrap;
+}
+.contact-icon { font-size: 13px; flex-shrink: 0; }
+.contact-numbers {
+  font-size: 12.5px;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.contact-numbers a {
+  color: var(--teal);
+  text-decoration: none;
+}
+.contact-numbers a:hover { text-decoration: underline; }
+
+.card-divider { height: 1px; background: var(--border); margin-bottom: 10px; }
+
+.card-stations-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.stations-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+.station-tag {
+  background: var(--teal-light);
+  color: var(--teal);
+  border: 1px solid #b8dfda;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.station-tag:hover {
+  background: var(--teal);
+  color: white;
+  border-color: var(--teal);
+}
+.station-tag.highlight {
+  background: var(--rust);
+  color: white;
+  border-color: var(--rust);
+}
+.station-tag mark {
+  background: transparent;
+  color: white;
+}
+
+/* ── LIST VIEW CARD ── */
+.list-view .card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+}
+.list-view .card-main { min-width: 0; }
+.list-view .card-name { font-size: 13px; margin-bottom: 2px; }
+.list-view .card-gst { margin-bottom: 0; }
+.list-view .card-contact { margin-bottom: 0; }
+.list-view .card-divider { display: none; }
+.list-view .stations-section { grid-column: 1 / -1; margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--border); }
+.list-view .card-head { margin-bottom: 0; }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size: 20px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+.empty-sub { font-size: 14px; }
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.stat-chip {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.stat-chip:hover, .stat-chip.active {
+  background: var(--rust-light);
+  border-color: var(--rust-mid);
+  color: var(--rust);
+}
+
+/* ── COPY TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 999;
+  transition: transform 0.3s;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+  .grid-view { grid-template-columns: 1fr; }
+  .list-view .card { grid-template-columns: 1fr; }
+  .header-count { display: none; }
+  .hero { padding: 28px 16px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-icon">🚛</div>
+      <div>
+        <div class="logo-text">Transporter Directory</div>
+        <div class="logo-sub">Guwahati Sanitary & Hardware Merchant's Association</div>
+      </div>
+    </div>
+    <div class="header-count" id="totalCount">135 transporters</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-label">📍 Northeast India Network</div>
+  <h1 class="hero-title">Find a Transporter<br><span>by Destination</span></h1>
+  <p class="hero-sub">Search by city, transporter name, or GST number</p>
+  <div class="search-wrap">
+    <div class="search-icon-wrap">🔍</div>
+    <input
+      type="text"
+      class="search-input"
+      id="searchInput"
+      placeholder="Type a city e.g. Jorhat, Dimapur, Silchar..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button class="search-clear" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="quick-locations" id="quickLocations"></div>
+</div>
+
+<div class="main">
+  <div class="results-bar">
+    <div class="results-count" id="resultsCount">All <span>135</span> Transporters</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="results-hint" id="resultsHint">Click a station tag to search that location</div>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="gridBtn" onclick="setView('grid')" title="Grid view">⊞</button>
+        <button class="vt-btn" id="listBtn" onclick="setView('list')" title="List view">☰</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardsContainer" class="grid-view"></div>
+</div>
+
+<div class="toast" id="toast">✓ Copied to clipboard</div>
+
+<script>
+// ── TRANSPORTER DATA ──
+const TRANSPORTERS = [
+  { id:1, name:"AASTHA GOOD CARRIER", gst:"18APFPM0899H2ZG", contact:"96783-64708 / 90851-58788", stations:["NARAYANPUR","BIHPURIA","BONGALMORA","BANDERDEWA","LALUK","GOGAMUKH","DHEMAJI","SILAPOTHAR","NAHARLAGUN","PASSIGHAT"] },
+  { id:2, name:"A C CARRIERS", gst:"18AXRPS7286G1ZI", contact:"98648-42560 / 97064-02007", stations:["BARPETA"] },
+  { id:3, name:"A R CARRIER TRANSPORT", gst:"18ABQPI6074B2ZJ", contact:"95776-80449 / 99573-40238", stations:["MORIGAON"] },
+  { id:4, name:"ANAND ROADWAYS CORPORATION", gst:"18AGRPK0860H1Z5", contact:"98644-86426 / 76370-50220", stations:["NAGAON"] },
+  { id:5, name:"ANITA LOGISTICS", gst:"18AYEPJ6945M1ZT", contact:"70860-93135 / 91273-33699", stations:["TANGLA"] },
+  { id:6, name:"ANKIT ROADLINES", gst:"18ALEPK8203E1ZC", contact:"94355-45354 / 97060-44371", stations:["DIMAPUR","JORHAT","IMPHAL"] },
+  { id:7, name:"ARUNACHAL CARRYING CORPORATION", gst:"18ABMPA8532C1ZV", contact:"97060-54015 / 0361-2544200", stations:["NAHARLAGUN"] },
+  { id:8, name:"ARUNACHAL ROAD SERVICE", gst:"18AJTPM4556H1ZL", contact:"70028-79360 / 91270-16490", stations:["TEZPUR"] },
+  { id:9, name:"ARUNACHAL ROAD SERVICE", gst:"18AHVPS8361E1ZL", contact:"0361-2134989", stations:["NAHARLAGUN"] },
+  { id:10, name:"ARUNACHAL ROADWAYS", gst:"18ABYPA3607J1ZE", contact:"98599-77622 / 0361-2511040", stations:["SILCHAR"] },
+  { id:11, name:"ASHOKA ROADWAYS", gst:"18AEKPB9646K1Z0", contact:"0361-2517908 / 0361-2543881", stations:["TEZPUR","DHEKIAJULI","RANGAPARA"] },
+  { id:12, name:"ASSAM ARUNACHAL CARRIERS", gst:"18AEHPK5825N1ZZ", contact:"88223-14436 / 0361-2482022", stations:["NORTH LAKHIMPUR"] },
+  { id:13, name:"ASSAM MEGHALAYA ROAD CARRIERS", gst:"18AAGFA2033B1Z6", contact:"98640-20872 / 75759-04111 / 76640-49594", stations:["SHILLONG"] },
+  { id:14, name:"ASSAM ROAD LINES CORPORATION", gst:"18AVYPS3845G1ZQ", contact:"98641-54852 / 98640-70657", stations:["BONGAIGAON","BARPETA ROAD"] },
+  { id:15, name:"ASSAM TRADE & TRANSPORT AGENCY", gst:"18AAKFA2101N1ZK", contact:"60012-23662", stations:["LUMDING"] },
+  { id:16, name:"B.S. LOGISTICS", gst:"18AEVPB0416J2ZG", contact:"99542-86641 / 88110-95117", stations:["SILCHAR","LAD-RYMBAI"] },
+  { id:17, name:"B.B.S. TRANSPORT", gst:"18BIYPG3436M1ZJ", contact:"95774-00630 / 95774-00640 / 91270-65810", stations:["SILCHAR"] },
+  { id:18, name:"BABA ROADWAYS", gst:"18AFTPK9308P3ZD", contact:"94350-10372 / 0361-2606693", stations:["BISWANATH CHARALI"] },
+  { id:19, name:"BAIKUNTHA TRANSPORT SERVICE", gst:"18BKXPP2768J1Z4", contact:"94350-97000 / 98540-91700", stations:["JORHAT","SIBASAGAR","NAZIRA"] },
+  { id:20, name:"BHAWANI ROADLINES", gst:"18EUVPS8530Q1Z6", contact:"70056-56197 / 69091-47370", stations:["DIMAPUR","IMPHAL"] },
+  { id:21, name:"BLUE HILL EXPRESS SERVICE", gst:"18AELPD0636A1Z2", contact:"75780-39385", stations:["BANDERDEWA","NAHARLAGUN"] },
+  { id:22, name:"DAYAL TRADE AND TRANSPORT", gst:"16AKWPR8897A2Z8", contact:"94015-67537 / 82569-35154", stations:["AGARTALA"] },
+  { id:23, name:"DEEP LOGISTICS", gst:"18DENPS5820A1ZE", contact:"88110-18534 / 88110-18533", stations:["DIMAPUR"] },
+  { id:24, name:"DEVEN ROADWAYS", gst:"18AFSPD4675D2Z7", contact:"99542-58718 / 99548-54840", stations:["AGARTALA"] },
+  { id:25, name:"DHEKIAJULI ROADWAYS", gst:"18AUEPS0371G1ZL", contact:"98541-65440 / 84861-80810 / 70026-30321", stations:["DHEKIAJULI","KHARUPETIA","MANGALDOI","BISWANATH CHARALI"] },
+  { id:26, name:"DIPHU ROAD CARRIERS", gst:"18AGFPM9905R1ZI", contact:"94350-67180 / 0361-781016", stations:["DIPHU"] },
+  { id:27, name:"DRISHTI CARGO", gst:"18CDIPB7372P2ZW", contact:"70865-11189 / 78967-51537", stations:["SILAPATHAR","DHEMAJI"] },
+  { id:28, name:"DURGA CARGO", gst:"18AEFPP9371N1ZN", contact:"84865-30744 / 98620-58818 / 76700-00270", stations:["PASSIGHAT"] },
+  { id:29, name:"EASTERN CARGO MOVERS", gst:"18AADFE5287A1ZL", contact:"75780-04285 / 94351-15667", stations:["GORCHUK","SILCHAR","KARIMGANJ","AIZAWL","HAILAKANDI","LUNGLEI","JORHAT"] },
+  { id:30, name:"GAYATRI ROAD CARRIERS", gst:"18AAIFG8035D1ZG", contact:"94359-70639 / 94012-21051 / 0361-2733177", stations:["JORHAT","SIBSAGAR","MORANGHAT","DIBRUGARH","GOLAGHAT","NAGAON","TINSUKIA"] },
+  { id:31, name:"GHASOLIA ROADWAYS", gst:"18ACCPG1096Q1Z7", contact:"94350-17639 / 0361-2510292", stations:["TURA"] },
+  { id:32, name:"GOSWAMI ROADWAYS", gst:"18ACIPG9740R1ZS", contact:"98546-89655", stations:["MANGALDOI"] },
+  { id:33, name:"HAWELIA ROADWAYS (INDIA)", gst:"18AAGFH8375R1ZD", contact:"99542-30739 / 84729-07890", stations:["DIBRUGARH","TINSUKIA"] },
+  { id:34, name:"JAGANNATH TRAVELS AND TOUR PVT LTD", gst:"18AABCJ2919H2ZK", contact:"0361-2604404", stations:["KARIMGANJ","SILCHAR"] },
+  { id:35, name:"JAGDISH TRAVELS", gst:"18AAHPY1896R1ZE", contact:"98620-91015", stations:["DIMAPUR"] },
+  { id:36, name:"JAIHIND TRANSPORT", gst:"18ACAPJ3692F1ZN", contact:"99548-63268", stations:["GOLAGHAT"] },
+  { id:37, name:"JAIN ROAD CARRIERS", gst:"18ACXPN8579Q1ZX", contact:"98640-32527 / 94350-83510", stations:["TEZPUR","MISSAMARI","BISWANATH CHARALI"] },
+  { id:38, name:"JANAKALLYAN TRANSPORT", gst:"16AYRPN2155J1Z0", contact:"76649-08524", stations:["AGARTALA","TRIPURA"] },
+  { id:39, name:"JANTA ROADWAYS", gst:"18ABQPC9275Q1ZM", contact:"0361-2542009 / 98640-53376 / 94355-24040", stations:["SIBSAGAR","JORHAT"] },
+  { id:40, name:"JANTA TRANSPORT COMPANY", gst:"18BHJPC2235C1ZV", contact:"94358-67567 / 97061-44115", stations:["BOKAGHAT","GOLAGHAT"] },
+  { id:41, name:"KAMAKHYA ROAD LINKS", gst:"18ABMPA6452F2ZP", contact:"94019-19553 / 94355-51426", stations:["SILCHAR"] },
+  { id:42, name:"KHARUPETIA ROADWAYS", gst:"18AATFK6486B1ZU", contact:"88760-51863", stations:["KHARUPETIA"] },
+  { id:43, name:"LANKA ROADWAYS", gst:"18BLCPD2067G1ZE", contact:"98640-30590", stations:["LANKA"] },
+  { id:44, name:"LAXMI GOLDEN TRANSPORT", gst:"18AODPR4649K1ZD", contact:"90858-17000 / 98647-77769", stations:["DIMAPUR"] },
+  { id:45, name:"LAXMI TRANSPORT AGENCY", gst:"18ABDPT0590Q1ZY", contact:"97070-58800", stations:["SHILLONG"] },
+  { id:46, name:"M S COMMUNICATION", gst:"18AKQPB5922Q1ZI", contact:"81330-14316 / 99575-66097", stations:["DIMAPUR"] },
+  { id:47, name:"M S LOGISTICS", gst:"18ABDFM3511E1ZO", contact:"94350-19391 / 97065-15111", stations:["AIZAWL"] },
+  { id:48, name:"MAA AMBIKA ROAD LINES", gst:"18ACCPV5548E1ZC", contact:"0361-2733835", stations:["NAGAON"] },
+  { id:49, name:"MAA KALI TRANSPORT AGENCY", gst:"18AKHPD7961N1ZK", contact:"84720-77635", stations:["LUMDING"] },
+  { id:50, name:"MAA SARASWATI TRANSPORT CORPORATION", gst:"18AWVPS0051L2ZV", contact:"0361-2607264 / 94352-12677 / 88764-77485", stations:["PATHSALA","TIHU","NALBARI","GOALPARA","BONGAIGAON","KOKRAJHAR","BARPETA"] },
+  { id:51, name:"MAHALAXMI ROADWAYS CORPORATION", gst:"18ADXPD8212B1ZM", contact:"94350-26515 / 94355-60699 / 94358-19641", stations:["SAPATGRAM","GOSIGAON","KOKRAJHAR"] },
+  { id:52, name:"MAHAMAYA ROAD SERVICE", gst:"18ALVPP5611N1Z9", contact:"98640-92679 / 98642-78346", stations:["BOKAJAN"] },
+  { id:53, name:"MARUTI CARGO SERVICES", gst:"18AMIPP6227A1Z5", contact:"94010-17155 / 96783-42357", stations:["NAGAON"] },
+  { id:54, name:"MARUTI ROADWAYS", gst:"18AVNPS9833P2Z9", contact:"98646-22949 / 94350-27710", stations:["NALBARI"] },
+  { id:55, name:"MARUTI TRANSPORT CORPORATION", gst:"18ABFPT6057Q2ZP", contact:"94351-89116 / 90850-47316", stations:["NORTH LAKHIMPUR"] },
+  { id:56, name:"METRO TRANSPORT", gst:"18DVCPS7825D1ZB", contact:"97060-09225 / 97066-54516 / 88118-33959", stations:["SILAPATHAR","JONAI","PASSIGHAT","ALONG"] },
+  { id:57, name:"MORAN ROAD CARRIERS", gst:"18BENPA1369G1ZI", contact:"98646-27526", stations:["MORAN"] },
+  { id:58, name:"N E CARGO SOLUTION", gst:"18BCOPS9373R1Z4", contact:"94350-17524 / 60001-76013 / 90850-35333", stations:["NAHARLAGUN"] },
+  { id:59, name:"N E LOGISTIC", gst:"18BCOPB4914M1ZA", contact:"94017-26480", stations:["SILCHAR","KARIMGANJ","AIZAWL","IMPHAL"] },
+  { id:60, name:"N M LOGISTICS", gst:"18CQBPS0351M2ZK", contact:"97065-19247 / 87519-83833", stations:["SILCHAR","AIZAWL"] },
+  { id:61, name:"N. B. ROADLINES", gst:"18ABEPT6084E1ZD", contact:"94015-37174 / 0361-2492784", stations:["SIBASAGAR","JORHAT"] },
+  { id:62, name:"N.E TRADERS", gst:"18AJXPD1022D1ZJ", contact:"97062-69648", stations:["DIMAPUR"] },
+  { id:63, name:"NATIONAL TRANSPORT (CAPITAL)", gst:"18AEAPB2814D1Z9", contact:"0361-2739705 / 99577-38012", stations:["AIZAWL","SILCHAR"] },
+  { id:64, name:"NETWORK OVERNITE TRANSPORT", gst:"18ACMPG2494C1ZM", contact:"97060-33677 / 98640-33621", stations:["SILCHAR"] },
+  { id:65, name:"NEW MOTI CARRIER", gst:"18AXHPK1350P2Z3", contact:"78966-31766 / 94352-13888", stations:["AIZAWL","SILCHAR"] },
+  { id:66, name:"NEW NORTH EASTERN TRANSPORT", gst:"18AWZPS7255G2ZI", contact:"0361-2637784 / 94358-39413", stations:["DIBRUGARH","TINSUKIA"] },
+  { id:67, name:"NEW POOJA ROAD CARRIER", gst:"18AOSPS0432G2ZO", contact:"98640-59335 / 70057-03936", stations:["SHILLONG"] },
+  { id:68, name:"NORTH EAST ROADWAYS", gst:"18ABBPE6382P1Z7", contact:"0361-2513033", stations:["DIPHU"] },
+  { id:69, name:"OLD RHINO TRANSPORT CORPORATION", gst:"18AUKPS9052L3ZQ", contact:"0361-2544497 / 2608522 / 2631007", stations:["DIMAPUR"] },
+  { id:70, name:"ONLINE LOGISTICS PVT. LTD.", gst:"18AABCO6147Q1ZT", contact:"88222-22999 / 98642-22191", stations:["KOHIMA","DIMAPUR"] },
+  { id:71, name:"P.C. CARGO CARRIERS", gst:"18ARBPN5440M1ZI", contact:"98546-29463 / 87218-92767 / 98646-65469", stations:["BOKO","DUDHNOI"] },
+  { id:72, name:"P.P. TRANSPORT", gst:"18ANKPJ4706F2Z0", contact:"90854-50162 / 84869-11469", stations:["ITANAGAR","NAHARLAGUN"] },
+  { id:73, name:"P.R. TRANSPORT", gst:"18ALYPK0610R1ZE", contact:"98545-42927 / 98542-76785", stations:["BOKAGHAT"] },
+  { id:74, name:"PAREEK ROADLINES", gst:"18ADVPP9099C1ZN", contact:"94011-69956 / 98640-91539", stations:["BONGAIGAON"] },
+  { id:75, name:"PAWAN CARRIERS", gst:"18ALPPM1459B1Z1", contact:"91270-14750", stations:["AIZAWL","SILCHAR","TINSUKIA","DIBRUGARH","SIBSAGAR","JORHAT","GOLAGHAT","NAGAON"] },
+  { id:76, name:"PAWAN HANS LOGISTICS", gst:"18AGSPM8297K1Z8", contact:"99549-73877", stations:["GOHPUR"] },
+  { id:77, name:"PODDAR LOGISTICS", gst:"18CIWPP6870M1ZZ", contact:"93656-73657 / 91012-13447", stations:["TANGLA"] },
+  { id:78, name:"PREM CARGO SERVICE", gst:"18BCSPB4104M2ZF", contact:"99577-06926 / 87619-13205", stations:["SILCHAR"] },
+  { id:79, name:"PURBANCHAL COURIER", gst:"18ANAPA9333R1ZM", contact:"99540-92047", stations:["MORANHAT","JORHAT","TINSUKIA","DIBRUGARH"] },
+  { id:80, name:"R D TRANSPORT SERVICE", gst:"18ARVPD5283C1ZK", contact:"94350-97000 / 80111-96554", stations:["SIBSAGAR"] },
+  { id:81, name:"RADHIKA EXPRESS SERVICE", gst:"18AFDPA7736H4ZF", contact:"99542-51236 / 0361-2733179 / 2733188", stations:["DIMAPUR"] },
+  { id:82, name:"RAJU TRANSPORT", gst:"18BCWPS6131F1Z3", contact:"98640-10256", stations:["IMPHAL"] },
+  { id:83, name:"RAM RAM TRANSPORTER", gst:"18AFCPT4973L1ZQ", contact:"81350-21050 / 81350-21051", stations:["SILAPATHAR","NORTH LAKHIMPUR"] },
+  { id:84, name:"RATNAGIRI TRANSPORT", gst:"18ACQPJ9553R1ZE", contact:"88767-10103 / 99543-09669", stations:["GOLAGHAT"] },
+  { id:85, name:"RAVI ROADWAYS", gst:"18AHZPD1714E1ZD", contact:"70999-54224", stations:["RANGIA","BAIHATA CHARALI"] },
+  { id:86, name:"RAYAN CARGO", gst:"18AHXPG7901Q3ZC", contact:"84862-08434", stations:["BADARPUR"] },
+  { id:87, name:"RAYCHAND COURIER & CARGO", gst:"18AWJPR9474J1ZK", contact:"98591-85531", stations:["NAGAON"] },
+  { id:88, name:"RDR LOGISTICS", gst:"18BNOPS0527A1Z2", contact:"97069-52668 / 87218-25491", stations:["TANGLA","UDALGURI"] },
+  { id:89, name:"RHINO ASSAM ROADLINES", gst:"18CNHPS7620E1ZS", contact:"90859-61491", stations:["DIMAPUR"] },
+  { id:90, name:"RHINO ROAD TRANSPORT SERVICE", gst:"18AUKPS9051K1ZV", contact:"0361-2542011 / 2733406", stations:["DIMAPUR"] },
+  { id:91, name:"RHINO ROADWAYS CORPORATION", gst:"18AAHFR5969A1ZZ", contact:"0361-2483062 / 84038-65542", stations:["DIMAPUR"] },
+  { id:92, name:"ROAD KINGS TRANSPORT", gst:"18ABTPA8718R1ZP", contact:"0361-2517171 / 94350-41683", stations:["TINSUKIA"] },
+  { id:93, name:"S S CARRIERS", gst:"18BCDPB5154L1ZL", contact:"75768-28285", stations:["MANGALDOI"] },
+  { id:94, name:"SAHIL TRANSPORT AGENCY", gst:"18AEVPA3782L1ZV", contact:"97077-77794 / 93655-67822 / 95083-29775", stations:["JORHAT","SIBSAGAR"] },
+  { id:95, name:"SARADA ROADLINES", gst:"18AJDPB3323M1ZE", contact:"84868-24594 / 98649-44626", stations:["AGARTALA"] },
+  { id:96, name:"SEVEN SISTER TRANSPORT", gst:"18CMBPS0634R1ZH", contact:"80110-02680 / 78960-02284 / 0361-2733084", stations:["IMPHAL"] },
+  { id:97, name:"SHILLONG TRANSPORT", gst:"18CZCPM8675A1Z6", contact:"90776-47853 / 87319-84426", stations:["SHILLONG"] },
+  { id:98, name:"SHIVAM ROADWAYS", gst:"18AJFPG7598B1Z1", contact:"94351-12778", stations:["RANGIA"] },
+  { id:99, name:"SHREE BAJRANG GOODS CARRIERS", gst:"18ALSPK3159P1Z6", contact:"0361-2735643 / 94351-05680", stations:["ROHA"] },
+  { id:100, name:"SHREE BALAJIEE TRANSPORT CORPORATION", gst:"18ACBPD9498C1ZI", contact:"84860-21670", stations:["NORTH LAKHIMPUR","BANDERDEWA","NAHARLAGUN","ITANAGAR","DHEMAJI","SILAPATHAR","ALONG","PASSIGHAT","ZIRO"] },
+  { id:101, name:"SHREE BHARAT ROADWAYS", gst:"19EDSPS9172L1Z8", contact:"87209-09602 / 94011-67305", stations:["DIMAPUR"] },
+  { id:102, name:"SHREE CARGO (INDIA)", gst:"18ADKFS3048R1Z8", contact:"99710-13902 / 69016-19370", stations:["HAILAKANDI","BADARPUR"] },
+  { id:103, name:"SHREE GANESH TRANSPORT CORPORATION", gst:"18BKHPP8174N2Z7", contact:"75760-96520", stations:["DHEMAJI","ARUNACHAL"] },
+  { id:104, name:"SHREE GARO HILL ROADLINES", gst:"18AHHPS1204Q1ZY", contact:"0361-2516097 / 98640-35605", stations:["TURA"] },
+  { id:105, name:"SHREE MAHABIR GOODS CARRIER", gst:"18ACCFS6433K1ZT", contact:"94351-68412 / 99579-41597", stations:["HOJAI"] },
+  { id:106, name:"SHREE MAHABIR TRANSPORT", gst:"18BCMPK9681E1Z2", contact:"95087-88284 / 94357-04363", stations:["TEZPUR","RANGAPARA","DHEKIAJULI"] },
+  { id:107, name:"SHREE OM TRANSPORT", gst:"18CLGPS3797H1ZD", contact:"98641-45644 / 82540-45674", stations:["PATHSALA"] },
+  { id:108, name:"SHREE SAI ROADWAYS", gst:"18AFOPM0699E1Z1", contact:"93652-08768 / 0361-2545573", stations:["KARIMGANJ","SILCHAR"] },
+  { id:109, name:"SHREE SALASAR ROADLINES", gst:"18ADAFS9539B1ZZ", contact:"99542-59111 / 98641-22033", stations:["TINSUKIA","DIBRUGARH","NAMRUP","NAHARKATIA","DIGBOI","MARGHERITA","DOOMDOOMA","MAKUM","DULIAJAN","RUING","TEZU","NAMSAI","SUDIA","KHONSA"] },
+  { id:110, name:"SHREE SHYAM LOGISTICS", gst:"18AFSPL2766H1ZW", contact:"97060-09946 / 98622-78883", stations:["TINSUKIA"] },
+  { id:111, name:"SHREE SHYAM ROADWAYS", gst:"18AAPPL3717J1ZB", contact:"90850-97600 / 90850-80235", stations:["DIBRUGARH"] },
+  { id:112, name:"SHYAM SUNDAR ROADWAYS", gst:"16ACFFS1000D1ZW", contact:"98642-12533 / 94019-81786", stations:["AGARTALA"] },
+  { id:113, name:"SIBSAGAR ROADWAYS", gst:"18ABMFS6978G1ZC", contact:"0361-2601015 / 84860-15385", stations:["SONARI","SIBSAGAR","JORHAT"] },
+  { id:114, name:"SINGODIA ROADWAYS", gst:"18AANHS5485E1ZL", contact:"98646-22970 / 76380-34693", stations:["LAKHIPUR","GOALPARA"] },
+  { id:115, name:"SIVSHAKTI CARRIERS", gst:"18AHJPD9920C1ZH", contact:"91270-15340 / 90852-01226", stations:["BADARPUR","HAILAKANDI","SILCHAR","KARIMGANJ"] },
+  { id:116, name:"SPEED KING LOGISTICS", gst:"18CBXPP0520L1Z4", contact:"95085-31955 / 0361-2478376 / 0361-2492949", stations:["DHUBRI","GAURIPUR","BONGAIGAON","BILASHIPARA"] },
+  { id:117, name:"SREE KRISHNA GOODS CARRIER", gst:"18ABFFM4308K1Z4", contact:"87239-98532 / 94355-79596", stations:["SILCHAR"] },
+  { id:118, name:"SRI KRISHNA LOGISTIC", gst:"18AHDPA9053D1ZO", contact:"98641-20311 / 91275-97612", stations:["AGARTALA"] },
+  { id:119, name:"STAR CARGO CARRYINGS", gst:"18BHVPS3703D1Z2", contact:"76700-12121 / 90854-79682", stations:["DIMAPUR"] },
+  { id:120, name:"STAR GOLD TRANSPORT", gst:"18AZGPR6261D1Z7", contact:"82569-12027 / 88221-58007", stations:["DIMAPUR","KOHIMA"] },
+  { id:121, name:"SUMAN TRANSPORT", gst:"18BTWPR1116C1ZK", contact:"0361-2607399", stations:["SHILLONG"] },
+  { id:122, name:"SUNRISE LOGISTIC", gst:"18AAZPN3898E2ZR", contact:"94350-93686", stations:["JORHAT"] },
+  { id:123, name:"SUPER ZED TRAVELS & COURIER", gst:"18ACCFS3750K1ZV", contact:"97078-35701 / 94014-10653", stations:["IMPHAL"] },
+  { id:124, name:"TAARA TRANSPORT", gst:"18AALFT1193N1ZI", contact:"98649-31267", stations:["TINSUKIA"] },
+  { id:125, name:"TEZPUR ROADLINK", gst:"18AKYPS7981E1Z3", contact:"94350-82773", stations:["TEZPUR"] },
+  { id:126, name:"TEZPUR ROADWAYS", gst:"18AACFT1569M1ZP", contact:"0361-2516475 / 0361-2516307", stations:["RANGAPARA","BISWANATH CHARALI","DHEKIAJULI","TEZPUR"] },
+  { id:127, name:"TIRUPATI ROAD CARRIERS", gst:"18AESPM4681D1Z3", contact:"99547-83440 / 94355-69806 / 98645-11635", stations:["BANDERDEWA","NAHARLAGUN","NIRJULY","ITANAGAR"] },
+  { id:128, name:"TRISHUL TRANSPORT", gst:"18AHTPB9834B2Z5", contact:"99540-65227 / 96784-67329 / 98641-18113", stations:["JORHAT","SIBSAGAR","NAZIRA","MORANHAT"] },
+  { id:129, name:"UNITED ROAD LINK", gst:"18ACCPD4231A1ZG", contact:"98640-87568 / 98641-62736 / 91271-06309", stations:["BIHPURIA"] },
+  { id:130, name:"UP TO DATE CARGO CARRIER", gst:"17ACNPB4508K1ZK", contact:"92060-14354", stations:["SHILLONG"] },
+  { id:131, name:"UPPER CARRIER TRANSPORT", gst:"18ADTPA5174H1ZA", contact:"97069-25879", stations:["MORAN","TINSUKIA"] },
+  { id:132, name:"VINAYAK CARRYING CORPORATION", gst:"18DHZPS6206K1ZD", contact:"98640-10709 / 88110-96286", stations:["NAHARLAGUN"] },
+  { id:133, name:"VISHAL ROADWAYS (INDIA)", gst:"18AABFV4335Q1ZM", contact:"88110-43289", stations:["NAGAON"] },
+  { id:134, name:"YASH ROADLINES", gst:"18ATTPS0689R1Z8", contact:"94355-50409 / 94350-43937", stations:["TEZPUR"] },
+  { id:135, name:"YATRA CARGO", gst:"18BBLPD8250Q1Z0", contact:"88110-39903 / 60003-24920", stations:["BANDERDEWA"] },
+];
+
+// ── QUICK LOCATION PILLS (most common) ──
+const QUICK_LOCS = ["JORHAT","DIMAPUR","SILCHAR","TINSUKIA","DIBRUGARH","IMPHAL","NAHARLAGUN","TEZPUR","SHILLONG","AIZAWL","NAGAON","AGARTALA"];
+
+let currentQuery = '';
+let currentView = 'grid';
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(text, query) {
+  if(!query) return esc(text);
+  const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return esc(text).replace(re, '<mark>$1</mark>');
+}
+
+function buildCard(t, query) {
+  const stationsHtml = t.stations.map(s => {
+    const isMatch = query && s.toUpperCase().includes(query.toUpperCase());
+    const label = query ? highlight(s, query) : esc(s);
+    return `<span class="station-tag${isMatch?' highlight':''}" onclick="searchLocation('${s}')">${label}</span>`;
+  }).join('');
+
+  const numbers = t.contact.split('/').map(n => {
+    const clean = n.trim().replace(/[^0-9]/g,'');
+    return `<a href="tel:${clean}">${n.trim()}</a>`;
+  }).join(' / ');
+
+  return `<div class="card" style="animation-delay:${Math.random()*0.08}s">
+    <div class="card-head">
+      <div class="card-name">${highlight(t.name, query)}</div>
+      <div class="card-num">#${t.id}</div>
+    </div>
+    <div class="card-gst" onclick="copyGST('${t.gst}')" title="Click to copy GST">
+      ${esc(t.gst)}
+      <span class="copy-tooltip">Copy GST</span>
+    </div>
+    <div class="card-contact">
+      <span class="contact-icon">📞</span>
+      <span class="contact-numbers">${numbers}</span>
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-stations-label">Delivers to</div>
+    <div class="stations-wrap">${stationsHtml}</div>
+  </div>`;
+}
+
+function render(query) {
+  const q = query.trim();
+  const container = document.getElementById('cardsContainer');
+  const countEl = document.getElementById('resultsCount');
+
+  let filtered = TRANSPORTERS;
+  if(q) {
+    const qUp = q.toUpperCase();
+    filtered = TRANSPORTERS.filter(t =>
+      t.name.toUpperCase().includes(qUp) ||
+      t.gst.toUpperCase().includes(qUp) ||
+      t.stations.some(s => s.toUpperCase().includes(qUp)) ||
+      t.contact.includes(q)
+    );
+  }
+
+  if(filtered.length === 0) {
+    container.innerHTML = `<div class="empty">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No transporters found</div>
+      <div class="empty-sub">Try searching for "${esc(q)}" differently, or browse all locations below</div>
+    </div>`;
+    countEl.innerHTML = `<span>0</span> results for "${esc(q)}"`;
+    return;
+  }
+
+  countEl.innerHTML = q
+    ? `<span>${filtered.length}</span> transporter${filtered.length!==1?'s':''} for "<span>${esc(q)}</span>"`
+    : `All <span>${filtered.length}</span> Transporters`;
+
+  container.innerHTML = filtered.map(t => buildCard(t, q)).join('');
+}
+
+function searchLocation(loc) {
+  const input = document.getElementById('searchInput');
+  input.value = loc;
+  currentQuery = loc;
+  document.getElementById('clearBtn').classList.add('show');
+  updateQuickPills(loc);
+  render(loc);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  currentQuery = '';
+  document.getElementById('clearBtn').classList.remove('show');
+  updateQuickPills('');
+  render('');
+}
+
+function updateQuickPills(active) {
+  document.querySelectorAll('.ql-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.loc.toUpperCase() === active.toUpperCase());
+  });
+}
+
+function setView(v) {
+  currentView = v;
+  const container = document.getElementById('cardsContainer');
+  container.className = v === 'grid' ? 'grid-view' : 'list-view';
+  document.getElementById('gridBtn').classList.toggle('active', v === 'grid');
+  document.getElementById('listBtn').classList.toggle('active', v === 'list');
+}
+
+function copyGST(gst) {
+  navigator.clipboard.writeText(gst).then(() => {
+    const t = document.getElementById('toast');
+    t.textContent = `✓ GST copied: ${gst}`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }).catch(() => {
+    const t = document.getElementById('toast');
+    t.textContent = gst;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  });
+}
+
+// ── INIT ──
+// Build quick location pills
+const qlContainer = document.getElementById('quickLocations');
+QUICK_LOCS.forEach(loc => {
+  const btn = document.createElement('button');
+  btn.className = 'ql-pill';
+  btn.dataset.loc = loc;
+  btn.textContent = loc;
+  btn.onclick = () => {
+    if(btn.classList.contains('active')) {
+      clearSearch();
+    } else {
+      searchLocation(loc);
+    }
+  };
+  qlContainer.appendChild(btn);
+});
+
+// Search input handler
+const searchInput = document.getElementById('searchInput');
+let debounceTimer;
+searchInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  const val = searchInput.value;
+  document.getElementById('clearBtn').classList.toggle('show', val.length > 0);
+  updateQuickPills(val);
+  debounceTimer = setTimeout(() => {
+    currentQuery = val;
+    render(val);
+  }, 180);
+});
+
+searchInput.addEventListener('keydown', e => {
+  if(e.key === 'Escape') clearSearch();
+});
+
+// Initial render
+render('');
+</script>
+</body>
+</html>

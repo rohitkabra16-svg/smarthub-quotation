@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Hub — Sticker Printer</title>
+<style>
+  :root {
+    --blue: #1a3a6e;
+    --blue-light: #e8edf5;
+    --teal: #0891b2;
+    --border: #d1d9e6;
+    --bg: #f4f6fb;
+    --white: #ffffff;
+    --text: #1a2340;
+    --muted: #6b7a99;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--blue);
+    color: white;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo {
+    width: 42px; height: 42px;
+    background: white;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
+  .header p  { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+
+  /* ── LAYOUT ── */
+  .app { display: flex; gap: 0; min-height: calc(100vh - 74px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 360px; flex-shrink: 0;
+    background: white;
+    border-right: 1px solid var(--border);
+    padding: 20px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .section-title {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; margin-top: 18px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .field { margin-bottom: 8px; }
+  .field label {
+    display: block; font-size: 11.5px; font-weight: 500;
+    color: var(--muted); margin-bottom: 3px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px; font-size: 13px;
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    color: var(--text); background: white;
+    transition: border-color 0.15s;
+    resize: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--blue);
+  }
+
+  /* ── ADD PARTY BUTTON ── */
+  .add-btn {
+    width: 100%; padding: 10px;
+    background: var(--blue); color: white;
+    border: none; border-radius: 8px;
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; margin-top: 10px;
+    transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .add-btn:hover { background: #0f2550; }
+
+  /* ── PARTY LIST ── */
+  .party-list {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 14px;
+  }
+
+  .party-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 11px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fafbfd;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+  .party-item:hover { border-color: var(--blue); }
+  .party-item.active { border-color: var(--blue); background: var(--blue-light); }
+
+  .party-item-info { flex: 1; min-width: 0; }
+  .party-item-name {
+    font-size: 13px; font-weight: 600; color: var(--blue);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .party-item-addr {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .party-item-copies {
+    font-size: 11px; color: var(--teal); font-weight: 600;
+    white-space: nowrap; margin-top: 3px;
+  }
+
+  .party-item-actions { display: flex; gap: 4px; align-items: center; }
+
+  .copy-ctrl {
+    display: flex; align-items: center; gap: 0;
+    border: 1px solid var(--border); border-radius: 5px; overflow: hidden;
+  }
+  .copy-ctrl button {
+    width: 22px; height: 22px; border: none; background: white;
+    cursor: pointer; font-size: 13px; color: var(--blue);
+    transition: background 0.1s; line-height: 1;
+  }
+  .copy-ctrl button:hover { background: var(--blue-light); }
+  .copy-num {
+    width: 26px; height: 22px; text-align: center;
+    font-size: 12px; font-weight: 600; line-height: 22px;
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    color: var(--blue);
+  }
+
+  .del-btn {
+    width: 24px; height: 24px;
+    border: 1px solid var(--red-light); border-radius: 5px;
+    background: var(--red-light); color: var(--red);
+    cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .del-btn:hover { background: #fca5a5; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 20px 10px;
+    color: var(--muted); font-size: 12px; line-height: 1.6;
+    border: 1.5px dashed var(--border); border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .print-btn {
+    width: 100%; padding: 12px;
+    background: var(--green); color: white;
+    border: none; border-radius: 8px;
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 16px;
+    transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .print-btn:hover { background: #15803d; }
+  .print-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+  .total-badge {
+    background: var(--blue-light);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px;
+    font-size: 12px; color: var(--blue);
+    font-weight: 600; margin-top: 10px; text-align: center;
+  }
+
+  /* ── SENDER BOX ── */
+  .sender-box {
+    background: var(--blue-light);
+    border-radius: 8px; padding: 10px 12px;
+    margin-top: 6px;
+  }
+
+  /* ── PREVIEW AREA ── */
+  .preview-area {
+    flex: 1; padding: 24px 28px;
+    overflow-y: auto;
+  }
+  .preview-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .preview-header h2 { font-size: 15px; font-weight: 600; }
+  .preview-header span {
+    font-size: 12px; color: var(--muted);
+    background: white; padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+
+  /* A4 sheet simulation */
+  .a4-sheet {
+    width: 210mm;
+    height: 297mm;
+    background: white;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    border-radius: 4px;
+    margin: 0 auto 20px auto;
+    padding: 8mm 10mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5mm;
+    page-break-after: always;
+  }
+  .a4-sheet:last-child { page-break-after: avoid; }
+
+  /* ── STICKER DESIGN — FULL HEIGHT ── */
+  .sticker {
+    border: 2px solid var(--blue);
+    border-radius: 7px;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-inside: avoid;
+  }
+
+  .sticker-top {
+    background: var(--blue);
+    padding: 6px 10px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .sticker-brand {
+    color: white;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .sticker-brand span {
+    font-size: 10px; font-weight: 400;
+    opacity: 0.85; display: block;
+    letter-spacing: 0.3px;
+  }
+  .sticker-logo-area {
+    width: 32px; height: 32px;
+    background: white; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .sticker-logo-area img { width: 28px; height: 28px; object-fit: contain; }
+
+  .sticker-body { padding: 7px 10px 6px; flex-shrink: 0; }
+
+  .sticker-to-label {
+    font-size: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 3px;
+  }
+  .sticker-receiver-name {
+    font-size: 15px; font-weight: 700;
+    color: var(--blue); line-height: 1.2;
+    margin-bottom: 3px;
+  }
+  .sticker-receiver-addr {
+    font-size: 11.5px; color: var(--text);
+    line-height: 1.5; margin-bottom: 4px;
+  }
+  .sticker-receiver-phone {
+    font-size: 12px; font-weight: 600;
+    color: var(--teal);
+    font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  }
+
+  .sticker-divider {
+    height: 1px; background: var(--border);
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+
+  .sticker-footer {
+    padding: 5px 10px 7px;
+    flex-shrink: 0;
+  }
+  .sticker-from-label {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+  }
+  .sticker-from-name {
+    font-size: 10.5px; font-weight: 700; color: var(--blue);
+  }
+  .sticker-from-addr {
+    font-size: 9.5px; color: var(--muted); line-height: 1.45;
+  }
+  .sticker-from-phone {
+    font-size: 9.5px; font-weight: 600;
+    color: var(--teal); font-family: ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  }
+
+  /* empty sticker placeholder */
+  .sticker-empty {
+    border: 1.5px dashed var(--border);
+    border-radius: 7px;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sticker-empty span { font-size: 11px; color: #ccc; }
+
+  /* ── PRINT STYLES ── */
+  @media (max-width: 820px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+    .preview-area { padding: 16px 10px; }
+    .a4-sheet { width: 100%; height: auto; aspect-ratio: 210/297; padding: 5mm; gap: 3mm; }
+  }
+
+  @media print {
+    body { background: white; }
+    .header, .sidebar, .preview-header { display: none !important; }
+    .app { display: block; }
+    .preview-area { padding: 0; }
+    .a4-sheet {
+      box-shadow: none;
+      width: 210mm; min-height: 297mm;
+      padding: 8mm 10mm; margin: 0;
+    }
+    .sticker-empty { display: none; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">📦</div>
+  <div>
+    <h1>Smart Hub — Sticker Printer</h1>
+    <p>Add multiple parties, set copies each, preview and print</p>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- SENDER -->
+    <div class="section-title">Sender Details (Your Info)</div>
+    <div class="sender-box">
+      <div class="field">
+        <label>Company Name</label>
+        <input type="text" id="sendName" value="Smart Hub" oninput="renderAll()">
+      </div>
+      <div class="field">
+        <label>Address</label>
+        <input type="text" id="sendAddr" value="Axis Tower, GF, Near Rajdhani Masjid, Hatigaon" oninput="renderAll()">
+      </div>
+      <div class="field">
+        <label>City &amp; PIN</label>
+        <input type="text" id="sendCity" value="Guwahati - 781038" oninput="renderAll()">
+      </div>
+      <div class="field">
+        <label>Contact Number</label>
+        <input type="text" id="sendPhone" value="7099100123" oninput="renderAll()">
+      </div>
+    </div>
+
+    <!-- ADD PARTY FORM -->
+    <div class="section-title">Add Receiver / Party</div>
+
+    <div class="field">
+      <label>Receiver Name / Company</label>
+      <input type="text" id="recName" placeholder="e.g. Ramesh Electricals">
+    </div>
+    <div class="field">
+      <label>Address Line 1</label>
+      <input type="text" id="recAddr1" placeholder="Shop / House / Building">
+    </div>
+    <div class="field">
+      <label>Address Line 2</label>
+      <input type="text" id="recAddr2" placeholder="Street / Area (optional)">
+    </div>
+    <div class="field">
+      <label>City &amp; PIN</label>
+      <input type="text" id="recCity" placeholder="e.g. Jorhat - 785001">
+    </div>
+    <div class="field">
+      <label>Contact Number</label>
+      <input type="text" id="recPhone" placeholder="e.g. 98540 00000">
+    </div>
+
+    <button class="add-btn" onclick="addParty()">
+      ＋ Add to Dispatch List
+    </button>
+
+    <!-- PARTY LIST -->
+    <div class="section-title" style="margin-top:22px">Dispatch List</div>
+
+    <div class="party-list" id="partyList">
+      <div class="empty-state">
+        No parties added yet.<br>Fill the form above and click <strong>Add to Dispatch List</strong>.
+      </div>
+    </div>
+
+    <!-- TOTAL + PRINT -->
+    <div class="total-badge" id="totalBadge" style="display:none"></div>
+    <button class="print-btn" id="printBtn" onclick="window.print()" disabled>
+      🖨️ Print All Stickers
+    </button>
+
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-area">
+    <div class="preview-header">
+      <h2>A4 Preview</h2>
+      <span id="previewLabel">No stickers yet</span>
+    </div>
+    <div id="sheetsContainer"></div>
+  </div>
+
+</div>
+
+<script>
+  // parties array: { name, addr1, addr2, city, phone, copies }
+  let parties = [];
+
+  function val(id) {
+    return document.getElementById(id).value.trim();
+  }
+
+  function addParty() {
+    const name  = val('recName');
+    const addr1 = val('recAddr1');
+    const addr2 = val('recAddr2');
+    const city  = val('recCity');
+    const phone = val('recPhone');
+
+    if (!name) { alert('Please enter Receiver Name / Company.'); return; }
+    if (!addr1) { alert('Please enter Address Line 1.'); return; }
+
+    parties.push({ name, addr1, addr2, city, phone, copies: 1 });
+
+    // clear form
+    ['recName','recAddr1','recAddr2','recCity','recPhone'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('recName').focus();
+
+    renderPartyList();
+    renderAll();
+  }
+
+  function removeParty(idx) {
+    parties.splice(idx, 1);
+    renderPartyList();
+    renderAll();
+  }
+
+  function changeCopies(idx, delta) {
+    parties[idx].copies = Math.max(1, Math.min(20, parties[idx].copies + delta));
+    renderPartyList();
+    renderAll();
+  }
+
+  function renderPartyList() {
+    const container = document.getElementById('partyList');
+    const badge     = document.getElementById('totalBadge');
+    const printBtn  = document.getElementById('printBtn');
+
+    if (parties.length === 0) {
+      container.innerHTML = `<div class="empty-state">No parties added yet.<br>Fill the form above and click <strong>Add to Dispatch List</strong>.</div>`;
+      badge.style.display = 'none';
+      printBtn.disabled = true;
+      return;
+    }
+
+    let totalStickers = parties.reduce((s, p) => s + p.copies, 0);
+    let totalPages    = Math.ceil(totalStickers / 8);
+
+    let html = '';
+    parties.forEach((p, i) => {
+      const addrSnip = [p.addr1, p.city].filter(Boolean).join(', ');
+      html += `
+        <div class="party-item">
+          <div class="party-item-info">
+            <div class="party-item-name">${escHtml(p.name)}</div>
+            <div class="party-item-addr">${escHtml(addrSnip)}</div>
+            <div class="party-item-copies">${p.copies} sticker${p.copies > 1 ? 's' : ''}</div>
+          </div>
+          <div class="party-item-actions">
+            <div class="copy-ctrl">
+              <button onclick="changeCopies(${i}, -1)">−</button>
+              <div class="copy-num">${p.copies}</div>
+              <button onclick="changeCopies(${i}, +1)">+</button>
+            </div>
+            <button class="del-btn" onclick="removeParty(${i})" title="Remove">✕</button>
+          </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+
+    badge.style.display = 'block';
+    badge.textContent   = `Total: ${totalStickers} sticker${totalStickers > 1 ? 's' : ''} across ${Math.ceil(totalStickers/8)} A4 page${Math.ceil(totalStickers/8) > 1 ? 's' : ''} (8 per page)`;
+    printBtn.disabled   = false;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function makeStickerHTML(party) {
+    const sendName  = val('sendName')  || 'Smart Hub';
+    const sendAddr  = val('sendAddr')  || '';
+    const sendCity  = val('sendCity')  || '';
+    const sendPhone = val('sendPhone') || '';
+    const addrLines = [party.addr1, party.addr2, party.city].filter(Boolean).join(', ');
+
+    return `
+      <div class="sticker">
+        <div class="sticker-top">
+          <div class="sticker-brand">
+            ${escHtml(sendName)}
+            <span>${escHtml(sendCity)}</span>
+          </div>
+          <div class="sticker-logo-area">
+            <img src="icon-192.png" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:15px>📦</span>'">
+          </div>
+        </div>
+        <div class="sticker-body">
+          <div class="sticker-to-label">Ship To</div>
+          <div class="sticker-receiver-name">${escHtml(party.name)}</div>
+          <div class="sticker-receiver-addr">${escHtml(addrLines)}</div>
+          <div class="sticker-receiver-phone">📞 ${escHtml(party.phone || '—')}</div>
+        </div>
+        <div class="sticker-divider"></div>
+        <div class="sticker-footer">
+          <div class="sticker-from-label">Return To (if undelivered)</div>
+          <div class="sticker-from-name">${escHtml(sendName)}</div>
+          <div class="sticker-from-addr">${escHtml(sendAddr)}, ${escHtml(sendCity)}</div>
+          <div class="sticker-from-phone">📞 ${escHtml(sendPhone)}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderAll() {
+    const container = document.getElementById('sheetsContainer');
+    const label     = document.getElementById('previewLabel');
+
+    if (parties.length === 0) {
+      container.innerHTML = '';
+      label.textContent   = 'No stickers yet';
+      return;
+    }
+
+    // Expand all parties with their copies into a flat array
+    let allStickers = [];
+    parties.forEach(p => {
+      for (let i = 0; i < p.copies; i++) allStickers.push(p);
+    });
+
+    const total      = allStickers.length;
+    const totalPages = Math.ceil(total / 8);
+    label.textContent = `${total} sticker${total > 1 ? 's' : ''} · ${totalPages} page${totalPages > 1 ? 's' : ''}`;
+
+    let html = '';
+    for (let page = 0; page < totalPages; page++) {
+      html += `<div class="a4-sheet">`;
+      const start = page * 8;
+      const end   = Math.min(start + 8, total);
+      for (let i = start; i < end; i++) {
+        html += makeStickerHTML(allStickers[i]);
+      }
+      // Fill blanks on last page
+      const filled = end - start;
+      for (let b = filled; b < 8; b++) {
+        html += `<div class="sticker-empty"><span>— blank —</span></div>`;
+      }
+      html += `</div>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  // Allow Enter key on any rec field to trigger Add
+  ['recName','recAddr1','recAddr2','recCity','recPhone'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') addParty();
+    });
+  });
+
+  // Init
+  renderPartyList();
+  renderAll();
+</script>
+</body>
+</html>
