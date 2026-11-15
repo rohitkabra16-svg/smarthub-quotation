@@ -211,6 +211,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
     <button id="nav-orders" onclick="go('orders')"><span class="ic">◳</span>Orders</button>
     <button id="nav-sticker" onclick="go('sticker')"><span class="ic">⎙</span>Dispatch stickers</button>
     <button id="nav-transport" onclick="go('transport')"><span class="ic">⛟</span>Transporters</button>
+    <button id="nav-post" onclick="go('post')"><span class="ic">▣</span>Posters</button>
   </div>
   <button id="installBtn" class="install" onclick="installApp()" style="display:none">⤓ Install as app</button>
   <div class="railfoot" id="railfoot">&nbsp;</div>
@@ -245,6 +246,7 @@ iframe{border:0;width:100%;height:100%;flex:1;background:var(--paper)}
   <section class="pane" id="pane-orders"></section>
   <section class="pane" id="pane-sticker"></section>
   <section class="pane" id="pane-transport"></section>
+  <section class="pane" id="pane-post"></section>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1066,16 +1068,17 @@ function toast(msg){
 
 /* ---- panes: each app loads once, then keeps its state ---- */
 const APPS={};
-const PAGES={quote:'quotation.html',list:'prices.html',orders:'orders.html',sticker:'stickers.html',transport:'transporters.html'};
+const PAGES={quote:'quotation.html',list:'prices.html',orders:'orders.html',sticker:'stickers.html',transport:'transporters.html',post:'posters.html'};
 function go(which){
-  ['home','quote','list','orders','sticker','transport'].forEach(k=>{
+  ['home','quote','list','orders','sticker','transport','post'].forEach(k=>{
     document.getElementById('pane-'+k).classList.toggle('on',k===which);
     document.getElementById('nav-'+k).classList.toggle('on',k===which);
   });
   if(PAGES[which]&&!APPS[which]){
     const f=document.createElement('iframe');
     f.src=PAGES[which];
-    f.title={quote:'Quotation builder',list:'Full price list',orders:'Orders',sticker:'Dispatch sticker printer',transport:'Transporter directory'}[which]||which;
+    f.title={quote:'Quotation builder',list:'Full price list',orders:'Orders',sticker:'Dispatch sticker printer',transport:'Transporter directory',post:'WhatsApp poster maker'}[which]||which;
+    if(which==='post')f.allow='web-share; clipboard-write';
     document.getElementById('pane-'+which).appendChild(f);
     APPS[which]=f;
   }

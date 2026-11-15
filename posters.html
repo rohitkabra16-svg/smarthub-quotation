@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Hub — WhatsApp Posters</title>
+<style>
+:root{
+  --paper:#f4f3ef; --card:#ffffff; --ink:#1b1d22; --ink2:#6a6f7a;
+  --rule:#dedbd3; --navy:#0a2f6b; --red:#d81f26; --ok:#2f5d54;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+h1{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.lead{color:var(--ink2);font-size:13px;margin-bottom:14px}
+.box{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;margin-bottom:14px}
+.box h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px;font-weight:700}
+label{display:block;font-size:12px;color:var(--ink2);margin:10px 0 4px;font-weight:600}
+input[type=text],input[type=number],input[type=search],textarea{width:100%;padding:10px 11px;border:1px solid var(--rule);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
+textarea{resize:vertical;min-height:74px;line-height:1.4}
+input:focus,textarea:focus{outline:2px solid var(--navy);outline-offset:1px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:86px;padding:9px 8px;border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.results{max-height:300px;overflow:auto;margin-top:8px;border-top:1px solid var(--rule)}
+.res{display:flex;gap:10px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--rule);cursor:pointer}
+.res:hover,.res.on{background:#eef2f9}
+.res img,.res .noimg{width:60px;height:40px;object-fit:contain;background:#fff;border:1px solid var(--rule);border-radius:6px;flex-shrink:0}
+.res .noimg{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink2)}
+.res b{display:block;font-size:13px;font-weight:600}
+.res span{font-size:11.5px;color:var(--ink2)}
+.res .pr{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.hint{font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.45}
+.warn{font-size:12px;color:#8a5a00;background:#fff6dd;border:1px solid #f0dfa8;border-radius:8px;padding:8px 10px;margin-top:8px;display:none}
+.side{position:sticky;top:12px}
+.stage{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px}
+canvas{width:100%;height:auto;display:block;border-radius:8px;border:1px solid var(--rule);background:#fff}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{flex:1;padding:12px 10px;border-radius:9px;border:1px solid var(--navy);background:var(--navy);color:#fff;font:inherit;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;font-size:14px}
+.btn.alt{background:var(--card);color:var(--navy)}
+.btn.wa{background:#1fa855;border-color:#1fa855}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.file{font-size:12.5px;margin-top:6px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1b1d22;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.side{position:static;order:-1}.stage{max-width:420px;margin:0 auto}}
+@media(prefers-color-scheme:dark){
+  :root{--paper:#16181d;--card:#1f2229;--ink:#eceef2;--ink2:#9aa1ae;--rule:#343843}
+  .res:hover,.res.on{background:#2a3040}
+  .seg button.on,.btn{background:#2b5fb8;border-color:#2b5fb8}
+  .btn.alt{background:var(--card);color:#cfe0ff;border-color:#2b5fb8}
+  .btn.wa{background:#1fa855;border-color:#1fa855}
+  .warn{background:#3a3220;border-color:#5c4d22;color:#f1d58a}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <h1>WhatsApp posters</h1>
+    <p class="lead">Pick an item, adjust the wording and price, then save or share the picture.</p>
+
+    <div class="box">
+      <h2>1 · Product</h2>
+      <input type="search" id="q" placeholder="Search by name or code — Adiva 6M plate, Stealth fan, geyser 15L" autocomplete="off">
+      <div class="results" id="results"></div>
+      <label for="photo">Use your own photo instead (optional)</label>
+      <input type="file" id="photo" accept="image/*" class="file">
+      <button class="btn alt" id="clearPhoto" style="display:none;margin-top:8px;flex:none;padding:7px 12px;font-size:12.5px">Remove my photo</button>
+      <div class="warn" id="lowres">The price-list photo is small, so it will look soft on a full-size poster. For a sharper picture, add your own photo above.</div>
+    </div>
+
+    <div class="box">
+      <h2>2 · Wording</h2>
+      <label>Ribbon</label>
+      <div class="seg" id="tagSeg">
+        <button data-v="NEW ARRIVAL">New arrival</button>
+        <button data-v="SPECIAL OFFER">Special offer</button>
+        <button data-v="IN STOCK">In stock</button>
+        <button data-v="">None</button>
+      </div>
+      <input type="text" id="tag" placeholder="Or type your own ribbon text" style="margin-top:8px" maxlength="26">
+      <label for="title">Product name on the poster</label>
+      <input type="text" id="title" maxlength="90">
+      <label for="sub">Small line under the name</label>
+      <input type="text" id="sub" maxlength="70">
+      <label for="points">Key points — one per line (up to 4)</label>
+      <textarea id="points" placeholder="5 star BLDC motor&#10;Remote control&#10;2 year warranty"></textarea>
+    </div>
+
+    <div class="box">
+      <h2>3 · Price</h2>
+      <div class="seg" id="priceSeg">
+        <button data-v="offer">MRP + offer price</button>
+        <button data-v="mrp">MRP only</button>
+        <button data-v="none">No price</button>
+      </div>
+      <div class="two">
+        <div><label for="mrp">MRP (₹)</label><input type="number" id="mrp" min="0" step="1" inputmode="decimal"></div>
+        <div><label for="offer">Offer price (₹)</label><input type="number" id="offer" min="0" step="1" inputmode="decimal"></div>
+      </div>
+      <label for="note">Small note under the price (optional)</label>
+      <input type="text" id="note" placeholder="Offer till stocks last" maxlength="60">
+      <p class="hint">MRP is filled from your price list. Check it before posting; you can type over it.</p>
+    </div>
+
+    <div class="box">
+      <h2>4 · Look</h2>
+      <label>Size</label>
+      <div class="seg" id="sizeSeg">
+        <button data-v="status">Status (tall)</button>
+        <button data-v="square">Square (groups, chats)</button>
+      </div>
+      <label>Colour</label>
+      <div class="seg" id="themeSeg">
+        <button data-v="light">Light</button>
+        <button data-v="navy">Navy</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Shop details on every poster</h2>
+      <div class="two">
+        <div><label for="shop">Shop name</label><input type="text" id="shop" maxlength="24"></div>
+        <div><label for="phone">Phone / WhatsApp</label><input type="text" id="phone" maxlength="24"></div>
+      </div>
+      <label for="tagline">Line under the shop name</label>
+      <input type="text" id="tagline" maxlength="44">
+      <label for="addr">Address</label>
+      <input type="text" id="addr" maxlength="70">
+      <p class="hint">Saved on this device, so you only set them once.</p>
+    </div>
+
+    <div class="box">
+      <h2>Caption to paste with the picture</h2>
+      <textarea id="caption" style="min-height:150px"></textarea>
+      <div class="acts">
+        <button class="btn alt" id="copyCap">Copy caption</button>
+        <a class="btn wa" id="waText" target="_blank" rel="noopener">Send caption on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="stage">
+      <canvas id="cv" width="1080" height="1920"></canvas>
+      <div class="acts">
+        <button class="btn" id="save">Save picture</button>
+        <button class="btn wa" id="share">Share</button>
+      </div>
+      <p class="hint" id="shareHint"></p>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="catalog.js"></script>
+<script src="img-codes.js"></script>
+<script src="lit-map.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const CAT=window.SH_CATALOG||[];
+const D=window.SH_IMG_DATA||{};
+const LIT=window.SH_LITIMG||{byCode:{}};
+const DEF={shop:'SMART HUB',tagline:'Havells Authorised Dealer · Guwahati',phone:'70991 00123',addr:'Axis Tower, Hatigaon Road, Guwahati'};
+const S={item:null,img:null,own:null,ownName:'',tag:'NEW ARRIVAL',price:'offer',size:'status',theme:'light'};
+
+/* ---------- small helpers ---------- */
+function store(k,v){try{localStorage.setItem('sh_post_'+k,v);}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem('sh_post_'+k);return v===null?d:v;}catch(e){return d;}}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2200);}
+function inr(n){n=Number(n);if(!isFinite(n)||n<=0)return '';return '₹'+Math.round(n).toLocaleString('en-IN');}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function imgSrc(x){
+  if(D[x.code])return D[x.code];
+  const stem=String(x.code||'').replace(/-[0-9]{2,4}$/,'');
+  if(D[stem])return D[stem];
+  if(LIT.byCode&&LIT.byCode[x.code])return 'img/'+LIT.byCode[x.code];
+  return '';
+}
+function loadImage(src){return new Promise(res=>{if(!src){res(null);return;}const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;});}
+
+/* ---------- search ---------- */
+const INDEX=CAT.map(x=>({x,t:(x.name+' '+x.code+' '+(x.category||'')).toLowerCase()}));
+function search(q){
+  const words=q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!words.length)return [];
+  const out=[];
+  for(let i=0;i<INDEX.length&&out.length<40;i++){
+    const t=INDEX[i].t;let ok=true;
+    for(let j=0;j<words.length;j++){if(t.indexOf(words[j])<0){ok=false;break;}}
+    if(ok)out.push(INDEX[i].x);
+  }
+  return out;
+}
+function renderResults(){
+  const q=$('q').value.trim();const box=$('results');
+  if(!q){box.innerHTML='<p class="hint" style="padding:8px 4px">Start typing to find an item from your price list.</p>';return;}
+  const res=search(q);
+  if(!res.length){box.innerHTML='<p class="hint" style="padding:8px 4px">Nothing matches that. Try fewer words or the item code.</p>';return;}
+  box.innerHTML=res.map((x,i)=>{
+    const s=imgSrc(x);
+    return '<div class="res'+(S.item&&S.item.code===x.code?' on':'')+'" data-i="'+i+'">'+
+      (s?'<img alt="" loading="lazy" src="'+esc(s)+'">':'<div class="noimg">no photo</div>')+
+      '<div><b>'+esc(x.name)+'</b><span>'+esc(x.code)+' · '+esc(x.category||'')+'</span></div>'+
+      '<div class="pr">'+inr(x.price)+'</div></div>';
+  }).join('');
+  box.querySelectorAll('.res').forEach(el=>el.addEventListener('click',()=>pick(res[+el.dataset.i])));
+}
+function tidyName(n){
+  n=String(n).replace(/\s*·\s*/g,' ').replace(/\s+/g,' ').trim();
+  if(n===n.toUpperCase())n=n.toLowerCase().replace(/(^|[\s(/-])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+  return n;
+}
+async function pick(x){
+  S.item=x;capTouched=false;
+  $('title').value=tidyName(x.name);
+  $('sub').value=String(x.category||'').replace(/\s*[—-]\s*/g,' · ');
+  $('mrp').value=x.price?Math.round(x.price):'';
+  $('offer').value='';
+  S.img=await loadImage(imgSrc(x));
+  renderResults();refresh();
+  toast('Loaded '+x.code);
+}
+
+/* ---------- canvas drawing ---------- */
+const FONT="'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
+function wrap(ctx,text,maxW,maxLines){
+  const words=String(text).split(/\s+/).filter(Boolean);const lines=[];let cur='';
+  for(const w of words){
+    const t=cur?cur+' '+w:w;
+    if(ctx.measureText(t).width<=maxW||!cur){cur=t;}else{lines.push(cur);cur=w;}
+  }
+  if(cur)lines.push(cur);
+  if(lines.length>maxLines){
+    const keep=lines.slice(0,maxLines);let last=keep[maxLines-1];
+    while(last.length>1&&ctx.measureText(last+'…').width>maxW)last=last.slice(0,-1);
+    keep[maxLines-1]=last.replace(/[\s,.-]+$/,'')+'…';return keep;
+  }
+  return lines;
+}
+function fitFont(ctx,text,weight,size,min,maxW){
+  do{ctx.font=weight+' '+size+'px '+FONT;if(ctx.measureText(text).width<=maxW)break;size-=2;}while(size>min);
+  return size;
+}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function draw(){
+  const cv=$('cv');const tall=S.size==='status';
+  const W=1080,H=tall?1920:1080;
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  const ctx=cv.getContext('2d');
+  const dark=S.theme==='navy';
+  const C=dark?{bg:'#0a2f6b',ink:'#ffffff',ink2:'#b9c8e6',band:'#06224f',panel:'#ffffff',accent:'#ffd24a',rule:'#28508f',price:'#ffd24a'}
+              :{bg:'#f4f3ef',ink:'#0a2f6b',ink2:'#5b6272',band:'#0a2f6b',panel:'#ffffff',accent:'#d81f26',rule:'#dedbd3',price:'#d81f26'};
+  const M=64;
+  ctx.textBaseline='alphabetic';ctx.textAlign='left';
+  ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);
+
+  /* header band */
+  const hh=tall?190:132;
+  ctx.fillStyle=C.band;ctx.fillRect(0,0,W,hh);
+  ctx.fillStyle='#d81f26';ctx.fillRect(0,hh,W,8);
+  const shop=($('shop').value||DEF.shop).toUpperCase();
+  ctx.fillStyle='#ffffff';
+  fitFont(ctx,shop,'800',tall?76:58,36,W-2*M);
+  ctx.fillText(shop,M,tall?104:74);
+  ctx.fillStyle='#c9d6f0';
+  fitFont(ctx,$('tagline').value,'500',tall?32:26,18,W-2*M);
+  ctx.fillText($('tagline').value,M,tall?152:110);
+
+  /* footer band */
+  const fh=tall?190:128;const fy=H-fh;
+  ctx.fillStyle=C.band;ctx.fillRect(0,fy,W,fh);
+  const phone=$('phone').value.trim();const addr=$('addr').value.trim();
+  ctx.fillStyle='#c9d6f0';ctx.font='600 '+(tall?28:22)+'px '+FONT;
+  if(phone)ctx.fillText('CALL / WHATSAPP',M,fy+(tall?58:40));
+  ctx.fillStyle='#ffffff';
+  if(phone){fitFont(ctx,phone,'800',tall?66:50,30,W-2*M);ctx.fillText(phone,M,fy+(tall?124:90));}
+  if(addr){
+    ctx.fillStyle='#c9d6f0';ctx.font='500 '+(tall?28:22)+'px '+FONT;
+    const pw=phone?(ctx.font='800 '+(tall?66:50)+'px '+FONT,ctx.measureText(phone).width):0;
+    ctx.font='500 '+(tall?28:22)+'px '+FONT;
+    if(tall){ctx.fillText(wrap(ctx,addr,W-2*M,1)[0],M,fy+166);}
+    else{
+      const ax=M+pw+40,aw=W-M-ax;
+      if(aw>260){const ls=wrap(ctx,addr,aw,2);ctx.textAlign='right';ls.forEach((l,i)=>ctx.fillText(l,W-M,fy+(ls.length>1?62:80)+i*30));ctx.textAlign='left';}
+    }
+  }
+
+  /* price block, measured from the bottom up */
+  const mrp=Number($('mrp').value)||0, offer=Number($('offer').value)||0, note=$('note').value.trim();
+  let mode=S.price;
+  if(mode==='offer'&&!(offer>0))mode=mrp>0?'mrp':'none';
+  if(mode==='mrp'&&!(mrp>0))mode='none';
+  const big=tall?128:100, small=tall?40:32;
+  let by=fy-(tall?70:44);
+  if(note){ctx.fillStyle=C.ink2;ctx.font='500 '+(tall?30:24)+'px '+FONT;ctx.fillText(wrap(ctx,note,W-2*M,1)[0],M,by);by-=(tall?54:40);}
+  let priceTop;
+  if(mode==='none'){
+    ctx.fillStyle=C.price;const t='Call for best price';
+    fitFont(ctx,t,'800',tall?92:72,40,W-2*M);ctx.fillText(t,M,by);
+    priceTop=by-(tall?100:80);
+  }else{
+    const main=inr(mode==='offer'?offer:mrp);
+    ctx.fillStyle=C.price;ctx.font='800 '+big+'px '+FONT;ctx.fillText(main,M,by);
+    const mw=ctx.measureText(main).width;
+    if(mode==='offer'&&mrp>offer){
+      const pct=Math.round((1-offer/mrp)*100);
+      if(pct>=1){
+        const t='SAVE '+pct+'%';ctx.font='800 '+(tall?36:28)+'px '+FONT;
+        const tw=ctx.measureText(t).width,ph=tall?64:50,px=M+mw+28,py=by-ph-(tall?14:10);
+        if(px+tw+44<=W-M){ctx.fillStyle=dark?'#ffd24a':'#0a2f6b';rr(ctx,px,py,tw+44,ph,ph/2);ctx.fill();
+          ctx.fillStyle=dark?'#0a2f6b':'#ffffff';ctx.fillText(t,px+22,py+ph-(tall?20:15));}
+      }
+    }
+    const ly=by-big+(tall?6:4);
+    ctx.font='600 '+small+'px '+FONT;ctx.fillStyle=C.ink2;
+    if(mode==='offer'){
+      let x=M;const a='OFFER PRICE';ctx.fillText(a,x,ly);
+      if(mrp>0&&mrp>offer){
+        x+=ctx.measureText(a).width+26;const b='MRP '+inr(mrp);ctx.fillText(b,x,ly);
+        const bw=ctx.measureText(b).width;ctx.strokeStyle=C.ink2;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x-4,ly-small*0.32);ctx.lineTo(x+bw+4,ly-small*0.32);ctx.stroke();
+      }
+    }else{ctx.fillText('MRP',M,ly);}
+    priceTop=ly-small-(tall?26:16);
+  }
+  ctx.strokeStyle=C.rule;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,priceTop);ctx.lineTo(W-M,priceTop);ctx.stroke();
+
+  /* text block above the price: points, sub line, title — measured upward */
+  const pts=$('points').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,tall?4:2);
+  const ps=tall?38:30, pl=tall?56:42;
+  const title=$('title').value.trim()||'Pick a product to begin';
+  const ts=tall?68:52, tl=tall?80:60;
+  ctx.font='800 '+ts+'px '+FONT;const tlines=wrap(ctx,title,W-2*M,tall?3:2);
+  const sub=$('sub').value.trim();const ss=tall?32:25;
+  const textH=tlines.length*tl+(sub?ss+(tall?22:14):0)+(pts.length?pts.length*pl+(tall?22:12):0);
+  const textTop=priceTop-(tall?36:20)-textH;
+
+  /* photo panel fills what is left */
+  const top=hh+8+(tall?46:26);
+  const ph=Math.max(160,textTop-(tall?44:24)-top);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.12)';ctx.shadowBlur=30;ctx.shadowOffsetY=8;
+  ctx.fillStyle=C.panel;rr(ctx,M,top,W-2*M,ph,28);ctx.fill();ctx.restore();
+  const im=S.own||S.img;
+  if(im){
+    const pad=tall?56:34;const bw=W-2*M-2*pad,bh=ph-2*pad;
+    const s=Math.min(bw/im.width,bh/im.height);const w=im.width*s,h=im.height*s;
+    ctx.save();rr(ctx,M,top,W-2*M,ph,28);ctx.clip();
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(im,M+pad+(bw-w)/2,top+pad+(bh-h)/2,w,h);ctx.restore();
+  }else{
+    ctx.fillStyle='#9aa1ae';ctx.font='500 '+(tall?34:28)+'px '+FONT;ctx.textAlign='center';
+    ctx.fillText(S.item?'No photo for this item — add your own':'Product photo',W/2,top+ph/2+10);ctx.textAlign='left';
+  }
+  /* ribbon */
+  const tag=(S.tag||'').toUpperCase();
+  if(tag){
+    ctx.font='800 '+(tall?34:27)+'px '+FONT;const tw=ctx.measureText(tag).width;const rh=tall?66:52;
+    ctx.fillStyle='#d81f26';rr(ctx,M+24,top+24,tw+52,rh,rh/2);ctx.fill();
+    ctx.fillStyle='#ffffff';ctx.fillText(tag,M+50,top+24+rh-(tall?21:17));
+  }
+
+  /* title, sub, points */
+  let y=textTop+ts;
+  ctx.fillStyle=C.ink;ctx.font='800 '+ts+'px '+FONT;
+  tlines.forEach(l=>{ctx.fillText(l,M,y);y+=tl;});
+  y-=tl;
+  if(sub){y+=(tall?22:14)+ss*0.9;ctx.fillStyle=C.ink2;ctx.font='500 '+ss+'px '+FONT;ctx.fillText(wrap(ctx,sub,W-2*M,1)[0],M,y);}
+  if(pts.length){
+    y+=(tall?22:12);
+    pts.forEach(p=>{y+=pl;ctx.fillStyle=C.accent;ctx.beginPath();ctx.arc(M+10,y-ps*0.33,tall?9:7,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=C.ink;ctx.font='500 '+ps+'px '+FONT;ctx.fillText(wrap(ctx,p,W-2*M-44,1)[0],M+38,y);});
+  }
+}
+
+/* ---------- caption ---------- */
+function buildCaption(){
+  const L=[];const title=$('title').value.trim();if(title)L.push('*'+title+'*');
+  const pts=$('points').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,4);
+  pts.forEach(p=>L.push('• '+p));
+  const mrp=Number($('mrp').value)||0, offer=Number($('offer').value)||0;
+  if(S.price==='offer'&&offer>0){L.push('');if(mrp>offer)L.push('MRP '+inr(mrp));L.push('Offer price *'+inr(offer)+'*');}
+  else if(S.price!=='none'&&mrp>0){L.push('');L.push('MRP *'+inr(mrp)+'*');}
+  else{L.push('');L.push('Call for best price');}
+  const note=$('note').value.trim();if(note)L.push(note);
+  L.push('');
+  const shop=$('shop').value.trim(),tg=$('tagline').value.trim(),ph=$('phone').value.trim(),ad=$('addr').value.trim();
+  if(shop)L.push(shop+(tg?' — '+tg:''));
+  if(ad)L.push(ad);
+  if(ph)L.push('Call / WhatsApp: '+ph);
+  return L.join('\n');
+}
+let capTouched=false;
+function refresh(){
+  draw();
+  if(!capTouched)$('caption').value=buildCaption();
+  $('waText').href='https://wa.me/?text='+encodeURIComponent($('caption').value);
+  const im=S.own||S.img;
+  $('lowres').style.display=(im&&!S.own&&Math.max(im.width,im.height)<500)?'block':'none';
+  $('clearPhoto').style.display=S.own?'inline-block':'none';
+}
+
+/* ---------- save and share ---------- */
+function fileName(){
+  const c=S.item?String(S.item.code).replace(/[^A-Za-z0-9]+/g,'-'):'product';
+  return 'smarthub-'+c+'-'+S.size+'.png';
+}
+function toBlob(){return new Promise(res=>$('cv').toBlob(b=>res(b),'image/png'));}
+async function save(){
+  const b=await toBlob();if(!b){toast('Could not make the picture');return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fileName();document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);toast('Picture saved');
+}
+async function share(){
+  const b=await toBlob();if(!b)return;
+  const f=new File([b],fileName(),{type:'image/png'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:$('caption').value});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  save();toast('Sharing is not available here — picture saved instead');
+}
+(function(){
+  let ok=false;try{ok=!!(navigator.canShare&&navigator.canShare({files:[new File([''],'a.png',{type:'image/png'})]}));}catch(e){}
+  $('shareHint').textContent=ok?'Share opens your phone’s share sheet — choose WhatsApp, then Status or a chat.'
+    :'On this device, use Save picture and attach it in WhatsApp. On a phone, Share sends it straight to WhatsApp.';
+})();
+
+/* ---------- wiring ---------- */
+function seg(id,key,after){
+  const box=$(id);
+  const paint=()=>box.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[key]));
+  box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{S[key]=b.dataset.v;store(key,S[key]);paint();if(after)after();refresh();}));
+  paint();return paint;
+}
+['size','theme','price'].forEach(k=>{S[k]=load(k,S[k]);});
+seg('sizeSeg','size');seg('themeSeg','theme');seg('priceSeg','price');
+const paintTag=seg('tagSeg','tag',()=>{$('tag').value='';});
+$('tag').addEventListener('input',()=>{S.tag=$('tag').value.trim();paintTag();refresh();});
+['shop','tagline','phone','addr'].forEach(k=>{$(k).value=load(k,DEF[k]);$(k).addEventListener('input',()=>{store(k,$(k).value);refresh();});});
+['title','sub','points','mrp','offer','note'].forEach(k=>$(k).addEventListener('input',refresh));
+$('caption').addEventListener('input',()=>{capTouched=$('caption').value.trim()!=='';$('waText').href='https://wa.me/?text='+encodeURIComponent($('caption').value);});
+$('q').addEventListener('input',renderResults);
+$('photo').addEventListener('change',async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const url=URL.createObjectURL(f);const im=await loadImage(url);
+  if(!im){toast('That file is not a picture');return;}
+  S.own=im;refresh();
+});
+$('clearPhoto').addEventListener('click',()=>{S.own=null;$('photo').value='';refresh();});
+$('save').addEventListener('click',save);
+$('share').addEventListener('click',share);
+$('copyCap').addEventListener('click',async()=>{
+  const t=$('caption').value;
+  try{await navigator.clipboard.writeText(t);toast('Caption copied');}
+  catch(e){$('caption').select();try{document.execCommand('copy');toast('Caption copied');}catch(e2){toast('Select the text and copy it');}}
+});
+renderResults();refresh();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>
