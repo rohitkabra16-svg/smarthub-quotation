@@ -882,7 +882,7 @@ function imgFor(x){
     if(D[x.code])return D[x.code];
     if(D[stem])return D[stem];
   }
-  if(x.source==='light'||x.source==='pro')return litImg(x);
+  if(x.source==='light'||x.source==='pro'||x.source==='welkm')return litImg(x);
   if(x.source!=='ewa')return '';
   const t0=(x.name+' '+(x.category||'')).toLowerCase();
   /* Flat modules look nothing like the rocker on a plate photo, and the difference
